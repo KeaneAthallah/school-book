@@ -1,0 +1,138 @@
+@extends('layouts.app')
+
+@section('title', isset($order) ? 'Ubah Pesanan '.$order['number'] : 'Buat Pesanan')
+
+@section('content')
+    @php
+        $editing = isset($order);
+        $blank = ['book_id' => '', 'quantity' => 1, 'unit_price' => '', 'discount_amount' => '0'];
+        $items = $editing
+            ? collect($order['items'])->map(fn (array $item): array => [
+                'book_id' => (string) $item['book_id'],
+                'quantity' => $item['quantity'],
+                'unit_price' => $item['unit_price'],
+                'discount_amount' => $item['discount_amount'],
+            ])->all()
+            : [$blank];
+    @endphp
+
+    <x-page-header
+        :title="$editing ? 'Ubah Pesanan '.$order['number'] : 'Buat Pesanan'"
+        subtitle="Pilih sekolah, sumber pesanan, dan item buku."
+    >
+        <x-slot:actions>
+            <x-button :href="route('orders.index')" variant="secondary">Kembali</x-button>
+        </x-slot:actions>
+    </x-page-header>
+
+    <form
+        method="POST"
+        action="{{ $editing ? route('orders.update', $order['id']) : route('orders.store') }}"
+        class="space-y-4"
+    >
+        @csrf
+        @if ($editing)
+            @method('PUT')
+        @endif
+
+        <x-card>
+            <x-card-header title="Informasi Pesanan" icon="cart" />
+
+            <div class="grid gap-3 p-4 sm:grid-cols-2 lg:grid-cols-3">
+                <x-field label="Tanggal" name="order_date" required>
+                    <x-input type="date" name="order_date" value="{{ old('order_date', $editing ? $order['order_date'] : $defaultDate) }}" :invalid="$errors->has('order_date')" />
+                </x-field>
+
+                <x-field label="Sekolah" name="school_id" required>
+                    <x-select name="school_id" :invalid="$errors->has('school_id')">
+                        <option value="">— Pilih Sekolah —</option>
+                        @foreach ($schools as $option)
+                            <option value="{{ $option['value'] }}" @selected((string) old('school_id', $editing ? $order['school_id'] : '') === (string) $option['value'])>{{ $option['label'] }}</option>
+                        @endforeach
+                    </x-select>
+                </x-field>
+
+                <x-field label="Sumber Pesanan" name="order_source_id" required>
+                    <x-select name="order_source_id" :invalid="$errors->has('order_source_id')">
+                        <option value="">— Pilih Sumber —</option>
+                        @foreach ($sources as $option)
+                            <option value="{{ $option['value'] }}" @selected((string) old('order_source_id', $editing ? $order['order_source_id'] : '') === (string) $option['value'])>{{ $option['label'] }}</option>
+                        @endforeach
+                    </x-select>
+                </x-field>
+
+                <x-field label="Referensi Eksternal" name="external_reference" hint="Opsional, untuk pesanan hasil impor.">
+                    <x-input name="external_reference" value="{{ old('external_reference', $editing ? $order['external_reference'] : '') }}" :invalid="$errors->has('external_reference')" />
+                </x-field>
+
+                <x-field label="Diskon Pesanan" name="discount_amount">
+                    <x-input type="number" step="any" name="discount_amount" value="{{ old('discount_amount', $editing ? $order['discount_amount'] : '0') }}" :invalid="$errors->has('discount_amount')" />
+                </x-field>
+
+                <x-field label="Catatan" name="notes" class="sm:col-span-2 lg:col-span-3">
+                    <x-textarea name="notes" rows="2">{{ old('notes', $editing ? $order['notes'] : '') }}</x-textarea>
+                </x-field>
+            </div>
+        </x-card>
+
+        <x-card x-data="lineItems({{ json_encode(['books' => $books, 'items' => $items, 'blank' => $blank]) }})">
+            <x-card-header title="Item Pesanan" icon="boxes">
+                <x-slot:action>
+                    <x-button type="button" variant="secondary" size="sm" x-on:click="add()">Tambah Item</x-button>
+                </x-slot:action>
+            </x-card-header>
+
+            <div class="space-y-3 p-4">
+                @error('items')
+                    <p class="text-xs text-rose-600 dark:text-rose-400">{{ $message }}</p>
+                @enderror
+
+                <template x-for="(item, index) in items" :key="index">
+                    <div class="grid gap-2 rounded-control border border-line p-3 sm:grid-cols-[2fr_1fr_1fr_1fr_auto]">
+                        <x-field label="Buku">
+                            <select
+                                :name="`items[${index}][book_id]`"
+                                x-model="item.book_id"
+                                x-on:change="pick(index)"
+                                class="w-full rounded-control border border-line-strong bg-panel px-3 py-2 text-sm text-ink outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-100 dark:focus:ring-brand-500/25"
+                            >
+                                <option value="">— Pilih Buku —</option>
+                                <template x-for="book in books" :key="book.value">
+                                    <option :value="book.value" x-text="book.label" :selected="String(item.book_id) === String(book.value)"></option>
+                                </template>
+                            </select>
+                        </x-field>
+
+                        <x-field label="Qty">
+                            <x-input type="number" min="1" x-model="item.quantity" x-bind:name="`items[${index}][quantity]`" />
+                        </x-field>
+
+                        <x-field label="Harga">
+                            <x-input type="number" step="any" x-model="item.unit_price" x-bind:name="`items[${index}][unit_price]`" />
+                        </x-field>
+
+                        <x-field label="Diskon">
+                            <x-input type="number" step="any" x-model="item.discount_amount" x-bind:name="`items[${index}][discount_amount]`" />
+                        </x-field>
+
+                        <div class="flex items-end">
+                            <x-button type="button" variant="ghost" size="sm" x-on:click="remove(index)" x-bind:disabled="items.length === 1">Hapus</x-button>
+                        </div>
+                    </div>
+                </template>
+            </div>
+        </x-card>
+
+        <x-card>
+            <div class="flex flex-wrap items-center justify-between gap-3 p-4">
+                <p class="text-sm text-ink-soft">
+                    Subtotal: <span class="font-medium text-ink" x-text="money(subtotal())"></span>
+                </p>
+                <div class="flex gap-2">
+                    <x-button :href="route('orders.index')" variant="secondary">Batal</x-button>
+                    <x-button type="submit">Simpan Pesanan</x-button>
+                </div>
+            </div>
+        </x-card>
+    </form>
+@endsection

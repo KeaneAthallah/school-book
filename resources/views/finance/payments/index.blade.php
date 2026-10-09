@@ -1,0 +1,117 @@
+@extends('layouts.app')
+
+@section('title', 'Pembayaran')
+
+@section('content')
+    @php
+        use App\Support\Format;
+    @endphp
+
+    <x-page-header
+        title="Pembayaran"
+        subtitle="Pencatatan dan verifikasi pembayaran sekolah."
+    >
+        <x-slot:actions>
+            @if ($can['manage'])
+                <x-button x-on:click="$dispatch('open-modal', 'record-payment')">Catat Pembayaran</x-button>
+            @endif
+        </x-slot:actions>
+    </x-page-header>
+
+    <x-card>
+        <x-filter-bar method="get" :action="route('payments.index')">
+            <x-field label="Cari" class="w-60">
+                <x-input type="search" name="search" value="{{ $filters['search'] }}" placeholder="Nomor / sekolah / referensi" />
+            </x-field>
+            <x-button type="submit" variant="secondary">Cari</x-button>
+        </x-filter-bar>
+
+        <x-data-table
+            empty="Belum ada pembayaran."
+            empty-icon="wallet"
+            :rows="$payments"
+            :columns="[
+                ['key' => 'number', 'label' => 'No. Pembayaran'],
+                ['key' => 'payment_date', 'label' => 'Tanggal', 'type' => 'date'],
+                ['key' => 'school', 'label' => 'Sekolah'],
+                ['key' => 'method', 'label' => 'Metode'],
+                ['key' => 'reference', 'label' => 'Referensi'],
+                ['key' => 'amount', 'label' => 'Jumlah', 'type' => 'currency', 'align' => 'right'],
+                ['key' => 'allocated_amount', 'label' => 'Dialokasikan', 'type' => 'currency', 'align' => 'right'],
+                ['key' => 'status', 'label' => 'Status', 'view' => 'components.status-label'],
+                ['label' => 'Aksi', 'view' => 'finance.payments.partials.actions', 'align' => 'right'],
+            ]"
+        />
+    </x-card>
+
+    <div class="mt-3">{{ $payments->links() }}</div>
+
+    @if ($can['manage'])
+        <x-modal name="record-payment" title="Catat Pembayaran" wide>
+            <form method="POST" action="{{ route('payments.store') }}" class="space-y-3" x-data="{ useInvoice: false }">
+                @csrf
+
+                <div class="grid gap-3 sm:grid-cols-2">
+                    <x-field label="Sekolah" name="school_id" required>
+                        <x-select name="school_id" :invalid="$errors->has('school_id')">
+                            <option value="">— Pilih —</option>
+                            @foreach ($schools as $option)
+                                <option value="{{ $option['value'] }}" @selected(old('school_id') == $option['value'])>{{ $option['label'] }}</option>
+                            @endforeach
+                        </x-select>
+                    </x-field>
+
+                    <x-field label="Tanggal" name="payment_date" required>
+                        <x-input type="date" name="payment_date" value="{{ old('payment_date', now()->toDateString()) }}" :invalid="$errors->has('payment_date')" />
+                    </x-field>
+
+                    <x-field label="Jumlah" name="amount" required>
+                        <x-input type="number" step="any" name="amount" value="{{ old('amount') }}" :invalid="$errors->has('amount')" />
+                    </x-field>
+
+                    <x-field label="Metode" name="payment_method_id">
+                        <x-select name="payment_method_id">
+                            <option value="">— Pilih —</option>
+                            @foreach ($methods as $option)
+                                <option value="{{ $option['value'] }}" @selected(old('payment_method_id') == $option['value'])>{{ $option['label'] }}</option>
+                            @endforeach
+                        </x-select>
+                    </x-field>
+
+                    <x-field label="Referensi" name="reference">
+                        <x-input name="reference" value="{{ old('reference') }}" />
+                    </x-field>
+
+                    <x-field label="Catatan" name="notes" class="sm:col-span-2">
+                        <x-textarea name="notes" rows="2">{{ old('notes') }}</x-textarea>
+                    </x-field>
+                </div>
+
+                <label class="flex items-center gap-2 text-sm text-ink-soft">
+                    <input type="checkbox" x-model="useInvoice" class="rounded border-line-strong bg-panel text-brand-600 focus:ring-brand-500" />
+                    Alokasikan ke invoice tertentu
+                </label>
+
+                <div x-show="useInvoice" x-cloak class="grid gap-3 sm:grid-cols-2">
+                    <x-field label="Invoice" name="allocations.0.invoice_id">
+                        <x-select name="allocations[0][invoice_id]" x-bind:disabled="! useInvoice">
+                            <option value="">— Pilih Invoice —</option>
+                            @foreach ($openInvoices as $option)
+                                <option value="{{ $option['value'] }}">{{ $option['label'] }} — sisa {{ Format::idr($option['outstanding']) }}</option>
+                            @endforeach
+                        </x-select>
+                    </x-field>
+
+                    <x-field label="Jumlah alokasi" name="allocations.0.amount" hint="Kosongkan untuk memakai jumlah pembayaran.">
+                        <x-input type="number" step="any" name="allocations[0][amount]" x-bind:disabled="! useInvoice" />
+                    </x-field>
+                </div>
+
+                <div class="flex justify-end gap-2 pt-1">
+                    <x-button type="button" variant="secondary" x-on:click="$dispatch('close-modal', 'record-payment')">Batal</x-button>
+                    <x-button type="submit">Simpan</x-button>
+                </div>
+            </form>
+        </x-modal>
+    @endif
+@endsection

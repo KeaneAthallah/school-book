@@ -1,0 +1,131 @@
+@import 'tailwindcss';
+
+@source '../views';
+@source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
+
+/*
+ | Manual theme selection: `dark:` utilities apply whenever an ancestor (or the
+ | root element) carries data-theme="dark". The resolved theme is written to
+ | <html data-theme> by the boot script in the layout.
+ */
+@custom-variant dark (&:where([data-theme='dark'], [data-theme='dark'] *));
+
+@theme {
+    --font-sans:
+        'Instrument Sans', ui-sans-serif, system-ui, sans-serif,
+        'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol',
+        'Noto Color Emoji';
+
+    /* Sidebar / dark chrome palette (identical in both themes) */
+    --color-navy-950: #070d1b;
+    --color-navy-900: #0e1729;
+    --color-navy-850: #131e35;
+    --color-navy-800: #17233f;
+    --color-navy-700: #1f2d4d;
+    --color-navy-600: #2b3d63;
+    --color-navy-500: #3d5480;
+    --color-navy-400: #5b74a3;
+    --color-navy-300: #8fa3c8;
+    --color-navy-200: #b9c6de;
+
+    /* Brand blue */
+    --color-brand-50: #eff5ff;
+    --color-brand-100: #dbe8ff;
+    --color-brand-200: #bfd5ff;
+    --color-brand-300: #93b4fd;
+    --color-brand-400: #5b8dfa;
+    --color-brand-500: #3b76f6;
+    --color-brand-600: #2560e8;
+    --color-brand-700: #1d4bc4;
+
+    /* Layout tokens */
+    --spacing-sidebar: 16rem;
+    --spacing-header: 3.75rem;
+
+    --radius-control: 0.625rem;
+    --radius-card: 0.875rem;
+
+    --shadow-card:
+        0 1px 2px rgb(15 23 42 / 0.05), 0 1px 3px rgb(15 23 42 / 0.08);
+    --shadow-pop:
+        0 10px 30px rgb(15 23 42 / 0.12), 0 2px 8px rgb(15 23 42 / 0.06);
+}
+
+/*
+ | Semantic surface tokens. These are declared as plain CSS variables per
+ | theme and exposed to Tailwind as utilities (bg-panel, text-ink, ...).
+ */
+@theme inline {
+    --color-canvas: var(--t-canvas);
+    --color-panel: var(--t-panel);
+    --color-panel-soft: var(--t-panel-soft);
+    --color-line: var(--t-line);
+    --color-line-strong: var(--t-line-strong);
+    --color-ink: var(--t-ink);
+    --color-ink-soft: var(--t-ink-soft);
+    --color-ink-muted: var(--t-ink-muted);
+}
+
+:root,
+[data-theme='light'] {
+    color-scheme: light;
+
+    --t-canvas: #f4f6fb;
+    --t-panel: #ffffff;
+    --t-panel-soft: #f8fafc;
+    --t-line: #e2e8f0;
+    --t-line-strong: #cbd5e1;
+    --t-ink: #0f172a;
+    --t-ink-soft: #475569;
+    --t-ink-muted: #94a3b8;
+}
+
+[data-theme='dark'] {
+    color-scheme: dark;
+
+    --t-canvas: #0a1120;
+    --t-panel: #111a2e;
+    --t-panel-soft: #162034;
+    --t-line: #22304c;
+    --t-line-strong: #32405e;
+    --t-ink: #e8edf7;
+    --t-ink-soft: #a9b6cd;
+    --t-ink-muted: #7686a3;
+}
+
+@layer base {
+    html {
+        -webkit-text-size-adjust: 100%;
+    }
+
+    body {
+        background-color: var(--t-canvas);
+        color: var(--t-ink);
+    }
+
+    :focus-visible {
+        outline: 2px solid var(--color-brand-500);
+        outline-offset: 2px;
+    }
+
+    /* Thin, unobtrusive scrollbars inside scrollable panels */
+    .scroll-slim {
+        scrollbar-width: thin;
+        scrollbar-color: var(--t-line-strong) transparent;
+    }
+
+    /* Alpine: hide elements until the component is initialised */
+    [x-cloak] {
+        display: none !important;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+        *,
+        *::before,
+        *::after {
+            animation-duration: 0.01ms !important;
+            animation-iteration-count: 1 !important;
+            transition-duration: 0.01ms !important;
+        }
+    }
+}
