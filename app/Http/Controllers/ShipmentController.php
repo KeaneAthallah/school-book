@@ -230,6 +230,7 @@ class ShipmentController extends Controller
                 'name' => Setting::value('company.name', config('app.name')),
                 'address' => Setting::value('company.address', ''),
                 'phone' => Setting::value('company.phone', ''),
+                'email' => Setting::value('company.email', ''),
             ],
         ]);
     }

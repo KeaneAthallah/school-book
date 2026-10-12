@@ -76,6 +76,7 @@
         ['kind' => 'link', 'label' => 'Laporan', 'icon' => 'chart', 'route' => 'reports.index', 'match' => 'reports.*', 'permission' => 'reports.view'],
 
         ['kind' => 'group', 'label' => 'Pengaturan', 'icon' => 'settings', 'items' => [
+            ['label' => 'Profil Perusahaan', 'route' => 'settings.company.edit', 'match' => 'settings.company.*', 'permission' => 'settings.manage'],
             ['label' => 'Pengguna', 'route' => 'users.index', 'match' => 'users.*', 'permission' => 'users.view'],
             ['label' => 'Jabatan & Role', 'route' => 'roles.index', 'match' => 'roles.*', 'permission' => 'roles.manage'],
             ['label' => 'Integrasi & Import', 'route' => 'integrations.index', 'match' => 'integrations.*', 'permission' => 'integrations.view'],

@@ -18,7 +18,7 @@
     </x-page-header>
 
     <x-card>
-        <form method="POST" action="{{ $action }}">
+        <form method="POST" action="{{ $action }}" enctype="multipart/form-data">
             @csrf
             @if ($isEdit)
                 @method('PUT')

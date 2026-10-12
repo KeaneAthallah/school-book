@@ -38,6 +38,19 @@
                     />
                     Ya
                 </label>
+            @elseif (($field['type'] ?? 'text') === 'file')
+                @if (! empty($value))
+                    <span class="mb-1.5 block">
+                        <img src="{{ Storage::url((string) $value) }}" alt="{{ $field['label'] }}" loading="lazy" class="h-14 w-14 rounded-control border border-line object-cover" />
+                    </span>
+                @endif
+                <input
+                    type="file"
+                    name="{{ $name }}"
+                    accept="image/jpeg,image/png,image/webp"
+                    aria-label="{{ $field['label'] }}"
+                    class="w-full rounded-control border border-line bg-canvas px-2.5 py-1.5 text-xs text-ink file:mr-1.5 file:rounded-control file:border-0 file:bg-brand-600 file:px-2 file:py-1 file:text-xs file:font-medium file:text-white"
+                />
             @else
                 <x-input
                     type="{{ ($field['type'] ?? 'text') === 'number' ? 'number' : ($field['type'] ?? 'text') }}"

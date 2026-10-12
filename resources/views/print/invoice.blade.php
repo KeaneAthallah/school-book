@@ -38,6 +38,9 @@
             <h1>{{ $company['name'] }}</h1>
             <p>{{ $company['address'] }}</p>
             <p>{{ $company['phone'] }}</p>
+            @if (! empty($company['email']))
+                <p>{{ $company['email'] }}</p>
+            @endif
         </div>
         <div class="doc">
             <h2>INVOICE</h2>

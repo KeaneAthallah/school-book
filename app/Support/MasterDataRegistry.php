@@ -18,6 +18,8 @@ use App\Models\ShippingMethod;
 use App\Models\User;
 use App\Models\Warehouse;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
 
@@ -164,13 +166,29 @@ class MasterDataRegistry
                 ['name' => 'phone', 'label' => 'Telepon', 'type' => 'text'],
                 ['name' => 'email', 'label' => 'Email', 'type' => 'email'],
                 ['name' => 'address', 'label' => 'Alamat', 'type' => 'textarea'],
+                ['name' => 'logo', 'label' => 'Logo', 'type' => 'file', 'hint' => 'JPEG, PNG, atau WebP · maksimal 5 MB'],
                 ['name' => 'status', 'label' => 'Status', 'type' => 'select', 'options' => [['value' => 'active', 'label' => 'Aktif'], ['value' => 'inactive', 'label' => 'Nonaktif']]],
             ],
             'rules' => fn (?Model $model): array => [
                 'name' => ['required', 'string', 'max:255'],
                 'email' => ['nullable', 'email', 'max:255'],
+                'logo' => ['nullable', 'file', 'image', 'mimes:jpeg,jpg,png,webp', 'max:5120'],
                 'status' => ['required', Rule::in(['active', 'inactive'])],
             ],
+            'prepare' => function (Model $model, array $attributes): array {
+                $file = $attributes['logo'] ?? null;
+
+                if ($file instanceof UploadedFile) {
+                    $old = $model->getAttribute('logo');
+                    $attributes['logo'] = $file->store('publishers', 'public');
+
+                    if (is_string($old) && $old !== '') {
+                        Storage::disk('public')->delete($old);
+                    }
+                }
+
+                return $attributes;
+            },
         ];
     }
 

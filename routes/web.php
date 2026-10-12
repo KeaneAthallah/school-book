@@ -18,6 +18,7 @@ use App\Http\Controllers\ReceivableController;
 use App\Http\Controllers\ReportController;
 use App\Http\Controllers\RoleController;
 use App\Http\Controllers\SearchController;
+use App\Http\Controllers\SettingsController;
 use App\Http\Controllers\ShipmentController;
 use App\Http\Controllers\StockController;
 use App\Http\Controllers\UserController;
@@ -118,6 +119,8 @@ Route::middleware('auth')->group(function (): void {
     Route::get('reports/export', [ReportController::class, 'export'])->name('reports.export');
 
     // Settings.
+    Route::get('settings/company', [SettingsController::class, 'editCompany'])->name('settings.company.edit');
+    Route::put('settings/company', [SettingsController::class, 'updateCompany'])->name('settings.company.update');
     Route::get('settings/users', [UserController::class, 'index'])->name('users.index');
     Route::post('settings/users', [UserController::class, 'store'])->name('users.store');
     Route::put('settings/users/{user}', [UserController::class, 'update'])->name('users.update');
