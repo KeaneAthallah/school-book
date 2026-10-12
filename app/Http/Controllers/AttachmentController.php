@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Attachment;
+use App\Models\Invoice;
 use App\Models\Shipment;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -12,13 +13,16 @@ class AttachmentController extends Controller
 {
     public function destroy(Request $request, Attachment $attachment): RedirectResponse
     {
-        abort_unless($this->userCan($request, 'shipments.manage'), 403);
+        abort_if(! in_array($attachment->attachable_type, [Shipment::class, Invoice::class], true), 404);
 
-        abort_if($attachment->attachable_type !== Shipment::class, 404);
+        $permission = $attachment->attachable_type === Invoice::class ? 'invoices.manage' : 'shipments.manage';
+        abort_unless($this->userCan($request, $permission), 403);
 
         Storage::disk('public')->delete($attachment->path);
         $attachment->delete();
 
-        return back()->with('success', 'Bukti foto pengiriman dihapus.');
+        return back()->with('success', $attachment->attachable_type === Invoice::class
+            ? 'Bukti foto pembayaran dihapus.'
+            : 'Bukti foto pengiriman dihapus.');
     }
 }

@@ -11,6 +11,7 @@ use App\Services\InvoiceService;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\View\View;
 
 class InvoiceController extends Controller
@@ -101,9 +102,17 @@ class InvoiceController extends Controller
                     'status' => $allocation->payment?->status->value,
                     'status_label' => $allocation->payment?->status->label(),
                 ])->all(),
+                'attachments' => $invoice->attachments()->orderByDesc('id')->get()->map(fn ($attachment): array => [
+                    'id' => $attachment->getKey(),
+                    'name' => $attachment->original_name,
+                    'url' => Storage::url($attachment->path),
+                    'time' => $attachment->created_at?->toDateTimeString(),
+                ])->all(),
             ],
             'can' => [
                 'cancel' => ($this->userCan($request, 'invoices.manage')) && $invoice->paid_amount === '0.00',
+                'upload_proof' => $this->userCan($request, 'invoices.manage'),
+                'manage_attachments' => $this->userCan($request, 'invoices.manage'),
             ],
         ]);
     }
@@ -135,6 +144,33 @@ class InvoiceController extends Controller
         $service->cancel($invoice, $request->user());
 
         return back()->with('success', 'Invoice '.$invoice->number.' dibatalkan.');
+    }
+
+    public function storePaymentProof(Request $request, Invoice $invoice): RedirectResponse
+    {
+        abort_unless($this->userCan($request, 'invoices.manage'), 403);
+
+        $request->validate([
+            'photo' => ['required', 'file', 'image', 'mimes:jpeg,jpg,png,webp', 'max:5120'],
+        ], [
+            'photo.required' => 'Bukti foto pembayaran wajib dilampirkan.',
+            'photo.image' => 'Bukti pembayaran harus berupa gambar (JPEG, PNG, atau WebP).',
+            'photo.mimes' => 'Bukti pembayaran harus berupa gambar (JPEG, PNG, atau WebP).',
+            'photo.max' => 'Bukti pembayaran maksimal 5 MB.',
+        ]);
+
+        $photo = $request->file('photo');
+        $path = $photo->store('invoices/'.$invoice->id, 'public');
+
+        $invoice->attachments()->create([
+            'original_name' => $photo->getClientOriginalName(),
+            'path' => $path,
+            'mime_type' => $photo->getMimeType(),
+            'size' => $photo->getSize(),
+            'uploaded_by' => $request->user()?->getKey(),
+        ]);
+
+        return back()->with('success', 'Bukti foto pembayaran ditambahkan.');
     }
 
     public function print(Request $request, Invoice $invoice): View

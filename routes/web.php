@@ -95,6 +95,7 @@ Route::middleware('auth')->group(function (): void {
     Route::get('invoices/{invoice}', [InvoiceController::class, 'show'])->name('invoices.show');
     Route::post('invoices/{invoice}/cancel', [InvoiceController::class, 'cancel'])->name('invoices.cancel');
     Route::get('invoices/{invoice}/print', [InvoiceController::class, 'print'])->name('invoices.print');
+    Route::post('invoices/{invoice}/attachments', [InvoiceController::class, 'storePaymentProof'])->name('invoices.attachments.store');
 
     // Piutang (receivables).
     Route::get('receivables', [ReceivableController::class, 'index'])->name('receivables.index');

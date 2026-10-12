@@ -37,7 +37,7 @@
         <div class="w-full max-w-sm">
             <div class="mb-5 flex items-center justify-center gap-2.5">
                 <span class="flex h-10 w-10 shrink-0 items-center justify-center overflow-hidden rounded-control bg-brand-600">
-                    <img src="{{ asset('logo-mark.png') }}" alt="{{ config('app.name') }}" class="h-10 w-10 object-cover">
+                    <img src="{{ asset('logo.png') }}" alt="{{ config('app.name') }}" class="h-10 w-10 object-cover">
                 </span>
                 <div>
                     <p class="text-sm font-semibold text-ink">{{ config('app.name') }}</p>

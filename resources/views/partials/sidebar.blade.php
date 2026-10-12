@@ -122,8 +122,8 @@
 
 <div class="flex h-full flex-col bg-navy-900">
     <div class="flex h-header items-center gap-2.5 px-4">
-        <span class="flex h-9 w-9 shrink-0 items-center justify-center overflow-hidden rounded-control bg-brand-600">
-            <img src="{{ asset('logo-mark.png') }}" alt="{{ config('app.name') }}" class="h-9 w-9 object-cover">
+        <span class="flex h-10 w-10 shrink-0 items-center justify-center overflow-hidden rounded-control bg-brand-600">
+            <img src="{{ asset('logo.png') }}" alt="{{ config('app.name') }}" class="h-10 w-10 object-cover">
         </span>
         <div class="min-w-0">
             <p class="truncate text-sm font-semibold text-white">{{ config('app.name') }}</p>
