@@ -6,9 +6,9 @@ use App\Enums\OrderStatus;
 use App\Enums\ShipmentStatus;
 use App\Models\Courier;
 use App\Models\Order;
-use App\Models\Setting;
 use App\Models\Shipment;
 use App\Models\ShippingMethod;
+use App\Services\PrintHeaderService;
 use App\Services\ShipmentService;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\RedirectResponse;
@@ -218,7 +218,7 @@ class ShipmentController extends Controller
         return back()->with('success', 'Pengiriman ditandai diterima.');
     }
 
-    public function print(Request $request, Shipment $shipment): View
+    public function print(Request $request, Shipment $shipment, PrintHeaderService $headers): View
     {
         abort_unless($this->userCan($request, 'shipments.view'), 403);
 
@@ -226,12 +226,7 @@ class ShipmentController extends Controller
 
         return view('print.delivery-note', [
             'shipment' => $shipment,
-            'company' => [
-                'name' => Setting::value('company.name', config('app.name')),
-                'address' => Setting::value('company.address', ''),
-                'phone' => Setting::value('company.phone', ''),
-                'email' => Setting::value('company.email', ''),
-            ],
+            'company' => $headers->resolve(),
         ]);
     }
 

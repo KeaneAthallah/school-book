@@ -5,9 +5,9 @@ namespace App\Http\Controllers;
 use App\Enums\InvoicePaymentStatus;
 use App\Models\Invoice;
 use App\Models\Order;
-use App\Models\Setting;
 use App\Models\Shipment;
 use App\Services\InvoiceService;
+use App\Services\PrintHeaderService;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -173,7 +173,7 @@ class InvoiceController extends Controller
         return back()->with('success', 'Bukti foto pembayaran ditambahkan.');
     }
 
-    public function print(Request $request, Invoice $invoice): View
+    public function print(Request $request, Invoice $invoice, PrintHeaderService $headers): View
     {
         abort_unless($this->userCan($request, 'invoices.view'), 403);
 
@@ -181,12 +181,7 @@ class InvoiceController extends Controller
 
         return view('print.invoice', [
             'invoice' => $invoice,
-            'company' => [
-                'name' => Setting::value('company.name', config('app.name')),
-                'address' => Setting::value('company.address', ''),
-                'phone' => Setting::value('company.phone', ''),
-                'email' => Setting::value('company.email', ''),
-            ],
+            'company' => $headers->resolve(),
         ]);
     }
 }

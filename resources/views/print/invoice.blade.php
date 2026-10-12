@@ -35,6 +35,9 @@
 
     <div class="header">
         <div class="company">
+            @if (! empty($company['logo']))
+                <img src="{{ $company['logo'] }}" alt="{{ $company['name'] }}" style="max-height: 52px; margin-bottom: 6px;" />
+            @endif
             <h1>{{ $company['name'] }}</h1>
             <p>{{ $company['address'] }}</p>
             <p>{{ $company['phone'] }}</p>
