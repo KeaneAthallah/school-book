@@ -65,7 +65,7 @@ class InvoiceController extends Controller
     {
         abort_unless($this->userCan($request, 'invoices.view'), 403);
 
-        $invoice->load(['school:id,name,npsn,address', 'order:id,number', 'shipment:id,number', 'items.book:id,code,title', 'allocations.payment']);
+        $invoice->load(['school:id,name,npsn,address', 'order:id,number', 'shipment:id,number', 'items.product:id,code,title', 'allocations.payment']);
 
         return view('finance.invoices.show', [
             'invoice' => [
@@ -141,7 +141,7 @@ class InvoiceController extends Controller
     {
         abort_unless($this->userCan($request, 'invoices.view'), 403);
 
-        $invoice->load(['school', 'items.book', 'order']);
+        $invoice->load(['school', 'items.product', 'order']);
 
         return view('print.invoice', [
             'invoice' => $invoice,

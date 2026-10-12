@@ -6,8 +6,10 @@ use App\Enums\OrderSourceType;
 use App\Models\Book;
 use App\Models\BookCategory;
 use App\Models\Courier as CourierModel;
+use App\Models\Goods;
 use App\Models\OrderSource;
 use App\Models\PaymentMethod;
+use App\Models\Product;
 use App\Models\Publisher;
 use App\Models\RebateRule;
 use App\Models\School;
@@ -38,6 +40,7 @@ class MasterDataRegistry
             'publishers' => self::publishers(),
             'categories' => self::categories(),
             'books' => self::books(),
+            'barang-lainnya' => self::goods(),
             'warehouses' => self::warehouses(),
             'order-sources' => self::orderSources(),
             'couriers' => self::couriers(),
@@ -89,6 +92,10 @@ class MasterDataRegistry
             'fields' => [],
             'rules' => fn (?Model $model): array => [],
             'prepare' => null,
+            'scope' => null,
+            'joins' => [],
+            'values' => null,
+            'save' => null,
         ];
     }
 
@@ -203,18 +210,20 @@ class MasterDataRegistry
     {
         return [
             ...self::base('Buku', Book::class, 'books.view', 'books.manage'),
-            'with' => ['publisher:id,name', 'category:id,name'],
-            'search' => ['code', 'title', 'isbn'],
-            'sort' => 'title',
+            'with' => ['product', 'publisher:id,name', 'category:id,name'],
+            'scope' => fn ($query) => $query->whereHas('product', fn ($q) => $q->where('type', 'book')),
+            'joins' => [['products', 'products.id', '=', 'books.product_id']],
+            'search' => ['products.code', 'products.title', 'isbn'],
+            'sort' => 'products.title',
             'columns' => [
-                ['key' => 'code', 'label' => 'Kode'],
-                ['key' => 'title', 'label' => 'Judul'],
+                ['key' => 'product.code', 'label' => 'Kode'],
+                ['key' => 'product.title', 'label' => 'Judul'],
                 ['key' => 'publisher.name', 'label' => 'Penerbit'],
                 ['key' => 'category.name', 'label' => 'Kategori'],
                 ['key' => 'grade', 'label' => 'Kelas'],
                 ['key' => 'subject', 'label' => 'Mapel'],
-                ['key' => 'price', 'label' => 'Harga', 'type' => 'currency'],
-                ['key' => 'status', 'label' => 'Status', 'type' => 'status'],
+                ['key' => 'product.price', 'label' => 'Harga', 'type' => 'currency'],
+                ['key' => 'product.status', 'label' => 'Status', 'type' => 'status'],
             ],
             'fields' => [
                 ['name' => 'code', 'label' => 'Kode Buku', 'type' => 'text', 'required' => true],
@@ -230,17 +239,144 @@ class MasterDataRegistry
                 ['name' => 'rack_location', 'label' => 'Lokasi Rak', 'type' => 'text'],
                 ['name' => 'status', 'label' => 'Status', 'type' => 'select', 'options' => [['value' => 'active', 'label' => 'Aktif'], ['value' => 'inactive', 'label' => 'Nonaktif']]],
             ],
-            'rules' => fn (?Model $model): array => [
-                'code' => ['required', 'string', 'max:255', Rule::unique('books', 'code')->ignore($model?->getKey())],
+            'rules' => fn (?Book $model): array => [
+                'code' => ['required', 'string', 'max:255', Rule::unique('products', 'code')->ignore($model?->product->getKey())],
                 'isbn' => ['nullable', 'string', 'max:255'],
                 'title' => ['required', 'string', 'max:255'],
                 'publisher_id' => ['required', 'integer', 'exists:publishers,id'],
                 'category_id' => ['nullable', 'integer', 'exists:book_categories,id'],
+                'grade' => ['nullable', 'string', 'max:255'],
+                'subject' => ['nullable', 'string', 'max:255'],
                 'price' => ['required', 'numeric', 'min:0'],
                 'cost_price' => ['nullable', 'numeric', 'min:0'],
                 'min_stock' => ['nullable', 'integer', 'min:0'],
                 'status' => ['required', Rule::in(['active', 'inactive'])],
             ],
+            'values' => function (Book $book): array {
+                $product = $book->product;
+
+                return [
+                    'code' => $product?->code,
+                    'title' => $product?->title,
+                    'isbn' => $book->isbn,
+                    'publisher_id' => $book->publisher_id,
+                    'category_id' => $book->category_id,
+                    'grade' => $book->grade,
+                    'subject' => $book->subject,
+                    'price' => $product?->price,
+                    'cost_price' => $product?->cost_price,
+                    'min_stock' => $product?->min_stock,
+                    'rack_location' => $product?->rack_location,
+                    'status' => $product?->status,
+                ];
+            },
+            'save' => function (array $attributes, ?Book $book): Book {
+                $product = $book === null ? new Product : $book->product;
+                $product->fill([
+                    'type' => 'book',
+                    'code' => $attributes['code'],
+                    'title' => $attributes['title'],
+                    'price' => $attributes['price'],
+                    'cost_price' => $attributes['cost_price'] ?? 0,
+                    'min_stock' => $attributes['min_stock'] ?? 0,
+                    'rack_location' => $attributes['rack_location'] ?? null,
+                    'status' => $attributes['status'],
+                ])->save();
+
+                $book ??= new Book;
+                $book->fill([
+                    'product_id' => $product->getKey(),
+                    'isbn' => $attributes['isbn'] ?? null,
+                    'publisher_id' => $attributes['publisher_id'],
+                    'category_id' => $attributes['category_id'] ?? null,
+                    'grade' => $attributes['grade'] ?? null,
+                    'subject' => $attributes['subject'] ?? null,
+                ])->save();
+
+                return $book;
+            },
+        ];
+    }
+
+    /**
+     * Barang lainnya - general goods (kipas angin, meja, ...) stored as
+     * products with type = "goods" plus a goods row, flowing through
+     * orders, picking, shipments and invoices like books.
+     *
+     * @return array<string, mixed>
+     */
+    private static function goods(): array
+    {
+        return [
+            ...self::base('Barang Lainnya', Goods::class, 'goods.view', 'goods.manage'),
+            'with' => ['product'],
+            'scope' => fn ($query) => $query->whereHas('product', fn ($q) => $q->where('type', 'goods')),
+            'joins' => [['products', 'products.id', '=', 'goods.product_id']],
+            'search' => ['products.code', 'products.title'],
+            'sort' => 'products.title',
+            'columns' => [
+                ['key' => 'product.code', 'label' => 'Kode'],
+                ['key' => 'product.title', 'label' => 'Nama Barang'],
+                ['key' => 'product.price', 'label' => 'Harga', 'type' => 'currency'],
+                ['key' => 'product.cost_price', 'label' => 'Harga Pokok', 'type' => 'currency'],
+                ['key' => 'product.min_stock', 'label' => 'Stok Minimum'],
+                ['key' => 'product.status', 'label' => 'Status', 'type' => 'status'],
+            ],
+            'fields' => [
+                ['name' => 'code', 'label' => 'Kode Barang', 'type' => 'text', 'required' => true],
+                ['name' => 'title', 'label' => 'Nama Barang', 'type' => 'text', 'required' => true],
+                ['name' => 'price', 'label' => 'Harga Jual', 'type' => 'number', 'required' => true],
+                ['name' => 'cost_price', 'label' => 'Harga Pokok', 'type' => 'number'],
+                ['name' => 'min_stock', 'label' => 'Stok Minimum', 'type' => 'number'],
+                ['name' => 'rack_location', 'label' => 'Lokasi Rak', 'type' => 'text'],
+                ['name' => 'unit', 'label' => 'Satuan', 'type' => 'text'],
+                ['name' => 'status', 'label' => 'Status', 'type' => 'select', 'options' => [['value' => 'active', 'label' => 'Aktif'], ['value' => 'inactive', 'label' => 'Nonaktif']]],
+            ],
+            'rules' => fn (?Goods $model): array => [
+                'code' => ['required', 'string', 'max:255', Rule::unique('products', 'code')->ignore($model?->product->getKey())],
+                'title' => ['required', 'string', 'max:255'],
+                'price' => ['required', 'numeric', 'min:0'],
+                'cost_price' => ['nullable', 'numeric', 'min:0'],
+                'min_stock' => ['nullable', 'integer', 'min:0'],
+                'rack_location' => ['nullable', 'string', 'max:255'],
+                'unit' => ['nullable', 'string', 'max:255'],
+                'status' => ['required', Rule::in(['active', 'inactive'])],
+            ],
+            'values' => function (Goods $goods): array {
+                $product = $goods->product;
+
+                return [
+                    'code' => $product?->code,
+                    'title' => $product?->title,
+                    'price' => $product?->price,
+                    'cost_price' => $product?->cost_price,
+                    'min_stock' => $product?->min_stock,
+                    'rack_location' => $product?->rack_location,
+                    'unit' => $goods->unit,
+                    'status' => $product?->status,
+                ];
+            },
+            'save' => function (array $attributes, ?Goods $goods): Goods {
+                $product = $goods === null ? new Product : $goods->product;
+                $product->fill([
+                    'type' => 'goods',
+                    'code' => $attributes['code'],
+                    'title' => $attributes['title'],
+                    'price' => $attributes['price'],
+                    'cost_price' => $attributes['cost_price'] ?? 0,
+                    'min_stock' => $attributes['min_stock'] ?? 0,
+                    'rack_location' => $attributes['rack_location'] ?? null,
+                    'status' => $attributes['status'],
+                ])->save();
+
+                $goods ??= new Goods;
+                $goods->fill([
+                    'product_id' => $product->getKey(),
+                    'unit' => $attributes['unit'] ?? null,
+                ])->save();
+
+                return $goods;
+            },
         ];
     }
 

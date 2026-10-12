@@ -97,7 +97,7 @@
                         <table class="w-full border-collapse text-sm">
                             <thead>
                                 <tr class="border-b border-line bg-panel-soft text-left text-xs font-semibold tracking-wide text-ink-soft uppercase">
-                                    <th scope="col" class="px-3 py-2.5">Buku</th>
+                                    <th scope="col" class="px-3 py-2.5">Barang</th>
                                     <th scope="col" class="px-3 py-2.5 text-right">Siap Kirim</th>
                                     <th scope="col" class="px-3 py-2.5 text-right">Jumlah Kirim</th>
                                 </tr>
@@ -106,7 +106,7 @@
                                 @foreach ($order['items'] as $index => $item)
                                     <tr class="border-b border-line last:border-0">
                                         <td class="px-3 py-2.5">
-                                            {{ $item['code'] }} {{ $item['book'] }}
+                                            {{ $item['code'] }} {{ $item['product'] }}
                                             <input type="hidden" name="items[{{ $index }}][order_item_id]" value="{{ $item['order_item_id'] }}" />
                                         </td>
                                         <td class="px-3 py-2.5 text-right tabular-nums">{{ $item['shippable'] }}</td>

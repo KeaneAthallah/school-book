@@ -5,7 +5,7 @@
 @section('content')
     <x-page-header
         title="Penerimaan Barang"
-        subtitle="Penerimaan buku dari penerbit. Stok bertambah setelah dikonfirmasi."
+        subtitle="Penerimaan barang dari penerbit. Stok bertambah setelah dikonfirmasi."
     >
         <x-slot:actions>
             @if ($can['create'])

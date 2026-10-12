@@ -170,8 +170,8 @@ class InvoiceService
                 $lines[] = [
                     'order_item_id' => $shipmentItem->order_item_id,
                     'shipment_item_id' => $shipmentItem->getKey(),
-                    'book_id' => $shipmentItem->book_id,
-                    'description' => $orderItem->book->title,
+                    'product_id' => $shipmentItem->product_id,
+                    'description' => $orderItem->product->title,
                     'quantity' => $billable,
                     'unit_price' => $unitPrice,
                     'discount_amount' => '0.00',

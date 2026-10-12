@@ -26,7 +26,13 @@ class OperatorDashboardService extends RoleDashboard
         $queues = $this->metrics->orderQueues($scope);
         $incoming = $this->metrics->ordersInPeriod($period, $scope);
         $incomingPrevious = $this->metrics->ordersInPeriod($period, $scope, true);
-        $backorders = $this->metrics->activeBackorderCount($scope);
+        $inTransit = $this->metrics->inTransitCount($scope);
+        $invoiced = $this->metrics->invoiceTotal($period, $scope);
+        $invoicedPrevious = $this->metrics->invoiceTotal($period, $scope, true);
+        $paid = $this->metrics->paymentTotal($period, $scope);
+        $paidPrevious = $this->metrics->paymentTotal($period, $scope, true);
+        $overdueCount = $this->metrics->overdueCount($scope);
+        $overdueTotal = $this->metrics->overdueTotal($scope);
 
         return [
             'kpis' => [
@@ -34,19 +40,27 @@ class OperatorDashboardService extends RoleDashboard
                     'delta' => Kpi::delta($incoming, $incomingPrevious),
                     'hint' => $period->label(),
                 ]),
-                Kpi::point('Draft Pesanan', $queues['draft'], 'fileText', 'slate'),
-                Kpi::point('Perlu Validasi', $queues['validation'], 'alert', 'amber', [
-                    'valueTone' => $queues['validation'] > 0 ? 'amber' : 'default',
+                Kpi::number('Siap Picking', $this->metrics->ordersWithStatus([
+                    OrderStatus::PartialReady->value,
+                    OrderStatus::Ready->value,
+                ], $scope), 'clipboard', 'violet'),
+                Kpi::number('Menunggu Stok', $this->metrics->ordersWithStatus([
+                    OrderStatus::Processing->value,
+                ], $scope), 'clock', 'amber'),
+                Kpi::number('Dalam Pengiriman', $inTransit, 'truck', 'sky'),
+                Kpi::money('Total Invoice', $invoiced, 'receipt', 'brand', [
+                    'delta' => Kpi::delta((float) $invoiced, (float) $invoicedPrevious),
+                    'hint' => $period->label(),
                 ]),
-                Kpi::point('Diproses', $queues['in_progress'], 'refresh', 'sky'),
-                Kpi::point('Siap Picking', $queues['ready_picking'], 'clipboard', 'violet'),
-                Kpi::point('Menunggu Stok', $queues['waiting_stock'], 'clock', 'amber', [
-                    'valueTone' => $queues['waiting_stock'] > 0 ? 'amber' : 'default',
+                Kpi::money('Sudah Dibayar', $paid, 'checkCircle', 'emerald', [
+                    'delta' => Kpi::delta((float) $paid, (float) $paidPrevious),
                 ]),
-                Kpi::point('Back Order', $backorders, 'inbox', 'rose', [
-                    'valueTone' => $backorders > 0 ? 'rose' : 'emerald',
+                Kpi::money('Piutang', $this->metrics->outstandingTotal($scope), 'fileText', 'amber'),
+                Kpi::money('Jatuh Tempo', $overdueTotal, 'alert', 'rose', [
+                    'valueTone' => (float) $overdueTotal > 0 ? 'rose' : 'default',
+                    'hint' => $overdueCount.' invoice',
+                    'goodWhenDown' => true,
                 ]),
-                Kpi::point('Pesanan Bermasalah', $queues['cancelled'], 'close', 'slate'),
             ],
             'notifications' => $this->alerts($user, $scope),
             'queues' => $queues,

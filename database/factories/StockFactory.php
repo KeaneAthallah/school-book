@@ -2,7 +2,7 @@
 
 namespace Database\Factories;
 
-use App\Models\Book;
+use App\Models\Product;
 use App\Models\Stock;
 use App\Models\Warehouse;
 use Illuminate\Database\Eloquent\Factories\Factory;
@@ -20,7 +20,7 @@ class StockFactory extends Factory
     public function definition(): array
     {
         return [
-            'book_id' => Book::factory(),
+            'product_id' => Product::factory(),
             'warehouse_id' => Warehouse::factory(),
             'quantity' => 0,
             'reserved_quantity' => 0,

@@ -99,7 +99,7 @@
                 empty="Pesanan ini belum memiliki item."
                 empty-icon="boxes"
                 :columns="[
-                    ['label' => 'Buku', 'view' => 'orders.partials.item-book'],
+                    ['label' => 'Barang', 'view' => 'orders.partials.item-book'],
                     ['key' => 'warehouse', 'label' => 'Gudang'],
                     ['key' => 'quantity', 'label' => 'Dipesan', 'align' => 'right', 'class' => 'tabular-nums'],
                     ['key' => 'reserved_quantity', 'label' => 'Ready', 'align' => 'right', 'class' => 'tabular-nums'],
@@ -122,7 +122,7 @@
                             <li class="flex items-center justify-between px-4 py-2 text-sm">
                                 <a href="{{ route('shipments.show', $shipment['id']) }}" class="text-ink hover:text-brand-600 hover:underline dark:hover:text-brand-300">{{ $shipment['number'] }}</a>
                                 <span class="flex items-center gap-2">
-                                    <span class="text-xs text-ink-soft">{{ Format::number($shipment['quantity']) }} buku</span>
+                                    <span class="text-xs text-ink-soft">{{ Format::number($shipment['quantity']) }} barang</span>
                                     <x-status-badge :value="$shipment['status']" :label="$shipment['status_label']" />
                                 </span>
                             </li>
@@ -155,7 +155,7 @@
                     <ul class="divide-y divide-line">
                         @foreach ($order['backorders'] as $backorder)
                             <li class="flex items-center justify-between px-4 py-2 text-sm">
-                                <span class="truncate pr-2 text-ink-soft">{{ $backorder['book'] }}</span>
+                                <span class="truncate pr-2 text-ink-soft">{{ $backorder['product'] }}</span>
                                 <span class="flex items-center gap-2">
                                     <span class="text-xs text-ink-muted tabular-nums">{{ $backorder['fulfilled_quantity'] }}/{{ $backorder['quantity'] }}</span>
                                     <x-status-badge :value="$backorder['status']" :label="$backorder['status_label']" />

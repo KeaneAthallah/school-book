@@ -2,9 +2,9 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Book;
 use App\Models\Invoice;
 use App\Models\Order;
+use App\Models\Product;
 use App\Models\School;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Builder;
@@ -87,16 +87,30 @@ class SearchController extends Controller
         }
 
         if ($user->hasPermission('books.view')) {
-            $books = Book::query()
+            $books = Product::query()->where('type', 'book')
                 ->where(fn (Builder $query) => $query->where('title', 'like', $like)->orWhere('code', 'like', $like))
                 ->orderBy('title')
                 ->limit(5)
                 ->get();
 
-            $this->addGroup($groups, 'books', 'Buku', $books->map(fn (Book $book): array => [
-                'title' => $book->title,
-                'subtitle' => 'Kode '.$book->code,
-                'href' => '/master/books?search='.urlencode($book->code),
+            $this->addGroup($groups, 'books', 'Buku', $books->map(fn (Product $product): array => [
+                'title' => $product->title,
+                'subtitle' => 'Kode '.$product->code,
+                'href' => '/master/books?search='.urlencode($product->code),
+            ])->all());
+        }
+
+        if ($user->hasPermission('goods.view')) {
+            $goods = Product::query()->where('type', 'goods')
+                ->where(fn (Builder $query) => $query->where('title', 'like', $like)->orWhere('code', 'like', $like))
+                ->orderBy('title')
+                ->limit(5)
+                ->get();
+
+            $this->addGroup($groups, 'goods', 'Barang Lainnya', $goods->map(fn (Product $product): array => [
+                'title' => $product->title,
+                'subtitle' => 'Kode '.$product->code,
+                'href' => '/master/barang-lainnya?search='.urlencode($product->code),
             ])->all());
         }
 

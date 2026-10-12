@@ -54,23 +54,39 @@ return new class extends Migration
             $table->timestamps();
         });
 
-        Schema::create('books', function (Blueprint $table) {
+        Schema::create('products', function (Blueprint $table) {
             $table->id();
+            $table->string('type')->default('book')->index();
             $table->string('code')->unique();
-            $table->string('isbn')->nullable();
             $table->string('title');
-            $table->foreignId('publisher_id')->constrained()->restrictOnDelete();
-            $table->foreignId('category_id')->nullable()->constrained('book_categories')->nullOnDelete();
-            $table->string('grade')->nullable();
-            $table->string('subject')->nullable();
             $table->decimal('price', 15, 2)->default(0);
             $table->decimal('cost_price', 15, 2)->default(0);
+            $table->integer('stock')->default(0);
             $table->integer('min_stock')->default(0);
             $table->string('rack_location')->nullable();
             $table->string('status')->default('active')->index();
             $table->timestamps();
+        });
 
-            $table->index(['publisher_id', 'status']);
+        Schema::create('books', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('product_id')->unique()->constrained()->restrictOnDelete();
+            $table->string('isbn')->nullable();
+            $table->foreignId('publisher_id')->nullable()->constrained()->restrictOnDelete();
+            $table->foreignId('category_id')->nullable()->constrained('book_categories')->nullOnDelete();
+            $table->string('grade')->nullable();
+            $table->string('subject')->nullable();
+            $table->timestamps();
+
+            $table->index('publisher_id');
+        });
+
+        Schema::create('goods', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('product_id')->unique()->constrained()->restrictOnDelete();
+            $table->string('unit')->nullable();
+            $table->text('description')->nullable();
+            $table->timestamps();
         });
 
         Schema::create('order_sources', function (Blueprint $table) {
@@ -138,7 +154,9 @@ return new class extends Migration
         Schema::dropIfExists('shipping_methods');
         Schema::dropIfExists('couriers');
         Schema::dropIfExists('order_sources');
+        Schema::dropIfExists('goods');
         Schema::dropIfExists('books');
+        Schema::dropIfExists('products');
         Schema::dropIfExists('warehouses');
         Schema::dropIfExists('schools');
         Schema::dropIfExists('book_categories');

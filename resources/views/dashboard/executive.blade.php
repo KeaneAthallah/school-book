@@ -60,7 +60,7 @@
 
     <div class="mt-4 grid gap-4 xl:grid-cols-2">
         <x-card>
-            <x-card-header title="Penjualan per Sekolah" icon="school" :subtitle="'Nilai buku terkirim · '.$period->label()" />
+            <x-card-header title="Penjualan per Sekolah" icon="school" :subtitle="'Nilai barang terkirim · '.$period->label()" />
             @if (count($data['sales_by_school']) === 0)
                 <x-empty-state message="Tidak ada data pada periode ini." icon="school" />
             @else

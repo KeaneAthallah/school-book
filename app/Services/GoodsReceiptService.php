@@ -100,7 +100,7 @@ class GoodsReceiptService
 
         foreach ($items as $line) {
             $receipt->items()->create([
-                'book_id' => (int) $line['book_id'],
+                'product_id' => (int) $line['product_id'],
                 'quantity' => (int) $line['quantity'],
                 'unit_cost' => (string) ($line['unit_cost'] ?? '0'),
             ]);

@@ -46,7 +46,7 @@ class FulfillmentService
             foreach ($ready as $item) {
                 $picking->items()->create([
                     'order_item_id' => $item->getKey(),
-                    'book_id' => $item->book_id,
+                    'product_id' => $item->product_id,
                     'quantity' => $item->reserved_quantity,
                     'picked_quantity' => 0,
                 ]);

@@ -10,11 +10,11 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property int $id
  * @property int $picking_id
  * @property int $order_item_id
- * @property int $book_id
+ * @property int $product_id
  * @property int $quantity
  * @property int $picked_quantity
  */
-#[Fillable(['picking_id', 'order_item_id', 'book_id', 'quantity', 'picked_quantity'])]
+#[Fillable(['picking_id', 'order_item_id', 'product_id', 'quantity', 'picked_quantity'])]
 class PickingItem extends Model
 {
     /**
@@ -45,10 +45,10 @@ class PickingItem extends Model
     }
 
     /**
-     * @return BelongsTo<Book, $this>
+     * @return BelongsTo<Product, $this>
      */
-    public function book(): BelongsTo
+    public function product(): BelongsTo
     {
-        return $this->belongsTo(Book::class);
+        return $this->belongsTo(Product::class);
     }
 }

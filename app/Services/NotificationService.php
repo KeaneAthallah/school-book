@@ -297,7 +297,7 @@ class NotificationService
         return [
             'key' => 'open_backorders',
             'title' => 'Back order belum terpenuhi',
-            'description' => $outstanding.' buku menunggu stok masuk',
+            'description' => $outstanding.' barang menunggu stok masuk',
             'tone' => 'warning',
             'count' => $outstanding,
             'href' => '/reports?type=backorders',

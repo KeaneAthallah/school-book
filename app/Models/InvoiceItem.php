@@ -11,7 +11,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property int $invoice_id
  * @property int|null $order_item_id
  * @property int|null $shipment_item_id
- * @property int|null $book_id
+ * @property int|null $product_id
  * @property string $description
  * @property int $quantity
  * @property string $unit_price
@@ -19,7 +19,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property string $subtotal
  */
 #[Fillable([
-    'invoice_id', 'order_item_id', 'shipment_item_id', 'book_id', 'description',
+    'invoice_id', 'order_item_id', 'shipment_item_id', 'product_id', 'description',
     'quantity', 'unit_price', 'discount_amount', 'subtotal',
 ])]
 class InvoiceItem extends Model
@@ -62,10 +62,10 @@ class InvoiceItem extends Model
     }
 
     /**
-     * @return BelongsTo<Book, $this>
+     * @return BelongsTo<Product, $this>
      */
-    public function book(): BelongsTo
+    public function product(): BelongsTo
     {
-        return $this->belongsTo(Book::class);
+        return $this->belongsTo(Product::class);
     }
 }

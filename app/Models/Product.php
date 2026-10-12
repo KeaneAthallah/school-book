@@ -1,0 +1,130 @@
+<?php
+
+namespace App\Models;
+
+use Database\Factories\ProductFactory;
+use Illuminate\Database\Eloquent\Attributes\Fillable;
+use Illuminate\Database\Eloquent\Attributes\Scope;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
+
+/**
+ * Shared catalog entry for books and general goods.
+ *
+ * @property int $id
+ * @property string $type
+ * @property string $code
+ * @property string $title
+ * @property string $price
+ * @property string $cost_price
+ * @property int $stock
+ * @property int $min_stock
+ * @property string|null $rack_location
+ * @property string $status
+ */
+#[Fillable([
+    'type', 'code', 'title', 'price', 'cost_price', 'stock', 'min_stock',
+    'rack_location', 'status',
+])]
+class Product extends Model
+{
+    /** @use HasFactory<ProductFactory> */
+    use HasFactory;
+
+    /**
+     * @return array<string, string>
+     */
+    protected function casts(): array
+    {
+        return [
+            'price' => 'decimal:2',
+            'cost_price' => 'decimal:2',
+            'stock' => 'integer',
+            'min_stock' => 'integer',
+        ];
+    }
+
+    /**
+     * @param  Builder<Product>  $query
+     */
+    #[Scope]
+    protected function active(Builder $query): void
+    {
+        $query->where('status', 'active');
+    }
+
+    /**
+     * @return HasOne<Book, $this>
+     */
+    public function book(): HasOne
+    {
+        return $this->hasOne(Book::class);
+    }
+
+    /**
+     * @return HasOne<Goods, $this>
+     */
+    public function goods(): HasOne
+    {
+        return $this->hasOne(Goods::class);
+    }
+
+    /**
+     * @return HasMany<OrderItem, $this>
+     */
+    public function orderItems(): HasMany
+    {
+        return $this->hasMany(OrderItem::class);
+    }
+
+    /**
+     * @return HasMany<InvoiceItem, $this>
+     */
+    public function invoiceItems(): HasMany
+    {
+        return $this->hasMany(InvoiceItem::class);
+    }
+
+    /**
+     * @return HasMany<ShipmentItem, $this>
+     */
+    public function shipmentItems(): HasMany
+    {
+        return $this->hasMany(ShipmentItem::class);
+    }
+
+    /**
+     * @return HasMany<PickingItem, $this>
+     */
+    public function pickingItems(): HasMany
+    {
+        return $this->hasMany(PickingItem::class);
+    }
+
+    /**
+     * @return HasMany<GoodsReceiptItem, $this>
+     */
+    public function receiptItems(): HasMany
+    {
+        return $this->hasMany(GoodsReceiptItem::class);
+    }
+
+    /**
+     * @return HasMany<Stock, $this>
+     */
+    public function stocks(): HasMany
+    {
+        return $this->hasMany(Stock::class);
+    }
+
+    /**
+     * @return HasMany<StockMovement, $this>
+     */
+    public function stockMovements(): HasMany
+    {
+        return $this->hasMany(StockMovement::class);
+    }
+}

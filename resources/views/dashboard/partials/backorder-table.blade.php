@@ -8,7 +8,7 @@
     :columns="[
         ['key' => 'number', 'label' => 'No. Pesanan'],
         ['key' => 'school', 'label' => 'Sekolah'],
-        ['key' => 'book', 'label' => 'Buku'],
+        ['key' => 'product', 'label' => 'Barang'],
         ['key' => 'quantity', 'label' => 'Sisa', 'align' => 'right', 'class' => 'tabular-nums'],
         ['key' => 'status', 'label' => 'Status', 'view' => 'components.status-label'],
     ]"

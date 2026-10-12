@@ -11,6 +11,7 @@ use App\Models\Invoice;
 use App\Models\Order;
 use App\Models\OrderItem;
 use App\Models\OrderSource;
+use App\Models\Product;
 use App\Models\Publisher;
 use App\Models\Rebate;
 use App\Models\RebateRule;
@@ -29,7 +30,8 @@ use App\Services\ShipmentService;
 it('runs the full order lifecycle with partial stock, back orders, invoicing, payments, and rebates', function () {
     $warehouse = Warehouse::factory()->create(['code' => 'GDG-TEST', 'status' => 'active']);
     $publisher = Publisher::factory()->create();
-    $book = Book::factory()->for($publisher)->create(['price' => '1000.00', 'cost_price' => '600.00']);
+    $product = Product::factory()->create(['price' => '1000.00', 'cost_price' => '600.00']);
+    $book = Book::factory()->for($publisher)->create(['product_id' => $product->id]);
     $school = School::factory()->create();
     $source = OrderSource::factory()->create();
     $user = User::factory()->create();
@@ -38,7 +40,7 @@ it('runs the full order lifecycle with partial stock, back orders, invoicing, pa
 
     // Only 60 of the 100 ordered books are in stock.
     $receipt = GoodsReceipt::factory()->for($publisher)->for($warehouse)->create();
-    $receipt->items()->create(['book_id' => $book->id, 'quantity' => 60, 'unit_cost' => '600.00']);
+    $receipt->items()->create(['product_id' => $product->id, 'quantity' => 60, 'unit_cost' => '600.00']);
     $inventory->confirm($receipt, $user);
 
     $order = app(OrderService::class)->create([
@@ -46,7 +48,7 @@ it('runs the full order lifecycle with partial stock, back orders, invoicing, pa
         'school_id' => $school->id,
         'order_source_id' => $source->id,
         'items' => [
-            ['book_id' => $book->id, 'quantity' => 100, 'unit_price' => '1000.00'],
+            ['product_id' => $product->id, 'quantity' => 100, 'unit_price' => '1000.00'],
         ],
     ], $user);
 
@@ -76,7 +78,7 @@ it('runs the full order lifecycle with partial stock, back orders, invoicing, pa
         ->and($item->reserved_quantity)->toBe(0)
         ->and($order->status)->toBe(OrderStatus::PartialShipped);
 
-    $stock = Stock::query()->where('book_id', $book->id)->where('warehouse_id', $warehouse->id)->firstOrFail();
+    $stock = Stock::query()->where('product_id', $product->id)->where('warehouse_id', $warehouse->id)->firstOrFail();
     expect($stock->quantity)->toBe(0)->and($stock->reserved_quantity)->toBe(0);
 
     // Invoice the shipped quantity only.
@@ -99,7 +101,7 @@ it('runs the full order lifecycle with partial stock, back orders, invoicing, pa
 
     // The remaining 40 books arrive and the back order becomes shippable.
     $secondReceipt = GoodsReceipt::factory()->for($publisher)->for($warehouse)->create();
-    $secondReceipt->items()->create(['book_id' => $book->id, 'quantity' => 40, 'unit_cost' => '600.00']);
+    $secondReceipt->items()->create(['product_id' => $product->id, 'quantity' => 40, 'unit_cost' => '600.00']);
     $inventory->confirm($secondReceipt, $user);
 
     $order->refresh()->load('items');

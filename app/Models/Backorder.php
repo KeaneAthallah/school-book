@@ -12,12 +12,12 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 /**
  * @property int $id
  * @property int $order_item_id
- * @property int $book_id
+ * @property int $product_id
  * @property int $quantity
  * @property int $fulfilled_quantity
  * @property BackorderStatus $status
  */
-#[Fillable(['order_item_id', 'book_id', 'quantity', 'fulfilled_quantity', 'status'])]
+#[Fillable(['order_item_id', 'product_id', 'quantity', 'fulfilled_quantity', 'status'])]
 class Backorder extends Model
 {
     /** @use HasFactory<BackorderFactory> */
@@ -44,11 +44,11 @@ class Backorder extends Model
     }
 
     /**
-     * @return BelongsTo<Book, $this>
+     * @return BelongsTo<Product, $this>
      */
-    public function book(): BelongsTo
+    public function product(): BelongsTo
     {
-        return $this->belongsTo(Book::class);
+        return $this->belongsTo(Product::class);
     }
 
     public function outstandingQuantity(): int

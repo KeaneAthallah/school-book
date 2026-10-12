@@ -13,6 +13,7 @@ use App\Services\ShipmentService;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\View\View;
 
 class ShipmentController extends Controller
@@ -63,7 +64,7 @@ class ShipmentController extends Controller
         $order = null;
 
         if ($request->filled('order_id')) {
-            $orderModel = Order::query()->with('items.book:id,code,title')->findOrFail($request->integer('order_id'));
+            $orderModel = Order::query()->with('items.product:id,code,title')->findOrFail($request->integer('order_id'));
 
             $order = [
                 'id' => $orderModel->getKey(),
@@ -72,8 +73,8 @@ class ShipmentController extends Controller
                 'items' => $orderModel->items
                     ->map(fn ($item): array => [
                         'order_item_id' => $item->getKey(),
-                        'book' => $item->book?->title,
-                        'code' => $item->book?->code,
+                        'product' => $item->product?->title,
+                        'code' => $item->product?->code,
                         'shippable' => $service->shippableQuantity($item),
                     ])
                     ->filter(fn (array $item): bool => $item['shippable'] > 0)
@@ -121,7 +122,7 @@ class ShipmentController extends Controller
     {
         abort_unless($this->userCan($request, 'shipments.view'), 403);
 
-        $shipment->load(['order:id,number', 'order.school:id,name,address', 'warehouse:id,name', 'courier:id,name', 'shippingMethod:id,name', 'items.book:id,code,title']);
+        $shipment->load(['order:id,number', 'order.school:id,name,address', 'warehouse:id,name', 'courier:id,name', 'shippingMethod:id,name', 'items.product:id,code,title']);
 
         return view('shipping.show', [
             'shipment' => [
@@ -142,13 +143,21 @@ class ShipmentController extends Controller
                 'confirmed_at' => $shipment->confirmed_at?->toDateTimeString(),
                 'notes' => $shipment->notes,
                 'items' => $shipment->items->map(fn ($item): array => [
-                    'book' => $item->book?->title,
-                    'code' => $item->book?->code,
+                    'product' => $item->product?->title,
+                    'code' => $item->product?->code,
                     'quantity' => $item->quantity,
+                ])->all(),
+                'attachments' => $shipment->attachments()->orderByDesc('id')->get()->map(fn ($attachment): array => [
+                    'id' => $attachment->getKey(),
+                    'name' => $attachment->original_name,
+                    'url' => Storage::url($attachment->path),
+                    'time' => $attachment->created_at?->toDateTimeString(),
                 ])->all(),
             ],
             'can' => [
                 'confirm' => ($this->userCan($request, 'shipments.confirm')) && ! $shipment->isConfirmed(),
+                'attach' => $this->userCan($request, 'shipments.confirm'),
+                'manage_attachments' => $this->userCan($request, 'shipments.manage'),
                 'deliver' => ($this->userCan($request, 'shipments.confirm')) && $shipment->status->value === 'shipped',
                 'invoice' => ($this->userCan($request, 'invoices.manage')) && in_array($shipment->status->value, ['shipped', 'delivered'], true),
             ],
@@ -159,9 +168,45 @@ class ShipmentController extends Controller
     {
         abort_unless($this->userCan($request, 'shipments.confirm'), 403);
 
-        $service->confirm($shipment, $request->user());
+        $request->validate([
+            'proof_photo' => ['required', 'file', 'image', 'mimes:jpeg,jpg,png,webp', 'max:5120'],
+        ], [
+            'proof_photo.required' => 'Bukti foto pengiriman wajib dilampirkan.',
+            'proof_photo.image' => 'Bukti pengiriman harus berupa gambar (JPEG, PNG, atau WebP).',
+            'proof_photo.mimes' => 'Bukti pengiriman harus berupa gambar (JPEG, PNG, atau WebP).',
+            'proof_photo.max' => 'Bukti pengiriman maksimal 5 MB.',
+        ]);
 
-        return back()->with('success', 'Pengiriman '.$shipment->number.' dikonfirmasi dan stok diperbarui.');
+        $service->confirm($shipment, $request->user(), $request->file('proof_photo'));
+
+        return back()->with('success', 'Pesanan telah dikirim berikut bukti foto.');
+    }
+
+    public function storeAttachment(Request $request, Shipment $shipment): RedirectResponse
+    {
+        abort_unless($this->userCan($request, 'shipments.confirm'), 403);
+
+        $request->validate([
+            'photo' => ['required', 'file', 'image', 'mimes:jpeg,jpg,png,webp', 'max:5120'],
+        ], [
+            'photo.required' => 'Bukti foto pengiriman wajib dilampirkan.',
+            'photo.image' => 'Bukti pengiriman harus berupa gambar (JPEG, PNG, atau WebP).',
+            'photo.mimes' => 'Bukti pengiriman harus berupa gambar (JPEG, PNG, atau WebP).',
+            'photo.max' => 'Bukti pengiriman maksimal 5 MB.',
+        ]);
+
+        $photo = $request->file('photo');
+        $path = $photo->store('shipments/'.$shipment->id, 'public');
+
+        $shipment->attachments()->create([
+            'original_name' => $photo->getClientOriginalName(),
+            'path' => $path,
+            'mime_type' => $photo->getMimeType(),
+            'size' => $photo->getSize(),
+            'uploaded_by' => $request->user()?->getKey(),
+        ]);
+
+        return back()->with('success', 'Bukti foto pengiriman ditambahkan.');
     }
 
     public function deliver(Request $request, Shipment $shipment, ShipmentService $service): RedirectResponse
@@ -177,7 +222,7 @@ class ShipmentController extends Controller
     {
         abort_unless($this->userCan($request, 'shipments.view'), 403);
 
-        $shipment->load(['order.school', 'warehouse', 'courier', 'shippingMethod', 'createdBy:id,name', 'items.book']);
+        $shipment->load(['order.school', 'warehouse', 'courier', 'shippingMethod', 'createdBy:id,name', 'items.product']);
 
         return view('print.delivery-note', [
             'shipment' => $shipment,

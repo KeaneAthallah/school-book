@@ -4,8 +4,8 @@ namespace Database\Factories;
 
 use App\Enums\BackorderStatus;
 use App\Models\Backorder;
-use App\Models\Book;
 use App\Models\OrderItem;
+use App\Models\Product;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -22,7 +22,7 @@ class BackorderFactory extends Factory
     {
         return [
             'order_item_id' => OrderItem::factory(),
-            'book_id' => Book::factory(),
+            'product_id' => Product::factory(),
             'quantity' => 1,
             'fulfilled_quantity' => 0,
             'status' => BackorderStatus::Open,

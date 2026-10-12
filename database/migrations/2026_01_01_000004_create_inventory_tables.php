@@ -25,28 +25,28 @@ return new class extends Migration
         Schema::create('goods_receipt_items', function (Blueprint $table) {
             $table->id();
             $table->foreignId('goods_receipt_id')->constrained()->cascadeOnDelete();
-            $table->foreignId('book_id')->constrained()->restrictOnDelete();
+            $table->foreignId('product_id')->constrained()->restrictOnDelete();
             $table->integer('quantity');
             $table->decimal('unit_cost', 15, 2)->default(0);
             $table->timestamps();
 
-            $table->index(['goods_receipt_id', 'book_id']);
+            $table->index(['goods_receipt_id', 'product_id']);
         });
 
         Schema::create('stocks', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('book_id')->constrained()->restrictOnDelete();
+            $table->foreignId('product_id')->constrained()->restrictOnDelete();
             $table->foreignId('warehouse_id')->constrained()->restrictOnDelete();
             $table->integer('quantity')->default(0);
             $table->integer('reserved_quantity')->default(0);
             $table->timestamps();
 
-            $table->unique(['book_id', 'warehouse_id']);
+            $table->unique(['product_id', 'warehouse_id']);
         });
 
         Schema::create('stock_movements', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('book_id')->constrained()->restrictOnDelete();
+            $table->foreignId('product_id')->constrained()->restrictOnDelete();
             $table->foreignId('warehouse_id')->constrained()->restrictOnDelete();
             $table->string('type')->index();
             $table->integer('quantity');
@@ -57,20 +57,20 @@ return new class extends Migration
             $table->foreignId('user_id')->nullable()->constrained('users')->nullOnDelete();
             $table->timestamps();
 
-            $table->index(['book_id', 'warehouse_id']);
+            $table->index(['product_id', 'warehouse_id']);
             $table->index(['reference_type', 'reference_id']);
         });
 
         Schema::create('backorders', function (Blueprint $table) {
             $table->id();
             $table->foreignId('order_item_id')->constrained()->cascadeOnDelete();
-            $table->foreignId('book_id')->constrained()->restrictOnDelete();
+            $table->foreignId('product_id')->constrained()->restrictOnDelete();
             $table->integer('quantity');
             $table->integer('fulfilled_quantity')->default(0);
             $table->string('status')->default('open')->index();
             $table->timestamps();
 
-            $table->index(['book_id', 'status']);
+            $table->index(['product_id', 'status']);
         });
     }
 

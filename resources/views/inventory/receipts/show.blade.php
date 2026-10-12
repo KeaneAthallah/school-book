@@ -32,7 +32,7 @@
                 :rows="collect($receipt['items'])->map(fn ($item, $index) => ['id' => $index] + $item)->all()"
                 :columns="[
                     ['key' => 'code', 'label' => 'Kode'],
-                    ['key' => 'book', 'label' => 'Buku'],
+                    ['key' => 'product', 'label' => 'Barang'],
                     ['key' => 'quantity', 'label' => 'Qty', 'align' => 'right', 'class' => 'tabular-nums'],
                     ['key' => 'unit_cost', 'label' => 'Harga Pokok', 'type' => 'currency', 'align' => 'right'],
                 ]"

@@ -100,7 +100,7 @@
         </x-card>
 
         <x-card>
-            <x-card-header title="Stok Buku" icon="book" subtitle="Diurutkan dari ketersediaan terendah">
+            <x-card-header title="Stok Barang" icon="book" subtitle="Diurutkan dari ketersediaan terendah">
                 <x-slot:action>
                     <a href="{{ route('stock.index') }}" class="text-xs font-medium text-brand-600 hover:underline dark:text-brand-300">Lihat stok</a>
                 </x-slot:action>

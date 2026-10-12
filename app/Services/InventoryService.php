@@ -22,10 +22,10 @@ class InventoryService
         private readonly OrderStatusResolver $statusResolver,
     ) {}
 
-    public function stock(int $bookId, int $warehouseId): Stock
+    public function stock(int $productId, int $warehouseId): Stock
     {
         return Stock::query()->firstOrCreate(
-            ['book_id' => $bookId, 'warehouse_id' => $warehouseId],
+            ['product_id' => $productId, 'warehouse_id' => $warehouseId],
             ['quantity' => 0, 'reserved_quantity' => 0],
         );
     }
@@ -33,20 +33,20 @@ class InventoryService
     /**
      * Return the stock row locked for update. Must be called inside a transaction.
      */
-    public function lockedStock(int $bookId, int $warehouseId): Stock
+    public function lockedStock(int $productId, int $warehouseId): Stock
     {
-        $this->stock($bookId, $warehouseId);
+        $this->stock($productId, $warehouseId);
 
         return Stock::query()
-            ->where('book_id', $bookId)
+            ->where('product_id', $productId)
             ->where('warehouse_id', $warehouseId)
             ->lockForUpdate()
             ->firstOrFail();
     }
 
-    public function availableQuantity(int $bookId, int $warehouseId): int
+    public function availableQuantity(int $productId, int $warehouseId): int
     {
-        return $this->stock($bookId, $warehouseId)->availableQuantity();
+        return $this->stock($productId, $warehouseId)->availableQuantity();
     }
 
     /**
@@ -73,12 +73,12 @@ class InventoryService
             }
 
             foreach ($locked->items as $item) {
-                $stock = $this->lockedStock($item->book_id, $locked->warehouse_id);
+                $stock = $this->lockedStock($item->product_id, $locked->warehouse_id);
                 $stock->quantity += $item->quantity;
                 $stock->save();
 
                 $this->recordMovement(
-                    bookId: $item->book_id,
+                    productId: $item->product_id,
                     warehouseId: $locked->warehouse_id,
                     type: StockMovementType::Receipt,
                     quantity: $item->quantity,
@@ -96,7 +96,7 @@ class InventoryService
             ])->save();
 
             foreach ($locked->items as $item) {
-                $this->allocateBackorders($item->book_id, $locked->warehouse_id, $user);
+                $this->allocateBackorders($item->product_id, $locked->warehouse_id, $user);
             }
 
             $this->audit->log(
@@ -113,14 +113,14 @@ class InventoryService
     /**
      * Apply a manual stock adjustment.
      */
-    public function adjust(int $bookId, int $warehouseId, int $delta, string $reason, User $user): Stock
+    public function adjust(int $productId, int $warehouseId, int $delta, string $reason, User $user): Stock
     {
         if ($delta === 0) {
             throw ValidationException::withMessages(['quantity' => 'Jumlah penyesuaian tidak boleh nol.']);
         }
 
-        return DB::transaction(function () use ($bookId, $warehouseId, $delta, $reason, $user): Stock {
-            $stock = $this->lockedStock($bookId, $warehouseId);
+        return DB::transaction(function () use ($productId, $warehouseId, $delta, $reason, $user): Stock {
+            $stock = $this->lockedStock($productId, $warehouseId);
 
             if ($stock->quantity + $delta < 0) {
                 throw ValidationException::withMessages([
@@ -132,7 +132,7 @@ class InventoryService
             $stock->save();
 
             $this->recordMovement(
-                bookId: $bookId,
+                productId: $productId,
                 warehouseId: $warehouseId,
                 type: $delta > 0 ? StockMovementType::AdjustmentIn : StockMovementType::AdjustmentOut,
                 quantity: $delta,
@@ -164,11 +164,11 @@ class InventoryService
         }
 
         $warehouseId = (int) $item->warehouse_id;
-        $stock = $this->lockedStock($item->book_id, $warehouseId);
+        $stock = $this->lockedStock($item->product_id, $warehouseId);
 
         if ($stock->availableQuantity() < $quantity) {
             throw ValidationException::withMessages([
-                'quantity' => "Stok tersedia untuk buku #{$item->book_id} tidak mencukupi.",
+                'quantity' => "Stok tersedia untuk barang #{$item->product_id} tidak mencukupi.",
             ]);
         }
 
@@ -176,7 +176,7 @@ class InventoryService
         $stock->save();
 
         $this->recordMovement(
-            bookId: $item->book_id,
+            productId: $item->product_id,
             warehouseId: $warehouseId,
             type: StockMovementType::Reservation,
             quantity: $quantity,
@@ -198,7 +198,7 @@ class InventoryService
         }
 
         $warehouseId = (int) $item->warehouse_id;
-        $stock = $this->lockedStock($item->book_id, $warehouseId);
+        $stock = $this->lockedStock($item->product_id, $warehouseId);
         $quantity = min($requested, $stock->availableQuantity());
 
         if ($quantity <= 0) {
@@ -209,7 +209,7 @@ class InventoryService
         $stock->save();
 
         $this->recordMovement(
-            bookId: $item->book_id,
+            productId: $item->product_id,
             warehouseId: $warehouseId,
             type: StockMovementType::Reservation,
             quantity: $quantity,
@@ -232,12 +232,12 @@ class InventoryService
         }
 
         $warehouseId = (int) $item->warehouse_id;
-        $stock = $this->lockedStock($item->book_id, $warehouseId);
+        $stock = $this->lockedStock($item->product_id, $warehouseId);
         $stock->reserved_quantity = max(0, $stock->reserved_quantity - $quantity);
         $stock->save();
 
         $this->recordMovement(
-            bookId: $item->book_id,
+            productId: $item->product_id,
             warehouseId: $warehouseId,
             type: StockMovementType::ReservationRelease,
             quantity: -$quantity,
@@ -259,11 +259,11 @@ class InventoryService
         }
 
         $warehouseId = (int) $item->warehouse_id;
-        $stock = $this->lockedStock($item->book_id, $warehouseId);
+        $stock = $this->lockedStock($item->product_id, $warehouseId);
 
         if ($stock->quantity < $quantity || $stock->reserved_quantity < $quantity) {
             throw ValidationException::withMessages([
-                'quantity' => "Stok fisik atau reservasi untuk buku #{$item->book_id} tidak mencukupi untuk dikirim.",
+                'quantity' => "Stok fisik atau reservasi untuk barang #{$item->product_id} tidak mencukupi untuk dikirim.",
             ]);
         }
 
@@ -272,7 +272,7 @@ class InventoryService
         $stock->save();
 
         $this->recordMovement(
-            bookId: $item->book_id,
+            productId: $item->product_id,
             warehouseId: $warehouseId,
             type: StockMovementType::Shipment,
             quantity: -$quantity,
@@ -287,9 +287,9 @@ class InventoryService
      * Allocate available stock to waiting back orders using a FIFO policy
      * (oldest order date first, then oldest back order).
      */
-    public function allocateBackorders(int $bookId, int $warehouseId, User $user): int
+    public function allocateBackorders(int $productId, int $warehouseId, User $user): int
     {
-        $stock = $this->lockedStock($bookId, $warehouseId);
+        $stock = $this->lockedStock($productId, $warehouseId);
         $available = $stock->availableQuantity();
 
         if ($available <= 0) {
@@ -297,7 +297,7 @@ class InventoryService
         }
 
         $backorders = Backorder::query()
-            ->where('backorders.book_id', $bookId)
+            ->where('backorders.product_id', $productId)
             ->whereIn('backorders.status', [BackorderStatus::Open->value, BackorderStatus::Partial->value])
             ->join('order_items', 'order_items.id', '=', 'backorders.order_item_id')
             ->join('orders', 'orders.id', '=', 'order_items.order_id')
@@ -342,7 +342,7 @@ class InventoryService
             $allocated += $take;
 
             $this->recordMovement(
-                bookId: $bookId,
+                productId: $productId,
                 warehouseId: $warehouseId,
                 type: StockMovementType::Reservation,
                 quantity: $take,
@@ -363,7 +363,7 @@ class InventoryService
     }
 
     private function recordMovement(
-        int $bookId,
+        int $productId,
         int $warehouseId,
         StockMovementType $type,
         int $quantity,
@@ -373,7 +373,7 @@ class InventoryService
         User $user,
     ): void {
         StockMovement::query()->create([
-            'book_id' => $bookId,
+            'product_id' => $productId,
             'warehouse_id' => $warehouseId,
             'type' => $type,
             'quantity' => $quantity,

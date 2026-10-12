@@ -1,2 +1,2 @@
 
-<span>{{ $row['code'] ?? '' }} {{ $row['book'] ?? '' }}</span>
+<span>{{ $row['code'] ?? '' }} {{ $row['product'] ?? '' }}</span>

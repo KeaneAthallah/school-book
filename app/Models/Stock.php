@@ -10,12 +10,12 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 /**
  * @property int $id
- * @property int $book_id
+ * @property int $product_id
  * @property int $warehouse_id
  * @property int $quantity
  * @property int $reserved_quantity
  */
-#[Fillable(['book_id', 'warehouse_id', 'quantity', 'reserved_quantity'])]
+#[Fillable(['product_id', 'warehouse_id', 'quantity', 'reserved_quantity'])]
 class Stock extends Model
 {
     /** @use HasFactory<StockFactory> */
@@ -33,11 +33,11 @@ class Stock extends Model
     }
 
     /**
-     * @return BelongsTo<Book, $this>
+     * @return BelongsTo<Product, $this>
      */
-    public function book(): BelongsTo
+    public function product(): BelongsTo
     {
-        return $this->belongsTo(Book::class);
+        return $this->belongsTo(Product::class);
     }
 
     /**

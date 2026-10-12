@@ -25,7 +25,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('picking_id')->constrained()->cascadeOnDelete();
             $table->foreignId('order_item_id')->constrained()->cascadeOnDelete();
-            $table->foreignId('book_id')->constrained()->restrictOnDelete();
+            $table->foreignId('product_id')->constrained()->restrictOnDelete();
             $table->integer('quantity');
             $table->integer('picked_quantity')->default(0);
             $table->timestamps();
@@ -58,7 +58,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('shipment_id')->constrained()->cascadeOnDelete();
             $table->foreignId('order_item_id')->constrained()->restrictOnDelete();
-            $table->foreignId('book_id')->constrained()->restrictOnDelete();
+            $table->foreignId('product_id')->constrained()->restrictOnDelete();
             $table->integer('quantity');
             $table->timestamps();
 

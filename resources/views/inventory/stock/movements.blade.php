@@ -10,7 +10,7 @@
 
     <x-card>
         <x-filter-bar method="get" :action="route('stock.movements')">
-            <x-field label="Cari buku" class="w-52">
+            <x-field label="Cari barang" class="w-52">
                 <x-input type="search" name="search" value="{{ $filters['search'] }}" placeholder="Judul / kode" />
             </x-field>
             <x-field label="Tipe" class="w-44">
@@ -37,7 +37,7 @@
             :columns="[
                 ['key' => 'date', 'label' => 'Waktu', 'type' => 'datetime'],
                 ['key' => 'code', 'label' => 'Kode'],
-                ['key' => 'book', 'label' => 'Buku'],
+                ['key' => 'product', 'label' => 'Barang'],
                 ['key' => 'warehouse', 'label' => 'Gudang'],
                 ['key' => 'type_label', 'label' => 'Tipe'],
                 ['key' => 'quantity', 'label' => 'Perubahan', 'align' => 'right', 'view' => 'inventory.stock.partials.movement-change'],

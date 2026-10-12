@@ -32,7 +32,7 @@
             <x-card-header
                 title="Penjualan per Sekolah"
                 icon="chart"
-                :subtitle="'Nilai buku terkirim · '.$period->label()"
+                :subtitle="'Nilai barang terkirim · '.$period->label()"
             />
             @if (count($data['sales_by_school']) === 0)
                 <x-empty-state message="Tidak ada penjualan pada periode ini." icon="chart" />

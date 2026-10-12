@@ -5,6 +5,7 @@ namespace App\Services\Dashboard;
 use App\Dashboard\DashboardScope;
 use App\Dashboard\Kpi;
 use App\Dashboard\Period;
+use App\Enums\OrderStatus;
 use App\Models\User;
 
 /**
@@ -23,29 +24,43 @@ class WarehouseDashboardService extends RoleDashboard
     public function build(User $user, Period $period, DashboardScope $scope): array
     {
         $stock = $this->metrics->stockAlerts();
-        $queues = $this->metrics->fulfillmentQueues($scope);
-        $receipts = $this->metrics->receiptCounts();
-        $backorders = $this->metrics->activeBackorderCount($scope);
+        $incoming = $this->metrics->ordersInPeriod($period, $scope);
+        $incomingPrevious = $this->metrics->ordersInPeriod($period, $scope, true);
+        $inTransit = $this->metrics->inTransitCount($scope);
+        $invoiced = $this->metrics->invoiceTotal($period, $scope);
+        $invoicedPrevious = $this->metrics->invoiceTotal($period, $scope, true);
+        $paid = $this->metrics->paymentTotal($period, $scope);
+        $paidPrevious = $this->metrics->paymentTotal($period, $scope, true);
+        $overdueCount = $this->metrics->overdueCount($scope);
+        $overdueTotal = $this->metrics->overdueTotal($scope);
 
         return [
             'kpis' => [
-                Kpi::point('Total Judul Buku', $this->metrics->counts()['books'], 'book', 'brand'),
-                Kpi::point('Stok Menipis', $stock['low'], 'trendDown', 'amber', [
-                    'valueTone' => $stock['low'] > 0 ? 'amber' : 'default',
-                    'hint' => 'di bawah minimum',
+                Kpi::number('Pesanan Masuk', $incoming, 'cart', 'brand', [
+                    'delta' => Kpi::delta($incoming, $incomingPrevious),
+                    'hint' => $period->label(),
                 ]),
-                Kpi::point('Stok Habis', $stock['out'], 'alert', 'rose', [
-                    'valueTone' => $stock['out'] > 0 ? 'rose' : 'emerald',
+                Kpi::number('Siap Picking', $this->metrics->ordersWithStatus([
+                    OrderStatus::PartialReady->value,
+                    OrderStatus::Ready->value,
+                ], $scope), 'clipboard', 'violet'),
+                Kpi::number('Menunggu Stok', $this->metrics->ordersWithStatus([
+                    OrderStatus::Processing->value,
+                ], $scope), 'clock', 'amber'),
+                Kpi::number('Dalam Pengiriman', $inTransit, 'truck', 'sky'),
+                Kpi::money('Total Invoice', $invoiced, 'receipt', 'brand', [
+                    'delta' => Kpi::delta((float) $invoiced, (float) $invoicedPrevious),
+                    'hint' => $period->label(),
                 ]),
-                Kpi::point('Barang Masuk', $receipts['draft'], 'inbox', 'sky', [
-                    'hint' => 'belum dikonfirmasi',
+                Kpi::money('Sudah Dibayar', $paid, 'checkCircle', 'emerald', [
+                    'delta' => Kpi::delta((float) $paid, (float) $paidPrevious),
                 ]),
-                Kpi::point('Menunggu Picking', $queues['picking'], 'clipboard', 'violet'),
-                Kpi::point('Menunggu Packing', $queues['packing'], 'boxes', 'amber'),
-                Kpi::point('Back Order', $backorders, 'refresh', 'rose', [
-                    'valueTone' => $backorders > 0 ? 'rose' : 'emerald',
+                Kpi::money('Piutang', $this->metrics->outstandingTotal($scope), 'fileText', 'amber'),
+                Kpi::money('Jatuh Tempo', $overdueTotal, 'alert', 'rose', [
+                    'valueTone' => (float) $overdueTotal > 0 ? 'rose' : 'default',
+                    'hint' => $overdueCount.' invoice',
+                    'goodWhenDown' => true,
                 ]),
-                Kpi::point('Siap Kirim', $queues['ready_to_ship'], 'truck', 'sky'),
             ],
             'notifications' => $this->alerts($user, $scope),
             'stock_alerts' => $stock,

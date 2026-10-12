@@ -55,14 +55,14 @@ class DemoDataResetSeeder extends Seeder
         $this->console()?->warn('Removing demo-only records from: '.$database);
 
         $schoolIds = DB::table('schools')->where('npsn', 'like', self::PREFIX.'%')->pluck('id')->all();
-        $bookIds = DB::table('books')->where('code', 'like', 'BK-DEMO-%')->pluck('id')->all();
+        $productIds = DB::table('products')->where('code', 'like', 'BK-DEMO-%')->pluck('id')->all();
         $orderIds = DB::table('orders')->where('external_source', 'DEMO')->pluck('id')->all();
         $receiptIds = DB::table('goods_receipts')->whereIn('notes', self::RECEIPT_NOTES)->pluck('id')->all();
         $publisherIds = DB::table('publishers')->where('email', self::PUBLISHER_EMAIL)->pluck('id')->all();
 
         $deleted = [];
 
-        DB::transaction(function () use ($schoolIds, $bookIds, $orderIds, $receiptIds, &$deleted): void {
+        DB::transaction(function () use ($schoolIds, $productIds, $orderIds, $receiptIds, &$deleted): void {
             $step = function (string $table, callable $query) use (&$deleted): void {
                 $count = $query()->delete();
                 $deleted[$table] = ($deleted[$table] ?? 0) + $count;
@@ -90,13 +90,14 @@ class DemoDataResetSeeder extends Seeder
             $step('orders', fn () => DB::table('orders')->where('external_source', 'DEMO'));
 
             // Inventory.
-            $step('stock_movements', fn () => DB::table('stock_movements')->whereIn('book_id', $bookIds));
-            $step('stocks', fn () => DB::table('stocks')->whereIn('book_id', $bookIds));
+            $step('stock_movements', fn () => DB::table('stock_movements')->whereIn('product_id', $productIds));
+            $step('stocks', fn () => DB::table('stocks')->whereIn('product_id', $productIds));
             $step('goods_receipt_items', fn () => DB::table('goods_receipt_items')->whereIn('goods_receipt_id', $receiptIds));
             $step('goods_receipts', fn () => DB::table('goods_receipts')->whereIn('notes', self::RECEIPT_NOTES));
 
             // Master data (children before parents).
-            $step('books', fn () => DB::table('books')->where('code', 'like', 'BK-DEMO-%'));
+            $step('books', fn () => DB::table('books')->whereIn('product_id', $productIds));
+            $step('products', fn () => DB::table('products')->where('code', 'like', 'BK-DEMO-%'));
             $step('book_categories', fn () => DB::table('book_categories')->where('slug', 'buku-pelajaran-demo'));
             $step('schools', fn () => DB::table('schools')->where('npsn', 'like', self::PREFIX.'%'));
             $step('publishers', fn () => DB::table('publishers')->where('email', self::PUBLISHER_EMAIL));

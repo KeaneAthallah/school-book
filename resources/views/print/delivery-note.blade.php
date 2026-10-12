@@ -71,7 +71,7 @@
             <tr>
                 <th style="width:40px">No</th>
                 <th>Kode</th>
-                <th>Judul Buku</th>
+                <th>Judul Barang</th>
                 <th class="num">Jumlah</th>
             </tr>
         </thead>
@@ -79,8 +79,8 @@
             @foreach ($shipment->items as $index => $item)
                 <tr>
                     <td class="num">{{ $index + 1 }}</td>
-                    <td>{{ $item->book?->code ?? '-' }}</td>
-                    <td>{{ $item->book?->title ?? '-' }}</td>
+                    <td>{{ $item->product?->code ?? '-' }}</td>
+                    <td>{{ $item->product?->title ?? '-' }}</td>
                     <td class="num">{{ $item->quantity }}</td>
                 </tr>
             @endforeach

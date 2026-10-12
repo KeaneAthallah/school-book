@@ -36,12 +36,12 @@
     <div class="flex min-h-screen items-center justify-center p-4">
         <div class="w-full max-w-sm">
             <div class="mb-5 flex items-center justify-center gap-2.5">
-                <span class="flex h-10 w-10 items-center justify-center rounded-control bg-brand-600 text-white">
-                    <x-icon name="book" class="h-5.5 w-5.5" />
+                <span class="flex h-10 w-10 shrink-0 items-center justify-center overflow-hidden rounded-control bg-brand-600">
+                    <img src="{{ asset('logo-mark.png') }}" alt="{{ config('app.name') }}" class="h-10 w-10 object-cover">
                 </span>
                 <div>
                     <p class="text-sm font-semibold text-ink">{{ config('app.name') }}</p>
-                    <p class="text-[11px] text-ink-muted">Monitoring Penjualan Buku</p>
+                    <p class="text-[11px] text-ink-muted">Kelola Lebih Mudah, Pantau Lebih Akurat.</p>
                 </div>
             </div>
 

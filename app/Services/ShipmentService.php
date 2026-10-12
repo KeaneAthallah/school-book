@@ -10,6 +10,7 @@ use App\Models\Shipment;
 use App\Models\ShipmentItem;
 use App\Models\User;
 use App\Models\Warehouse;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
 
@@ -78,12 +79,12 @@ class ShipmentService
     }
 
     /**
-     * Confirm a shipment: deduct stock, advance fulfilment quantities, and
-     * recompute the parent order status.
+     * Confirm a shipment: deduct stock, advance fulfilment quantities,
+     * recompute the parent order status and persist the proof photo.
      */
-    public function confirm(Shipment $shipment, User $user): Shipment
+    public function confirm(Shipment $shipment, User $user, ?UploadedFile $proofPhoto = null): Shipment
     {
-        return DB::transaction(function () use ($shipment, $user): Shipment {
+        return DB::transaction(function () use ($shipment, $user, $proofPhoto): Shipment {
             $locked = Shipment::query()->lockForUpdate()->findOrFail((int) $shipment->getKey());
 
             if ($locked->isConfirmed()) {
@@ -105,7 +106,7 @@ class ShipmentService
 
                 if ($shipmentItem->quantity > $item->reserved_quantity) {
                     throw ValidationException::withMessages([
-                        'quantity' => "Jumlah kirim melebihi stok yang direservasi untuk buku #{$item->book_id}.",
+                        'quantity' => "Jumlah kirim melebihi stok yang direservasi untuk barang #{$item->product_id}.",
                     ]);
                 }
 
@@ -126,6 +127,18 @@ class ShipmentService
                 'ship_date' => $locked->ship_date ?? now()->toDateString(),
                 'confirmed_at' => now(),
             ])->save();
+
+            if ($proofPhoto !== null) {
+                $path = $proofPhoto->store('shipments/'.((int) $locked->getKey()), 'public');
+
+                $locked->attachments()->create([
+                    'original_name' => $proofPhoto->getClientOriginalName(),
+                    'path' => $path,
+                    'mime_type' => $proofPhoto->getMimeType(),
+                    'size' => $proofPhoto->getSize(),
+                    'uploaded_by' => $user->getKey(),
+                ]);
+            }
 
             $order = Order::query()->findOrFail((int) $locked->order_id);
             $this->statusResolver->apply($order);
@@ -194,13 +207,13 @@ class ShipmentService
 
             if ($quantity > $available) {
                 throw ValidationException::withMessages([
-                    'items' => "Jumlah kirim untuk buku #{$orderItem->book_id} melebihi sisa yang siap dikirim ({$available}).",
+                    'items' => "Jumlah kirim untuk barang #{$orderItem->product_id} melebihi sisa yang siap dikirim ({$available}).",
                 ]);
             }
 
             $lines[] = [
                 'order_item_id' => (int) $orderItem->getKey(),
-                'book_id' => (int) $orderItem->book_id,
+                'product_id' => (int) $orderItem->product_id,
                 'quantity' => $quantity,
             ];
         }

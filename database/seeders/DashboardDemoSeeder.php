@@ -10,6 +10,7 @@ use App\Models\Invoice;
 use App\Models\Order;
 use App\Models\OrderSource;
 use App\Models\PaymentMethod;
+use App\Models\Product;
 use App\Models\Publisher;
 use App\Models\RebateRule;
 use App\Models\School;
@@ -234,20 +235,27 @@ class DashboardDemoSeeder extends Seeder
                     $index++;
                     $publisher = $publisherModels[$index % count($publisherModels)];
 
-                    $this->books[] = Book::query()->firstOrCreate(
+                    $product = Product::query()->firstOrCreate(
                         ['code' => sprintf('BK-DEMO-%s-%s%s', $code, $grade, $edition)],
                         [
-                            'isbn' => sprintf('978-602-DEMO-%04d', $index),
+                            'type' => 'book',
                             'title' => sprintf('%s Kelas %s (%s)', $subject, $grade, $edition),
-                            'publisher_id' => $publisher->getKey(),
-                            'category_id' => $category->getKey(),
-                            'grade' => $grade,
-                            'subject' => $subject,
                             'price' => (string) ($this->rand(45, 135) * 1000),
                             'cost_price' => (string) ($this->rand(30, 95) * 1000),
                             'min_stock' => 40,
                             'rack_location' => 'RAK-'.$grade,
                             'status' => 'active',
+                        ],
+                    );
+
+                    $this->books[] = Book::query()->firstOrCreate(
+                        ['product_id' => $product->getKey()],
+                        [
+                            'isbn' => sprintf('978-602-DEMO-%04d', $index),
+                            'publisher_id' => $publisher->getKey(),
+                            'category_id' => $category->getKey(),
+                            'grade' => $grade,
+                            'subject' => $subject,
                         ],
                     );
                 }
@@ -310,9 +318,9 @@ class DashboardDemoSeeder extends Seeder
 
         foreach ($receivable as $position => $book) {
             $byPublisher[$book->publisher_id][] = [
-                'book_id' => $book->getKey(),
+                'product_id' => $book->product->getKey(),
                 'quantity' => $position % 7 === 0 ? 36 : $this->rand(220, 420),
-                'unit_cost' => $book->cost_price,
+                'unit_cost' => $book->product->cost_price,
             ];
         }
 
@@ -336,7 +344,7 @@ class DashboardDemoSeeder extends Seeder
         $inventory = app(InventoryService::class);
 
         foreach (array_slice($this->books, max(0, count($this->books) - 2)) as $book) {
-            $inventory->stock($book->getKey(), $this->warehouse->getKey());
+            $inventory->stock($book->product->getKey(), $this->warehouse->getKey());
         }
     }
 
@@ -358,9 +366,9 @@ class DashboardDemoSeeder extends Seeder
             'receipt_date' => Carbon::today()->subDays(2)->toDateString(),
             'notes' => 'Menunggu pemeriksaan gudang',
             'items' => [[
-                'book_id' => $book->getKey(),
+                'product_id' => $book->product->getKey(),
                 'quantity' => 60,
-                'unit_cost' => $book->cost_price,
+                'unit_cost' => $book->product->cost_price,
             ]],
         ], $this->warehouseUser);
     }
@@ -409,14 +417,14 @@ class DashboardDemoSeeder extends Seeder
                 for ($l = 0; $l < $lineCount; $l++) {
                     $book = $this->books[$this->rand(0, count($this->books) - 1)];
 
-                    if (collect($lines)->contains(fn (array $line): bool => $line['book_id'] === $book->getKey())) {
+                    if (collect($lines)->contains(fn (array $line): bool => $line['product_id'] === $book->product->getKey())) {
                         continue;
                     }
 
                     $lines[] = [
-                        'book_id' => $book->getKey(),
+                        'product_id' => $book->product->getKey(),
                         'quantity' => $this->rand(30, 120),
-                        'unit_price' => $book->price,
+                        'unit_price' => $book->product->price,
                         'discount_amount' => '0',
                     ];
                 }

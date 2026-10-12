@@ -4,9 +4,9 @@ namespace App\Services;
 
 use App\Exceptions\IntegrationNotConfiguredException;
 use App\Integrations\IntegrationManager;
-use App\Models\Book;
 use App\Models\IntegrationLog;
 use App\Models\OrderSource;
+use App\Models\Product;
 use App\Models\School;
 use App\Models\User;
 use App\Support\IntegrationSyncResult;
@@ -79,18 +79,18 @@ class IntegrationService
         $items = [];
 
         foreach ((array) ($payload['items'] ?? []) as $line) {
-            $book = Book::query()->where('code', (string) ($line['code'] ?? ''))->first();
+            $product = Product::query()->where('code', (string) ($line['code'] ?? ''))->first();
 
-            if ($book === null) {
-                $this->log($source, 'skipped', "Buku dengan kode {$line['code']} tidak ditemukan.", $reference);
+            if ($product === null) {
+                $this->log($source, 'skipped', "Barang dengan kode {$line['code']} tidak ditemukan.", $reference);
 
                 return false;
             }
 
             $items[] = [
-                'book_id' => $book->getKey(),
+                'product_id' => $product->getKey(),
                 'quantity' => (int) ($line['quantity'] ?? 0),
-                'unit_price' => (string) ($line['unit_price'] ?? $book->price),
+                'unit_price' => (string) ($line['unit_price'] ?? $product->price),
             ];
         }
 

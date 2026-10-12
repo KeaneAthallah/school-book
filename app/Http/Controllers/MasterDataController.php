@@ -10,6 +10,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\QueryException;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\DB;
 use Illuminate\View\View;
 
@@ -22,14 +23,25 @@ class MasterDataController extends Controller
 
         /** @var class-string<Model> $modelClass */
         $modelClass = $definition['model'];
-        $model = new $modelClass;
 
-        $query = $model->newQuery();
+        $query = $this->scoped($definition, $modelClass);
 
         /** @var list<string> $with */
         $with = $definition['with'];
         if ($with !== []) {
             $query->with($with);
+        }
+
+        /** @var list<array{0: string, 1: string, 2: string, 3: string}> $joins */
+        $joins = $definition['joins'];
+        foreach ($joins as [$table, $first, $operator, $second]) {
+            $query->join($table, $first, $operator, $second);
+        }
+
+        // A bare join would let the products columns shadow the child table's
+        // own columns (notably id), so keep the query rooted on its model.
+        if ($joins !== []) {
+            $query->select($query->getModel()->getTable().'.*');
         }
 
         $search = $request->string('search')->toString();
@@ -82,12 +94,14 @@ class MasterDataController extends Controller
 
         /** @var class-string<Model> $modelClass */
         $modelClass = $definition['model'];
-        $record = $modelClass::query()->findOrFail($id);
+        $record = $this->scoped($definition, $modelClass)->findOrFail($id);
+
+        $values = $definition['values'];
 
         return view('master.resource-form', [
             'resource' => $this->resourcePayload($resource, $definition),
             'record' => $record,
-            'values' => $this->editable($record, $definition),
+            'values' => is_callable($values) ? $values($record) : $this->editable($record, $definition),
             'title' => 'Ubah '.$definition['title'],
         ]);
     }
@@ -104,6 +118,14 @@ class MasterDataController extends Controller
         $modelClass = $definition['model'];
 
         DB::transaction(function () use ($definition, $modelClass, $attributes): void {
+            $save = $definition['save'];
+            if (is_callable($save)) {
+                /** @var callable(array<string, mixed>, null): Model $save */
+                $save($attributes, null);
+
+                return;
+            }
+
             $model = new $modelClass;
             $attributes = $this->prepare($definition, $model, $attributes);
             $model->fill($attributes)->save();
@@ -119,12 +141,20 @@ class MasterDataController extends Controller
 
         /** @var class-string<Model> $modelClass */
         $modelClass = $definition['model'];
-        $record = $modelClass::query()->findOrFail($id);
+        $record = $this->scoped($definition, $modelClass)->findOrFail($id);
 
         /** @var array<string, mixed> $attributes */
         $attributes = $request->validate($this->rules($definition, $record));
 
         DB::transaction(function () use ($definition, $record, $attributes): void {
+            $save = $definition['save'];
+            if (is_callable($save)) {
+                /** @var callable(array<string, mixed>, Model): Model $save */
+                $save($attributes, $record);
+
+                return;
+            }
+
             $attributes = $this->prepare($definition, $record, $attributes);
             $record->fill($attributes)->save();
         });
@@ -139,7 +169,7 @@ class MasterDataController extends Controller
 
         /** @var class-string<Model> $modelClass */
         $modelClass = $definition['model'];
-        $record = $modelClass::query()->findOrFail($id);
+        $record = $this->scoped($definition, $modelClass)->findOrFail($id);
 
         try {
             $record->delete();
@@ -163,8 +193,30 @@ class MasterDataController extends Controller
     }
 
     /**
+     * Apply the definition's optional scope so a resource only ever
+     * sees its own records (e.g. books vs. barang lainnya).
+     *
      * @param  array<string, mixed>  $definition
-     * @return array<string, array<string, mixed>>
+     * @param  class-string<Model>  $modelClass
+     * @return Builder<Model>
+     */
+    private function scoped(array $definition, string $modelClass): Builder
+    {
+        $query = $modelClass::query();
+
+        $scope = $definition['scope'];
+
+        if (is_callable($scope)) {
+            /** @var callable(Builder<Model>): void $scope */
+            $scope($query);
+        }
+
+        return $query;
+    }
+
+    /**
+     * @param  array<string, mixed>  $definition
+     * @return array<string, mixed>
      */
     private function rules(array $definition, ?Model $model): array
     {
@@ -241,9 +293,9 @@ class MasterDataController extends Controller
             }
 
             if (is_scalar($value) || $value === null) {
-                $display[$column['key']] = $value;
+                Arr::set($display, $column['key'], $value);
             } else {
-                $display[$column['key']] = (string) json_encode($value);
+                Arr::set($display, $column['key'], (string) json_encode($value));
             }
         }
 

@@ -3,8 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\StoreGoodsReceiptRequest;
-use App\Models\Book;
 use App\Models\GoodsReceipt;
+use App\Models\Product;
 use App\Models\Publisher;
 use App\Models\Warehouse;
 use App\Services\GoodsReceiptService;
@@ -65,7 +65,7 @@ class GoodsReceiptController extends Controller
     {
         abort_unless($this->userCan($request, 'receipts.view'), 403);
 
-        $receipt->load(['publisher:id,name', 'warehouse:id,name', 'items.book:id,code,title', 'confirmedBy:id,name']);
+        $receipt->load(['publisher:id,name', 'warehouse:id,name', 'items.product:id,code,title', 'confirmedBy:id,name']);
 
         return view('inventory.receipts.show', [
             'receipt' => [
@@ -80,8 +80,8 @@ class GoodsReceiptController extends Controller
                 'confirmed_by' => $receipt->confirmedBy?->name,
                 'confirmed_at' => $receipt->confirmed_at?->toDateTimeString(),
                 'items' => $receipt->items->map(fn ($item): array => [
-                    'book' => $item->book?->title,
-                    'code' => $item->book?->code,
+                    'product' => $item->product?->title,
+                    'code' => $item->product?->code,
                     'quantity' => $item->quantity,
                     'unit_cost' => $item->unit_cost,
                 ])->all(),
@@ -118,11 +118,11 @@ class GoodsReceiptController extends Controller
                 ->map(fn (Publisher $publisher): array => ['value' => $publisher->getKey(), 'label' => $publisher->name])->all(),
             'warehouses' => Warehouse::query()->active()->orderBy('name')->get(['id', 'name'])
                 ->map(fn (Warehouse $warehouse): array => ['value' => $warehouse->getKey(), 'label' => $warehouse->name])->all(),
-            'books' => Book::query()->active()->orderBy('title')->get(['id', 'code', 'title', 'cost_price'])
-                ->map(fn (Book $book): array => [
-                    'value' => $book->getKey(),
-                    'label' => $book->code.' - '.$book->title,
-                    'cost_price' => $book->cost_price,
+            'products' => Product::query()->active()->orderBy('title')->get(['id', 'code', 'title', 'cost_price'])
+                ->map(fn (Product $product): array => [
+                    'value' => $product->getKey(),
+                    'label' => $product->code.' - '.$product->title,
+                    'cost_price' => $product->cost_price,
                 ])->all(),
             'defaultDate' => now()->toDateString(),
         ];

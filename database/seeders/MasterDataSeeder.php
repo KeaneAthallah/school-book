@@ -8,6 +8,7 @@ use App\Models\BookCategory;
 use App\Models\Courier;
 use App\Models\OrderSource;
 use App\Models\PaymentMethod;
+use App\Models\Product;
 use App\Models\Publisher;
 use App\Models\RebateRule;
 use App\Models\School;
@@ -65,20 +66,27 @@ class MasterDataSeeder extends Seeder
         ];
 
         foreach ($books as $data) {
-            Book::query()->updateOrCreate(
+            $product = Product::query()->updateOrCreate(
                 ['code' => $data['code']],
                 [
+                    'type' => 'book',
                     'title' => $data['title'],
-                    'isbn' => '978-602-'.Str::padLeft((string) random_int(1, 99999), 5, '0'),
-                    'publisher_id' => $publisherModels[$data['publisher']]->id,
-                    'category_id' => $categoryModels[$data['category']]->id,
-                    'grade' => $data['grade'],
-                    'subject' => $data['subject'],
                     'price' => $data['price'],
                     'cost_price' => (string) ((float) $data['price'] * 0.7),
                     'min_stock' => $data['min_stock'],
                     'rack_location' => 'RAK-'.$data['grade'],
                     'status' => 'active',
+                ],
+            );
+
+            Book::query()->updateOrCreate(
+                ['product_id' => $product->id],
+                [
+                    'isbn' => '978-602-'.Str::padLeft((string) random_int(1, 99999), 5, '0'),
+                    'publisher_id' => $publisherModels[$data['publisher']]->id,
+                    'category_id' => $categoryModels[$data['category']]->id,
+                    'grade' => $data['grade'],
+                    'subject' => $data['subject'],
                 ],
             );
         }

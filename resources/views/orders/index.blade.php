@@ -11,7 +11,7 @@
         title="Pesanan"
         :subtitle="$activeSource
             ? 'Pesanan dari sumber '.$activeSource['label'].'.'
-            : 'Daftar pesanan buku dari semua sumber.'"
+            : 'Daftar pesanan dari semua sumber.'"
     >
         <x-slot:actions>
             @if ($can['create'])

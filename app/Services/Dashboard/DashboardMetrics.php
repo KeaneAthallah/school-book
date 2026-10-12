@@ -93,8 +93,8 @@ class DashboardMetrics
     public function inventoryValue(): string
     {
         $total = DB::table('stocks')
-            ->join('books', 'books.id', '=', 'stocks.book_id')
-            ->selectRaw('COALESCE(SUM(stocks.quantity * books.cost_price), 0) as total')
+            ->join('products', 'products.id', '=', 'stocks.product_id')
+            ->selectRaw('COALESCE(SUM(stocks.quantity * products.cost_price), 0) as total')
             ->value('total');
 
         return Money::add((string) $total, '0');
@@ -111,6 +111,16 @@ class DashboardMetrics
             ->whereNotIn('status', [OrderStatus::Cancelled->value, OrderStatus::Draft->value])
             ->whereDate('order_date', '>=', $start->toDateString())
             ->whereDate('order_date', '<=', $end->toDateString())
+            ->count();
+    }
+
+    /**
+     * Shipments handed to the courier but not yet marked delivered.
+     */
+    public function inTransitCount(DashboardScope $scope): int
+    {
+        return $scope->shipments(Shipment::query())
+            ->where('status', ShipmentStatus::Shipped->value)
             ->count();
     }
 
@@ -223,7 +233,7 @@ class DashboardMetrics
     public function backorders(DashboardScope $scope, int $limit = 6): array
     {
         return $this->backorderQuery($scope)
-            ->with(['orderItem.order:id,number,school_id', 'orderItem.order.school:id,name', 'orderItem.book:id,title'])
+            ->with(['orderItem.order:id,number,school_id', 'orderItem.order.school:id,name', 'orderItem.product:id,title'])
             ->orderByDesc('id')
             ->limit($limit)
             ->get()
@@ -231,7 +241,7 @@ class DashboardMetrics
                 'id' => $backorder->getKey(),
                 'number' => $backorder->orderItem?->order?->number,
                 'school' => $backorder->orderItem?->order?->school?->name,
-                'book' => $backorder->orderItem?->book?->title,
+                'product' => $backorder->orderItem?->product?->title,
                 'quantity' => max(0, $backorder->quantity - $backorder->fulfilled_quantity),
                 'status' => $backorder->status->value,
                 'status_label' => $backorder->status->label(),
@@ -267,9 +277,9 @@ class DashboardMetrics
     public function stockAlerts(): array
     {
         $row = DB::table('stocks')
-            ->join('books', 'books.id', '=', 'stocks.book_id')
-            ->groupBy('books.id', 'books.min_stock')
-            ->selectRaw('books.min_stock as min_stock, SUM(stocks.quantity) as quantity, SUM(stocks.reserved_quantity) as reserved')
+            ->join('products', 'products.id', '=', 'stocks.product_id')
+            ->groupBy('products.id', 'products.min_stock')
+            ->selectRaw('products.min_stock as min_stock, SUM(stocks.quantity) as quantity, SUM(stocks.reserved_quantity) as reserved')
             ->get();
 
         $low = 0;
@@ -297,9 +307,9 @@ class DashboardMetrics
     public function stockRows(int $limit = 6): array
     {
         return DB::table('stocks')
-            ->join('books', 'books.id', '=', 'stocks.book_id')
-            ->groupBy('books.id', 'books.code', 'books.title', 'books.min_stock')
-            ->selectRaw('books.code as code, books.title as title, books.min_stock as min_stock, SUM(stocks.quantity) as quantity, SUM(stocks.reserved_quantity) as reserved')
+            ->join('products', 'products.id', '=', 'stocks.product_id')
+            ->groupBy('products.id', 'products.code', 'products.title', 'products.min_stock')
+            ->selectRaw('products.code as code, products.title as title, products.min_stock as min_stock, SUM(stocks.quantity) as quantity, SUM(stocks.reserved_quantity) as reserved')
             ->orderByRaw('(SUM(stocks.quantity) - SUM(stocks.reserved_quantity)) asc')
             ->limit($limit)
             ->get()
@@ -328,7 +338,7 @@ class DashboardMetrics
     public function stockMovements(int $limit = 8): array
     {
         return DB::table('stock_movements')
-            ->join('books', 'books.id', '=', 'stock_movements.book_id')
+            ->join('products', 'products.id', '=', 'stock_movements.product_id')
             ->leftJoin('warehouses', 'warehouses.id', '=', 'stock_movements.warehouse_id')
             ->orderByDesc('stock_movements.id')
             ->limit($limit)
@@ -337,14 +347,14 @@ class DashboardMetrics
                 'stock_movements.type',
                 'stock_movements.quantity',
                 'stock_movements.created_at',
-                'books.title as book',
+                'products.title as product',
                 'warehouses.name as warehouse',
             ])
             ->map(fn (object $row): array => [
                 'id' => (int) $row->id,
                 'type' => (string) $row->type,
                 'quantity' => (int) $row->quantity,
-                'book' => (string) $row->book,
+                'product' => (string) $row->product,
                 'warehouse' => $row->warehouse === null ? null : (string) $row->warehouse,
                 'time' => (string) $row->created_at,
             ])
@@ -735,7 +745,8 @@ class DashboardMetrics
     public function salesByPublisher(Period $period, DashboardScope $scope): array
     {
         $query = $this->shippedValueQuery($period)
-            ->join('books', 'books.id', '=', 'order_items.book_id')
+            ->join('products', 'products.id', '=', 'order_items.product_id')
+            ->join('books', 'books.product_id', '=', 'products.id')
             ->join('publishers', 'publishers.id', '=', 'books.publisher_id')
             ->groupBy('publishers.id', 'publishers.name')
             ->selectRaw('publishers.name as label, SUM(order_items.unit_price * order_items.shipped_quantity) as value')

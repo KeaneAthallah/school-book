@@ -63,7 +63,7 @@ class PickingController extends Controller
     {
         abort_unless($this->userCan($request, 'fulfillment.view'), 403);
 
-        $picking->load(['order:id,number', 'order.school:id,name', 'warehouse:id,name', 'items.book:id,code,title']);
+        $picking->load(['order:id,number', 'order.school:id,name', 'warehouse:id,name', 'items.product:id,code,title']);
 
         return view('inventory.pickings.show', [
             'picking' => [
@@ -76,8 +76,8 @@ class PickingController extends Controller
                 'status_label' => $picking->status->label(),
                 'items' => $picking->items->map(fn ($item): array => [
                     'id' => $item->getKey(),
-                    'book' => $item->book?->title,
-                    'code' => $item->book?->code,
+                    'product' => $item->product?->title,
+                    'code' => $item->product?->code,
                     'quantity' => $item->quantity,
                     'picked_quantity' => $item->picked_quantity,
                 ])->all(),

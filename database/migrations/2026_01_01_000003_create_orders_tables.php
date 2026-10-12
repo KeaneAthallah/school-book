@@ -35,7 +35,7 @@ return new class extends Migration
         Schema::create('order_items', function (Blueprint $table) {
             $table->id();
             $table->foreignId('order_id')->constrained()->cascadeOnDelete();
-            $table->foreignId('book_id')->constrained()->restrictOnDelete();
+            $table->foreignId('product_id')->constrained()->restrictOnDelete();
             $table->integer('quantity');
             $table->decimal('unit_price', 15, 2)->default(0);
             $table->decimal('discount_amount', 15, 2)->default(0);
@@ -46,7 +46,7 @@ return new class extends Migration
             $table->string('status')->default('pending')->index();
             $table->timestamps();
 
-            $table->index(['order_id', 'book_id']);
+            $table->index(['order_id', 'product_id']);
         });
     }
 

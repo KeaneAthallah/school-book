@@ -5,6 +5,7 @@ namespace App\Services\Dashboard;
 use App\Dashboard\DashboardScope;
 use App\Dashboard\Kpi;
 use App\Dashboard\Period;
+use App\Enums\OrderStatus;
 use App\Models\User;
 
 /**
@@ -25,32 +26,41 @@ class FinanceDashboardService extends RoleDashboard
         $invoicedPrevious = $this->metrics->invoiceTotal($period, $scope, true);
         $buckets = $this->metrics->invoicePaymentBuckets($scope);
         $pending = $this->metrics->paymentsAwaitingVerification($scope);
-        $overdueCount = $this->metrics->overdueCount($scope);
         $rebates = $this->metrics->rebateCounts($scope);
-        $awaitingRebates = $rebates['submitted'] + $rebates['approved'];
+        $incoming = $this->metrics->ordersInPeriod($period, $scope);
+        $incomingPrevious = $this->metrics->ordersInPeriod($period, $scope, true);
+        $inTransit = $this->metrics->inTransitCount($scope);
+        $paid = $this->metrics->paymentTotal($period, $scope);
+        $paidPrevious = $this->metrics->paymentTotal($period, $scope, true);
+        $overdueCount = $this->metrics->overdueCount($scope);
+        $overdueTotal = $this->metrics->overdueTotal($scope);
 
         return [
             'kpis' => [
+                Kpi::number('Pesanan Masuk', $incoming, 'cart', 'brand', [
+                    'delta' => Kpi::delta($incoming, $incomingPrevious),
+                    'hint' => $period->label(),
+                ]),
+                Kpi::number('Siap Picking', $this->metrics->ordersWithStatus([
+                    OrderStatus::PartialReady->value,
+                    OrderStatus::Ready->value,
+                ], $scope), 'clipboard', 'violet'),
+                Kpi::number('Menunggu Stok', $this->metrics->ordersWithStatus([
+                    OrderStatus::Processing->value,
+                ], $scope), 'clock', 'amber'),
+                Kpi::number('Dalam Pengiriman', $inTransit, 'truck', 'sky'),
                 Kpi::money('Total Invoice', $invoiced, 'receipt', 'brand', [
                     'delta' => Kpi::delta((float) $invoiced, (float) $invoicedPrevious),
                     'hint' => $period->label(),
                 ]),
-                Kpi::point('Invoice Terbit', $this->metrics->issuedInvoiceCount($scope), 'fileText', 'sky'),
-                Kpi::point('Belum Bayar', $buckets['unpaid'], 'clock', 'slate'),
-                Kpi::point('Sebagian Dibayar', $buckets['partial'], 'refresh', 'sky'),
-                Kpi::point('Menunggu Verifikasi', $pending, 'alert', 'amber', [
-                    'valueTone' => $pending > 0 ? 'amber' : 'default',
+                Kpi::money('Sudah Dibayar', $paid, 'checkCircle', 'emerald', [
+                    'delta' => Kpi::delta((float) $paid, (float) $paidPrevious),
                 ]),
-                Kpi::money('Piutang', $this->metrics->outstandingTotal($scope), 'wallet', 'amber', [
-                    'hint' => 'seluruh invoice',
-                ]),
-                Kpi::money('Jatuh Tempo', $this->metrics->overdueTotal($scope), 'alert', 'rose', [
-                    'valueTone' => 'rose',
+                Kpi::money('Piutang', $this->metrics->outstandingTotal($scope), 'fileText', 'amber'),
+                Kpi::money('Jatuh Tempo', $overdueTotal, 'alert', 'rose', [
+                    'valueTone' => (float) $overdueTotal > 0 ? 'rose' : 'default',
                     'hint' => $overdueCount.' invoice',
                     'goodWhenDown' => true,
-                ]),
-                Kpi::point('Rebate Menunggu', $awaitingRebates, 'percent', 'violet', [
-                    'hint' => $rebates['approved'].' siap dibayar',
                 ]),
             ],
             'notifications' => $this->alerts($user, $scope),

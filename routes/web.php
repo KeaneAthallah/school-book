@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\AttachmentController;
 use App\Http\Controllers\AuditLogController;
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use App\Http\Controllers\DashboardController;
@@ -83,6 +84,10 @@ Route::middleware('auth')->group(function (): void {
     Route::post('shipments/{shipment}/confirm', [ShipmentController::class, 'confirm'])->name('shipments.confirm');
     Route::post('shipments/{shipment}/deliver', [ShipmentController::class, 'deliver'])->name('shipments.deliver');
     Route::get('shipments/{shipment}/print', [ShipmentController::class, 'print'])->name('shipments.print');
+
+    // Bukti foto pengiriman (polymorphic attachments).
+    Route::post('shipments/{shipment}/attachments', [ShipmentController::class, 'storeAttachment'])->name('shipments.attachments.store');
+    Route::delete('attachments/{attachment}', [AttachmentController::class, 'destroy'])->name('attachments.destroy');
 
     // Invoices.
     Route::get('invoices', [InvoiceController::class, 'index'])->name('invoices.index');

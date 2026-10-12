@@ -10,7 +10,7 @@ use Illuminate\Database\Eloquent\Relations\MorphTo;
 
 /**
  * @property int $id
- * @property int $book_id
+ * @property int $product_id
  * @property int $warehouse_id
  * @property StockMovementType $type
  * @property int $quantity
@@ -19,7 +19,7 @@ use Illuminate\Database\Eloquent\Relations\MorphTo;
  * @property int|null $reference_id
  */
 #[Fillable([
-    'book_id', 'warehouse_id', 'type', 'quantity', 'balance_after',
+    'product_id', 'warehouse_id', 'type', 'quantity', 'balance_after',
     'reference_type', 'reference_id', 'note', 'user_id',
 ])]
 class StockMovement extends Model
@@ -37,11 +37,11 @@ class StockMovement extends Model
     }
 
     /**
-     * @return BelongsTo<Book, $this>
+     * @return BelongsTo<Product, $this>
      */
-    public function book(): BelongsTo
+    public function product(): BelongsTo
     {
-        return $this->belongsTo(Book::class);
+        return $this->belongsTo(Product::class);
     }
 
     /**

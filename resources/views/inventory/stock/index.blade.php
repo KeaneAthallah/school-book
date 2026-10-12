@@ -4,7 +4,7 @@
 
 @section('content')
     <x-page-header
-        title="Stok Buku"
+        title="Stok Barang"
         subtitle="Saldo stok fisik, reservasi, dan ketersediaan per gudang."
     >
         <x-slot:actions>
@@ -21,7 +21,7 @@
     <x-card>
         <x-filter-bar method="get" :action="route('stock.index')">
             <x-field label="Cari" class="w-56">
-                <x-input type="search" name="search" value="{{ $filters['search'] }}" placeholder="Judul / kode buku…" />
+                <x-input type="search" name="search" value="{{ $filters['search'] }}" placeholder="Judul / kode barang…" />
             </x-field>
             <x-button type="submit" variant="secondary">Cari</x-button>
         </x-filter-bar>
@@ -32,7 +32,7 @@
             :rows="$stocks"
             :columns="[
                 ['key' => 'code', 'label' => 'Kode'],
-                ['key' => 'book', 'label' => 'Buku'],
+                ['key' => 'product', 'label' => 'Barang'],
                 ['key' => 'warehouse', 'label' => 'Gudang'],
                 ['key' => 'quantity', 'label' => 'Fisik', 'align' => 'right', 'class' => 'tabular-nums'],
                 ['key' => 'reserved_quantity', 'label' => 'Reservasi', 'align' => 'right', 'class' => 'tabular-nums'],
@@ -50,11 +50,11 @@
             <form method="POST" action="{{ route('stock.adjust') }}" class="space-y-3">
                 @csrf
 
-                <x-field label="Buku" name="book_id" required>
-                    <x-select name="book_id" :invalid="$errors->has('book_id')">
-                        <option value="">— Pilih Buku —</option>
-                        @foreach ($books as $option)
-                            <option value="{{ $option['value'] }}" @selected(old('book_id') == $option['value'])>{{ $option['label'] }}</option>
+                <x-field label="Barang" name="product_id" required>
+                    <x-select name="product_id" :invalid="$errors->has('product_id')">
+                        <option value="">— Pilih Barang —</option>
+                        @foreach ($products as $option)
+                            <option value="{{ $option['value'] }}" @selected(old('product_id') == $option['value'])">{{ $option['label'] }}</option>
                         @endforeach
                     </x-select>
                 </x-field>

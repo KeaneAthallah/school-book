@@ -5,10 +5,10 @@
 @section('content')
     @php
         $editing = isset($order);
-        $blank = ['book_id' => '', 'quantity' => 1, 'unit_price' => '', 'discount_amount' => '0'];
+        $blank = ['product_id' => '', 'quantity' => 1, 'unit_price' => '', 'discount_amount' => '0'];
         $items = $editing
             ? collect($order['items'])->map(fn (array $item): array => [
-                'book_id' => (string) $item['book_id'],
+                'product_id' => (string) $item['product_id'],
                 'quantity' => $item['quantity'],
                 'unit_price' => $item['unit_price'],
                 'discount_amount' => $item['discount_amount'],
@@ -18,7 +18,7 @@
 
     <x-page-header
         :title="$editing ? 'Ubah Pesanan '.$order['number'] : 'Buat Pesanan'"
-        subtitle="Pilih sekolah, sumber pesanan, dan item buku."
+        subtitle="Pilih sekolah, sumber pesanan, dan item barang."
     >
         <x-slot:actions>
             <x-button :href="route('orders.index')" variant="secondary">Kembali</x-button>
@@ -75,7 +75,7 @@
             </div>
         </x-card>
 
-        <x-card x-data="lineItems({{ json_encode(['books' => $books, 'items' => $items, 'blank' => $blank]) }})">
+        <x-card x-data="lineItems({{ json_encode(['products' => $products, 'items' => $items, 'blank' => $blank]) }})">
             <x-card-header title="Item Pesanan" icon="boxes">
                 <x-slot:action>
                     <x-button type="button" variant="secondary" size="sm" x-on:click="add()">Tambah Item</x-button>
@@ -89,16 +89,16 @@
 
                 <template x-for="(item, index) in items" :key="index">
                     <div class="grid gap-2 rounded-control border border-line p-3 sm:grid-cols-[2fr_1fr_1fr_1fr_auto]">
-                        <x-field label="Buku">
+                        <x-field label="Barang">
                             <select
-                                :name="`items[${index}][book_id]`"
-                                x-model="item.book_id"
+                                :name="`items[${index}][product_id]`"
+                                x-model="item.product_id"
                                 x-on:change="pick(index)"
                                 class="w-full rounded-control border border-line-strong bg-panel px-3 py-2 text-sm text-ink outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-100 dark:focus:ring-brand-500/25"
                             >
-                                <option value="">— Pilih Buku —</option>
-                                <template x-for="book in books" :key="book.value">
-                                    <option :value="book.value" x-text="book.label" :selected="String(item.book_id) === String(book.value)"></option>
+                                <option value="">— Pilih Barang —</option>
+                                <template x-for="product in products" :key="product.value">
+                                    <option :value="product.value" x-text="product.label" :selected="String(item.product_id) === String(product.value)"></option>
                                 </template>
                             </select>
                         </x-field>

@@ -33,6 +33,7 @@
             ['label' => $schoolLabel, 'route' => 'master.index', 'params' => ['resource' => 'schools'], 'match' => 'master.index', 'permission' => 'schools.view'],
             ['label' => 'Penerbit', 'route' => 'master.index', 'params' => ['resource' => 'publishers'], 'match' => 'master.index', 'permission' => 'publishers.view'],
             ['label' => 'Buku', 'route' => 'master.index', 'params' => ['resource' => 'books'], 'match' => 'master.index', 'permission' => 'books.view'],
+            ['label' => 'Barang Lainnya', 'route' => 'master.index', 'params' => ['resource' => 'barang-lainnya'], 'match' => 'master.index', 'permission' => 'goods.view'],
             ['label' => 'Kategori Buku', 'route' => 'master.index', 'params' => ['resource' => 'categories'], 'match' => 'master.index', 'permission' => 'categories.manage'],
             ['label' => 'Gudang', 'route' => 'master.index', 'params' => ['resource' => 'warehouses'], 'match' => 'master.index', 'permission' => 'warehouses.manage'],
             ['label' => 'Sumber Pesanan', 'route' => 'master.index', 'params' => ['resource' => 'order-sources'], 'match' => 'master.index', 'permission' => 'order-sources.manage'],
@@ -44,7 +45,7 @@
         ]],
 
         ['kind' => 'group', 'label' => 'Stok & Gudang', 'icon' => 'boxes', 'permission' => 'stock.view', 'items' => [
-            ['label' => 'Stok Buku', 'route' => 'stock.index', 'match' => 'stock.index', 'permission' => 'stock.view'],
+            ['label' => 'Stok Barang', 'route' => 'stock.index', 'match' => 'stock.index', 'permission' => 'stock.view'],
             ['label' => 'Barang Masuk', 'route' => 'receipts.index', 'match' => 'receipts.*', 'permission' => 'receipts.view'],
             ['label' => 'Mutasi Stok', 'route' => 'stock.movements', 'match' => 'stock.movements', 'permission' => 'stock.view'],
             ['label' => 'Stok Minimum', 'route' => 'reports.index', 'query' => ['type' => 'low_stock'], 'match' => 'reports.index', 'permission' => 'reports.view'],
@@ -121,12 +122,12 @@
 
 <div class="flex h-full flex-col bg-navy-900">
     <div class="flex h-header items-center gap-2.5 px-4">
-        <span class="flex h-9 w-9 items-center justify-center rounded-control bg-brand-600 text-white">
-            <x-icon name="book" class="h-5 w-5" />
+        <span class="flex h-9 w-9 shrink-0 items-center justify-center overflow-hidden rounded-control bg-brand-600">
+            <img src="{{ asset('logo-mark.png') }}" alt="{{ config('app.name') }}" class="h-9 w-9 object-cover">
         </span>
         <div class="min-w-0">
             <p class="truncate text-sm font-semibold text-white">{{ config('app.name') }}</p>
-            <p class="truncate text-[11px] text-navy-300">Monitoring Penjualan Buku</p>
+            <p class="truncate text-[11px] text-navy-300">Kelola Lebih Mudah, Pantau Lebih Akurat.</p>
         </div>
     </div>
 

@@ -67,7 +67,7 @@
         </x-card>
 
         <x-card>
-            <x-card-header title="Menunggu Stok" icon="clock" subtitle="Sudah dikonfirmasi, menunggu ketersediaan buku">
+            <x-card-header title="Menunggu Stok" icon="clock" subtitle="Sudah dikonfirmasi, menunggu ketersediaan barang">
                 <x-slot:action>
                     <a href="{{ route('stock.index') }}" class="text-xs font-medium text-brand-600 hover:underline dark:text-brand-300">Cek stok</a>
                 </x-slot:action>
@@ -89,7 +89,7 @@
         </x-card>
 
         <x-card>
-            <x-card-header title="Back Order" icon="inbox" subtitle="Kekurangan stok yang menunggu buku masuk">
+            <x-card-header title="Back Order" icon="inbox" subtitle="Kekurangan stok yang menunggu barang masuk">
                 <x-slot:action>
                     <a href="{{ route('reports.index', ['type' => 'backorders']) }}" class="text-xs font-medium text-brand-600 hover:underline dark:text-brand-300">Lihat laporan</a>
                 </x-slot:action>

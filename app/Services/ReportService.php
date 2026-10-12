@@ -19,11 +19,11 @@ class ReportService
         return [
             'sales_by_school' => 'Penjualan per Sekolah',
             'sales_by_publisher' => 'Penjualan per Penerbit',
-            'sales_by_book' => 'Penjualan per Buku',
+            'sales_by_book' => 'Penjualan per Barang',
             'order_summary' => 'Ringkasan Pesanan',
             'receivables' => 'Piutang per Sekolah',
             'overdue_invoices' => 'Invoice Jatuh Tempo',
-            'stock' => 'Stok per Buku',
+            'stock' => 'Stok per Barang',
             'low_stock' => 'Stok Menipis',
             'backorders' => 'Back Order',
         ];
@@ -79,7 +79,8 @@ class ReportService
     private function salesByPublisher(array $filters): array
     {
         $rows = $this->salesQuery($filters)
-            ->join('books', 'books.id', '=', 'order_items.book_id')
+            ->join('products', 'products.id', '=', 'order_items.product_id')
+            ->join('books', 'books.product_id', '=', 'products.id')
             ->join('publishers', 'publishers.id', '=', 'books.publisher_id')
             ->groupBy('publishers.id', 'publishers.name')
             ->selectRaw('publishers.name as name, SUM(order_items.shipped_quantity) as quantity, SUM(order_items.unit_price * order_items.shipped_quantity) as value')
@@ -103,9 +104,9 @@ class ReportService
     private function salesByBook(array $filters): array
     {
         $rows = $this->salesQuery($filters)
-            ->join('books', 'books.id', '=', 'order_items.book_id')
-            ->groupBy('books.id', 'books.title', 'books.code')
-            ->selectRaw('books.code as code, books.title as title, SUM(order_items.shipped_quantity) as quantity, SUM(order_items.unit_price * order_items.shipped_quantity) as value')
+            ->join('products', 'products.id', '=', 'order_items.product_id')
+            ->groupBy('products.id', 'products.title', 'products.code')
+            ->selectRaw('products.code as code, products.title as title, SUM(order_items.shipped_quantity) as quantity, SUM(order_items.unit_price * order_items.shipped_quantity) as value')
             ->orderByDesc('value')
             ->get();
 
@@ -224,10 +225,10 @@ class ReportService
     private function stock(): array
     {
         $rows = DB::table('stocks')
-            ->join('books', 'books.id', '=', 'stocks.book_id')
+            ->join('products', 'products.id', '=', 'stocks.product_id')
             ->join('warehouses', 'warehouses.id', '=', 'stocks.warehouse_id')
-            ->selectRaw('books.code as code, books.title as title, warehouses.name as warehouse, stocks.quantity as quantity, stocks.reserved_quantity as reserved, (stocks.quantity - stocks.reserved_quantity) as available')
-            ->orderBy('books.title')
+            ->selectRaw('products.code as code, products.title as title, warehouses.name as warehouse, stocks.quantity as quantity, stocks.reserved_quantity as reserved, (stocks.quantity - stocks.reserved_quantity) as available')
+            ->orderBy('products.title')
             ->get();
 
         return $this->table(
@@ -256,11 +257,11 @@ class ReportService
     private function lowStock(): array
     {
         $rows = DB::table('stocks')
-            ->join('books', 'books.id', '=', 'stocks.book_id')
+            ->join('products', 'products.id', '=', 'stocks.product_id')
             ->join('warehouses', 'warehouses.id', '=', 'stocks.warehouse_id')
-            ->whereColumn('stocks.quantity', '<=', 'books.min_stock')
-            ->where('books.min_stock', '>', 0)
-            ->selectRaw('books.code as code, books.title as title, warehouses.name as warehouse, stocks.quantity as quantity, books.min_stock as min_stock')
+            ->whereColumn('stocks.quantity', '<=', 'products.min_stock')
+            ->where('products.min_stock', '>', 0)
+            ->selectRaw('products.code as code, products.title as title, warehouses.name as warehouse, stocks.quantity as quantity, products.min_stock as min_stock')
             ->orderBy('stocks.quantity')
             ->get();
 
@@ -290,10 +291,10 @@ class ReportService
         $rows = DB::table('backorders')
             ->join('order_items', 'order_items.id', '=', 'backorders.order_item_id')
             ->join('orders', 'orders.id', '=', 'order_items.order_id')
-            ->join('books', 'books.id', '=', 'backorders.book_id')
+            ->join('products', 'products.id', '=', 'backorders.product_id')
             ->join('schools', 'schools.id', '=', 'orders.school_id')
             ->whereIn('backorders.status', [BackorderStatus::Open->value, BackorderStatus::Partial->value])
-            ->selectRaw('orders.number as number, orders.order_date as order_date, schools.name as school, books.title as book, (backorders.quantity - backorders.fulfilled_quantity) as outstanding')
+            ->selectRaw('orders.number as number, orders.order_date as order_date, schools.name as school, products.title as product, (backorders.quantity - backorders.fulfilled_quantity) as outstanding')
             ->orderBy('orders.order_date')
             ->get();
 
@@ -302,14 +303,14 @@ class ReportService
                 ['key' => 'number', 'label' => 'No. Pesanan'],
                 ['key' => 'order_date', 'label' => 'Tanggal'],
                 ['key' => 'school', 'label' => 'Sekolah'],
-                ['key' => 'book', 'label' => 'Buku'],
+                ['key' => 'product', 'label' => 'Barang'],
                 ['key' => 'outstanding', 'label' => 'Sisa', 'type' => 'number'],
             ],
             $rows->map(fn (object $row): array => [
                 'number' => (string) $row->number,
                 'order_date' => (string) $row->order_date,
                 'school' => (string) $row->school,
-                'book' => (string) $row->book,
+                'product' => (string) $row->product,
                 'outstanding' => (int) $row->outstanding,
             ])->all(),
         );

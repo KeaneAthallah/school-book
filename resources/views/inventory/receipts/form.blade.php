@@ -4,12 +4,12 @@
 
 @section('content')
     @php
-        $blank = ['book_id' => '', 'quantity' => 1, 'unit_cost' => ''];
+        $blank = ['product_id' => '', 'quantity' => 1, 'unit_cost' => ''];
     @endphp
 
     <x-page-header
         title="Tambah Penerimaan"
-        subtitle="Catat buku yang diterima dari penerbit. Stok bertambah setelah konfirmasi."
+        subtitle="Catat barang yang diterima dari penerbit. Stok bertambah setelah konfirmasi."
     >
         <x-slot:actions>
             <x-button :href="route('receipts.index')" variant="secondary">Kembali</x-button>
@@ -50,7 +50,7 @@
             </div>
         </x-card>
 
-        <x-card x-data="lineItems({{ json_encode(['books' => $books, 'items' => [$blank], 'blank' => $blank, 'priceKey' => 'unit_cost', 'bookPriceKey' => 'cost_price']) }})">
+        <x-card x-data="lineItems({{ json_encode(['products' => $products, 'items' => [$blank], 'blank' => $blank, 'priceKey' => 'unit_cost', 'bookPriceKey' => 'cost_price']) }})">
             <x-card-header title="Item" icon="boxes">
                 <x-slot:action>
                     <x-button type="button" variant="secondary" size="sm" x-on:click="add()">Tambah Item</x-button>
@@ -64,16 +64,16 @@
 
                 <template x-for="(item, index) in items" :key="index">
                     <div class="grid gap-2 rounded-control border border-line p-3 sm:grid-cols-[2fr_1fr_1fr_auto]">
-                        <x-field label="Buku">
+                        <x-field label="Barang">
                             <select
-                                x-bind:name="`items[${index}][book_id]`"
-                                x-model="item.book_id"
+                                x-bind:name="`items[${index}][product_id]`"
+                                x-model="item.product_id"
                                 x-on:change="pick(index)"
                                 class="w-full rounded-control border border-line-strong bg-panel px-3 py-2 text-sm text-ink outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-100 dark:focus:ring-brand-500/25"
                             >
-                                <option value="">— Pilih Buku —</option>
-                                <template x-for="book in books" :key="book.value">
-                                    <option :value="book.value" x-text="book.label"></option>
+                                <option value="">— Pilih Barang —</option>
+                                <template x-for="product in products" :key="product.value">
+                                    <option :value="product.value" x-text="product.label"></option>
                                 </template>
                             </select>
                         </x-field>

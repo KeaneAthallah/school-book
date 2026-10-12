@@ -17,6 +17,8 @@ return [
         'publishers.manage' => ['name' => 'Kelola Penerbit', 'group' => 'Master Data'],
         'books.view' => ['name' => 'Lihat Buku', 'group' => 'Master Data'],
         'books.manage' => ['name' => 'Kelola Buku', 'group' => 'Master Data'],
+        'goods.view' => ['name' => 'Lihat Barang Lainnya', 'group' => 'Master Data'],
+        'goods.manage' => ['name' => 'Kelola Barang Lainnya', 'group' => 'Master Data'],
         'categories.manage' => ['name' => 'Kelola Kategori Buku', 'group' => 'Master Data'],
         'warehouses.manage' => ['name' => 'Kelola Gudang', 'group' => 'Master Data'],
         'order-sources.manage' => ['name' => 'Kelola Sumber Pesanan', 'group' => 'Master Data'],
@@ -75,7 +77,7 @@ return [
             'name' => 'Operator Pesanan',
             'description' => 'Menginput dan memvalidasi pesanan.',
             'permissions' => [
-                'dashboard.view', 'schools.view', 'books.view', 'orders.view',
+                'dashboard.view', 'schools.view', 'books.view', 'goods.view', 'orders.view',
                 'orders.manage', 'orders.confirm', 'stock.view', 'reports.view',
             ],
         ],
@@ -83,7 +85,7 @@ return [
             'name' => 'Gudang',
             'description' => 'Mengelola penerimaan, stok, picking, packing, dan pengiriman.',
             'permissions' => [
-                'dashboard.view', 'books.view', 'orders.view', 'receipts.view',
+                'dashboard.view', 'books.view', 'goods.view', 'orders.view', 'receipts.view',
                 'receipts.manage', 'receipts.confirm', 'stock.view', 'stock.adjust',
                 'fulfillment.view', 'fulfillment.pick', 'fulfillment.pack',
                 'shipments.view', 'shipments.manage', 'shipments.confirm', 'reports.view',
@@ -103,7 +105,7 @@ return [
             'name' => 'Sales / PIC',
             'description' => 'Menangani sekolah yang ditugaskan dan transaksinya.',
             'permissions' => [
-                'dashboard.view', 'schools.view', 'books.view', 'orders.view',
+                'dashboard.view', 'schools.view', 'books.view', 'goods.view', 'orders.view',
                 'orders.manage', 'invoices.view', 'payments.view', 'rebates.view',
                 'rebates.request', 'reports.view',
             ],

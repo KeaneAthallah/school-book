@@ -5,6 +5,7 @@ namespace App\Services\Dashboard;
 use App\Dashboard\DashboardScope;
 use App\Dashboard\Kpi;
 use App\Dashboard\Period;
+use App\Enums\OrderStatus;
 use App\Models\User;
 
 /**
@@ -25,28 +26,42 @@ class AdminDashboardService extends RoleDashboard
     {
         $counts = $this->metrics->counts();
         $alerts = $this->alerts($user, $scope);
-        $orders = $this->metrics->ordersInPeriod($period, $scope);
-        $ordersPrevious = $this->metrics->ordersInPeriod($period, $scope, true);
+        $incoming = $this->metrics->ordersInPeriod($period, $scope);
+        $incomingPrevious = $this->metrics->ordersInPeriod($period, $scope, true);
+        $inTransit = $this->metrics->inTransitCount($scope);
+        $invoiced = $this->metrics->invoiceTotal($period, $scope);
+        $invoicedPrevious = $this->metrics->invoiceTotal($period, $scope, true);
+        $paid = $this->metrics->paymentTotal($period, $scope);
+        $paidPrevious = $this->metrics->paymentTotal($period, $scope, true);
         $overdueCount = $this->metrics->overdueCount($scope);
+        $overdueTotal = $this->metrics->overdueTotal($scope);
 
         return [
             'kpis' => [
-                Kpi::point('Total Pengguna', $counts['users'], 'users', 'brand'),
-                Kpi::point('Total Sekolah', $counts['schools'], 'school', 'sky'),
-                Kpi::point('Total Penerbit', $counts['publishers'], 'database', 'violet'),
-                Kpi::point('Total Buku', $counts['books'], 'book', 'brand'),
-                Kpi::number('Pesanan Periode Ini', $orders, 'cart', 'brand', [
-                    'delta' => Kpi::delta($orders, $ordersPrevious),
+                Kpi::number('Pesanan Masuk', $incoming, 'cart', 'brand', [
+                    'delta' => Kpi::delta($incoming, $incomingPrevious),
                     'hint' => $period->label(),
                 ]),
-                Kpi::money('Nilai Persediaan', $this->metrics->inventoryValue(), 'boxes', 'sky', [
-                    'hint' => 'harga pokok',
+                Kpi::number('Siap Picking', $this->metrics->ordersWithStatus([
+                    OrderStatus::PartialReady->value,
+                    OrderStatus::Ready->value,
+                ], $scope), 'clipboard', 'violet'),
+                Kpi::number('Menunggu Stok', $this->metrics->ordersWithStatus([
+                    OrderStatus::Processing->value,
+                ], $scope), 'clock', 'amber'),
+                Kpi::number('Dalam Pengiriman', $inTransit, 'truck', 'sky'),
+                Kpi::money('Total Invoice', $invoiced, 'receipt', 'brand', [
+                    'delta' => Kpi::delta((float) $invoiced, (float) $invoicedPrevious),
+                    'hint' => $period->label(),
                 ]),
-                Kpi::money('Piutang', $this->metrics->outstandingTotal($scope), 'fileText', 'amber', [
-                    'hint' => $overdueCount.' jatuh tempo',
+                Kpi::money('Sudah Dibayar', $paid, 'checkCircle', 'emerald', [
+                    'delta' => Kpi::delta((float) $paid, (float) $paidPrevious),
                 ]),
-                Kpi::point('Peringatan Sistem', count($alerts), 'bell', 'rose', [
-                    'valueTone' => count($alerts) > 0 ? 'rose' : 'emerald',
+                Kpi::money('Piutang', $this->metrics->outstandingTotal($scope), 'fileText', 'amber'),
+                Kpi::money('Jatuh Tempo', $overdueTotal, 'alert', 'rose', [
+                    'valueTone' => (float) $overdueTotal > 0 ? 'rose' : 'default',
+                    'hint' => $overdueCount.' invoice',
+                    'goodWhenDown' => true,
                 ]),
             ],
             'notifications' => $alerts,

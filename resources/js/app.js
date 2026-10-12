@@ -283,11 +283,11 @@ Alpine.data('chart', (config = {}) => ({
  * Repeater helper for document line items (orders, goods receipts).
  *
  * Usage:
- *   <div x-data="lineItems({ books: [...], items: [...] })">…</div>
+ *   <div x-data="lineItems({ products: [...], items: [...] })">…</div>
  */
 Alpine.data('lineItems', (config = {}) => ({
-    books: config.books ?? [],
-    blank: config.blank ?? { book_id: '', quantity: 1, unit_price: '' },
+    products: config.products ?? [],
+    blank: config.blank ?? { product_id: '', quantity: 1, unit_price: '' },
     items: [],
 
     init() {
@@ -308,12 +308,12 @@ Alpine.data('lineItems', (config = {}) => ({
     },
 
     pick(index) {
-        const book = this.books.find(
+        const product = this.products.find(
             (candidate) =>
-                String(candidate.value) === String(this.items[index].book_id),
+                String(candidate.value) === String(this.items[index].product_id),
         );
 
-        if (!book) {
+        if (!product) {
             return;
         }
 
@@ -322,7 +322,7 @@ Alpine.data('lineItems', (config = {}) => ({
         const current = this.items[index][targetKey];
 
         if (current === '' || current === null || current === undefined) {
-            this.items[index][targetKey] = book[sourceKey] ?? '';
+            this.items[index][targetKey] = product[sourceKey] ?? '';
         }
     },
 

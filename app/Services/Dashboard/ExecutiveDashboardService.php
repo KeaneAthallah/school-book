@@ -23,44 +23,44 @@ class ExecutiveDashboardService extends RoleDashboard
      */
     public function build(User $user, Period $period, DashboardScope $scope): array
     {
-        $sales = $this->metrics->salesTotal($period, $scope);
-        $salesPrevious = $this->metrics->salesTotal($period, $scope, true);
+        $rebates = $this->metrics->rebateCounts($scope);
+        $incoming = $this->metrics->ordersInPeriod($period, $scope);
+        $incomingPrevious = $this->metrics->ordersInPeriod($period, $scope, true);
+        $inTransit = $this->metrics->inTransitCount($scope);
         $invoiced = $this->metrics->invoiceTotal($period, $scope);
         $invoicedPrevious = $this->metrics->invoiceTotal($period, $scope, true);
         $paid = $this->metrics->paymentTotal($period, $scope);
-        $stock = $this->metrics->stockAlerts();
-        $awaitingFulfillment = $this->metrics->ordersWithStatus([
-            OrderStatus::Processing->value,
-            OrderStatus::PartialReady->value,
-            OrderStatus::Ready->value,
-            OrderStatus::PartialShipped->value,
-        ], $scope);
-        $rebates = $this->metrics->rebateCounts($scope);
+        $paidPrevious = $this->metrics->paymentTotal($period, $scope, true);
+        $overdueCount = $this->metrics->overdueCount($scope);
+        $overdueTotal = $this->metrics->overdueTotal($scope);
 
         return [
             'kpis' => [
-                Kpi::money('Total Penjualan', $sales, 'chart', 'emerald', [
-                    'delta' => Kpi::delta((float) $sales, (float) $salesPrevious),
-                    'hint' => 'nilai terkirim',
+                Kpi::number('Pesanan Masuk', $incoming, 'cart', 'brand', [
+                    'delta' => Kpi::delta($incoming, $incomingPrevious),
+                    'hint' => $period->label(),
                 ]),
+                Kpi::number('Siap Picking', $this->metrics->ordersWithStatus([
+                    OrderStatus::PartialReady->value,
+                    OrderStatus::Ready->value,
+                ], $scope), 'clipboard', 'violet'),
+                Kpi::number('Menunggu Stok', $this->metrics->ordersWithStatus([
+                    OrderStatus::Processing->value,
+                ], $scope), 'clock', 'amber'),
+                Kpi::number('Dalam Pengiriman', $inTransit, 'truck', 'sky'),
                 Kpi::money('Total Invoice', $invoiced, 'receipt', 'brand', [
                     'delta' => Kpi::delta((float) $invoiced, (float) $invoicedPrevious),
+                    'hint' => $period->label(),
                 ]),
-                Kpi::money('Pembayaran Diterima', $paid, 'wallet', 'emerald'),
-                Kpi::money('Piutang', $this->metrics->outstandingTotal($scope), 'fileText', 'amber', [
-                    'hint' => 'seluruh invoice',
+                Kpi::money('Sudah Dibayar', $paid, 'checkCircle', 'emerald', [
+                    'delta' => Kpi::delta((float) $paid, (float) $paidPrevious),
                 ]),
-                Kpi::money('Jatuh Tempo', $this->metrics->overdueTotal($scope), 'alert', 'rose', [
-                    'valueTone' => 'rose',
-                    'hint' => $this->metrics->overdueCount($scope).' invoice',
+                Kpi::money('Piutang', $this->metrics->outstandingTotal($scope), 'fileText', 'amber'),
+                Kpi::money('Jatuh Tempo', $overdueTotal, 'alert', 'rose', [
+                    'valueTone' => (float) $overdueTotal > 0 ? 'rose' : 'default',
+                    'hint' => $overdueCount.' invoice',
                     'goodWhenDown' => true,
                 ]),
-                Kpi::point('Menunggu Pemenuhan', $awaitingFulfillment, 'truck', 'sky'),
-                Kpi::point('Judul Buku Menipis', $stock['low'] + $stock['out'], 'boxes', 'amber', [
-                    'valueTone' => ($stock['low'] + $stock['out']) > 0 ? 'amber' : 'default',
-                    'hint' => $stock['out'].' habis',
-                ]),
-                Kpi::point('Rebate Menunggu', $rebates['submitted'] + $rebates['approved'], 'percent', 'violet'),
             ],
             'notifications' => $this->alerts($user, $scope),
             'sales_series' => $this->metrics->salesSeries($period, $scope),

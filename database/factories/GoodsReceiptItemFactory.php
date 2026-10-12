@@ -2,9 +2,9 @@
 
 namespace Database\Factories;
 
-use App\Models\Book;
 use App\Models\GoodsReceipt;
 use App\Models\GoodsReceiptItem;
+use App\Models\Product;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -21,7 +21,7 @@ class GoodsReceiptItemFactory extends Factory
     {
         return [
             'goods_receipt_id' => GoodsReceipt::factory(),
-            'book_id' => Book::factory(),
+            'product_id' => Product::factory(),
             'quantity' => 1,
             'unit_cost' => '70000.00',
         ];

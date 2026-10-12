@@ -6,7 +6,6 @@ use App\Enums\BackorderStatus;
 use App\Enums\OrderItemStatus;
 use App\Enums\OrderStatus;
 use App\Models\Backorder;
-use App\Models\Book;
 use App\Models\Order;
 use App\Models\OrderItem;
 use App\Models\Setting;
@@ -115,7 +114,7 @@ class OrderService
             }
 
             foreach ($locked->items as $item) {
-                $item->warehouse_id = $this->pickWarehouse((int) $item->book_id)->getKey();
+                $item->warehouse_id = $this->pickWarehouse((int) $item->product_id)->getKey();
                 $item->save();
 
                 $reserved = $this->inventory->reserveAvailable($item, $item->quantity, $user);
@@ -129,7 +128,7 @@ class OrderService
                 if ($shortage > 0) {
                     Backorder::query()->create([
                         'order_item_id' => $item->getKey(),
-                        'book_id' => $item->book_id,
+                        'product_id' => $item->product_id,
                         'quantity' => $shortage,
                         'fulfilled_quantity' => 0,
                         'status' => BackorderStatus::Open,
@@ -209,7 +208,7 @@ class OrderService
             $subtotal = Money::sub(Money::mul($price, (string) $quantity), $discount);
 
             $order->items()->create([
-                'book_id' => (int) $line['book_id'],
+                'product_id' => (int) $line['product_id'],
                 'quantity' => $quantity,
                 'unit_price' => $price,
                 'discount_amount' => $discount,
@@ -246,13 +245,13 @@ class OrderService
     }
 
     /**
-     * Pick the warehouse holding the most available stock for a book,
+     * Pick the warehouse holding the most available stock for a product,
      * falling back to the default warehouse.
      */
-    private function pickWarehouse(int $bookId): Warehouse
+    private function pickWarehouse(int $productId): Warehouse
     {
         $best = Stock::query()
-            ->where('book_id', $bookId)
+            ->where('product_id', $productId)
             ->orderByRaw('(quantity - reserved_quantity) DESC')
             ->first();
 

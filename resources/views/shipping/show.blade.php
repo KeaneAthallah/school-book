@@ -31,8 +31,11 @@
             @endif
 
             @if ($can['confirm'])
-                <form method="POST" action="{{ route('shipments.confirm', $shipment['id']) }}" x-data x-on:submit="if (! confirm('Konfirmasi pengiriman? Stok akan berkurang.')) $event.preventDefault()">
+                <form method="POST" action="{{ route('shipments.confirm', $shipment['id']) }}" enctype="multipart/form-data" x-data x-on:submit="if (! confirm('Konfirmasi pengiriman? Stok akan berkurang.')) $event.preventDefault()" class="flex items-center gap-2">
                     @csrf
+                    <input type="file" name="proof_photo" accept="image/jpeg,image/png,image/webp" required
+                        aria-label="Bukti foto pengiriman"
+                        class="rounded-control border border-line bg-canvas px-2.5 py-1.5 text-xs text-ink file:mr-1.5 file:rounded-control file:border-0 file:bg-brand-600 file:px-2 file:py-1 file:text-xs file:font-medium file:text-white">
                     <x-button type="submit">Konfirmasi Kirim</x-button>
                 </form>
             @endif
@@ -65,7 +68,7 @@
                 :rows="collect($shipment['items'])->map(fn ($item, $index) => ['id' => $index] + $item)->all()"
                 :columns="[
                     ['key' => 'code', 'label' => 'Kode'],
-                    ['key' => 'book', 'label' => 'Buku'],
+                    ['key' => 'product', 'label' => 'Barang'],
                     ['key' => 'quantity', 'label' => 'Qty', 'align' => 'right', 'class' => 'tabular-nums'],
                 ]"
             />
@@ -91,4 +94,51 @@
             </dl>
         </x-card>
     </div>
+
+    <x-card class="mt-4">
+        <x-card-header title="Bukti Pengiriman" subtitle="Pesanan telah dikirim berikut bukti foto" icon="checkCircle">
+            <x-slot:action>
+                @if ($can['attach'])
+                    <form method="POST" action="{{ route('shipments.attachments.store', $shipment['id']) }}" enctype="multipart/form-data" class="flex items-center gap-2">
+                        @csrf
+                        <input type="file" name="photo" accept="image/jpeg,image/png,image/webp" required
+                            aria-label="Tambah bukti foto"
+                            class="w-40 rounded-control border border-line bg-canvas px-2.5 py-1.5 text-xs text-ink file:mr-1.5 file:rounded-control file:border-0 file:bg-brand-600 file:px-2 file:py-1 file:text-xs file:font-medium file:text-white">
+                        <x-button type="submit" variant="secondary">Tambah Foto</x-button>
+                    </form>
+                @endif
+            </x-slot:action>
+        </x-card-header>
+
+        <div class="p-4">
+            @if (in_array($shipment['status'], ['shipped', 'delivered'], true))
+                <x-alert tone="success">Pesanan telah dikirim berikut bukti foto.</x-alert>
+            @endif
+
+            @if (count($shipment['attachments']) > 0)
+                <div class="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
+                    @foreach ($shipment['attachments'] as $attachment)
+                        <figure class="group relative overflow-hidden rounded-control border border-line bg-canvas">
+                            <a href="{{ $attachment['url'] }}" target="_blank" rel="noreferrer">
+                                <img src="{{ $attachment['url'] }}" alt="{{ $attachment['name'] }}" loading="lazy" class="h-36 w-full object-cover">
+                            </a>
+                            <figcaption class="truncate px-2 py-1.5 text-[11px] text-ink-soft">{{ $attachment['name'] }}</figcaption>
+                            @if ($can['manage_attachments'])
+                                <form method="POST" action="{{ route('attachments.destroy', $attachment['id']) }}" class="absolute right-1.5 top-1.5">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button type="submit" aria-label="Hapus bukti foto"
+                                        class="rounded-control bg-rose-600/90 p-1 text-white opacity-0 transition hover:bg-rose-600 group-hover:opacity-100">
+                                        <x-icon name="close" class="h-3.5 w-3.5" />
+                                    </button>
+                                </form>
+                            @endif
+                        </figure>
+                    @endforeach
+                </div>
+            @else
+                <p class="text-sm text-ink-soft">Belum ada bukti foto pengiriman.</p>
+            @endif
+        </div>
+    </x-card>
 @endsection

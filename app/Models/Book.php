@@ -4,42 +4,33 @@ namespace App\Models;
 
 use Database\Factories\BookFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
-use Illuminate\Database\Eloquent\Attributes\Scope;
-use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\HasMany;
 
 /**
+ * Specialty side of a product of type "book".
+ *
  * @property int $id
- * @property string $code
- * @property string $title
- * @property int $publisher_id
+ * @property int $product_id
+ * @property string|null $isbn
+ * @property int|null $publisher_id
  * @property int|null $category_id
- * @property string $price
- * @property int $min_stock
- * @property string $status
+ * @property string|null $grade
+ * @property string|null $subject
  */
-#[Fillable([
-    'code', 'isbn', 'title', 'publisher_id', 'category_id', 'grade', 'subject',
-    'price', 'cost_price', 'min_stock', 'rack_location', 'status',
-])]
+#[Fillable(['product_id', 'isbn', 'publisher_id', 'category_id', 'grade', 'subject'])]
 class Book extends Model
 {
     /** @use HasFactory<BookFactory> */
     use HasFactory;
 
     /**
-     * @return array<string, string>
+     * @return BelongsTo<Product, $this>
      */
-    protected function casts(): array
+    public function product(): BelongsTo
     {
-        return [
-            'price' => 'decimal:2',
-            'cost_price' => 'decimal:2',
-            'min_stock' => 'integer',
-        ];
+        return $this->belongsTo(Product::class);
     }
 
     /**
@@ -58,20 +49,10 @@ class Book extends Model
         return $this->belongsTo(BookCategory::class, 'category_id');
     }
 
-    /**
-     * @return HasMany<Stock, $this>
-     */
-    public function stocks(): HasMany
+    protected static function booted(): void
     {
-        return $this->hasMany(Stock::class);
-    }
-
-    /**
-     * @param  Builder<Book>  $query
-     */
-    #[Scope]
-    protected function active(Builder $query): void
-    {
-        $query->where('status', 'active');
+        static::deleted(function (Book $book): void {
+            $book->product()->delete();
+        });
     }
 }

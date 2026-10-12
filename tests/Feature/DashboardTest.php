@@ -37,6 +37,24 @@ it('renders the role dashboard with real KPI data', function () {
         });
 });
 
+it('shows the operational and financial KPI cards in order', function () {
+    $this->actingAs(dashboardUser('admin@sekolah.test'))
+        ->get('/dashboard')
+        ->assertOk()
+        ->assertViewHas('data', function (array $data): bool {
+            return collect($data['kpis'])->pluck('label')->all() === [
+                'Pesanan Masuk',
+                'Siap Picking',
+                'Menunggu Stok',
+                'Dalam Pengiriman',
+                'Total Invoice',
+                'Sudah Dibayar',
+                'Piutang',
+                'Jatuh Tempo',
+            ];
+        });
+});
+
 it('applies the requested date range to period metrics', function () {
     $this->actingAs(dashboardUser('admin@sekolah.test'))
         ->get('/dashboard?date_from=2026-03-01&date_to=2026-03-31')

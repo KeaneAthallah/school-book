@@ -33,7 +33,7 @@
                     <table class="w-full border-collapse text-sm">
                         <thead>
                             <tr class="border-b border-line bg-panel-soft text-left text-xs font-semibold tracking-wide text-ink-soft uppercase">
-                                <th scope="col" class="px-3 py-2.5">Buku</th>
+                                <th scope="col" class="px-3 py-2.5">Barang</th>
                                 <th scope="col" class="px-3 py-2.5 text-right">Diminta</th>
                                 <th scope="col" class="px-3 py-2.5 text-right">Diambil</th>
                             </tr>
@@ -41,7 +41,7 @@
                         <tbody>
                             @foreach ($picking['items'] as $index => $item)
                                 <tr class="border-b border-line last:border-0">
-                                    <td class="px-3 py-2.5">{{ $item['code'] }} {{ $item['book'] }}</td>
+                                    <td class="px-3 py-2.5">{{ $item['code'] }} {{ $item['product'] }}</td>
                                     <td class="px-3 py-2.5 text-right tabular-nums">{{ $item['quantity'] }}</td>
                                     <td class="w-32 px-3 py-2.5">
                                         <input type="hidden" name="items[{{ $index }}][id]" value="{{ $item['id'] }}" />
@@ -71,7 +71,7 @@
                 :rows="collect($picking['items'])->map(fn ($item, $index) => ['id' => $index] + $item)->all()"
                 :columns="[
                     ['key' => 'code', 'label' => 'Kode'],
-                    ['key' => 'book', 'label' => 'Buku'],
+                    ['key' => 'product', 'label' => 'Barang'],
                     ['key' => 'quantity', 'label' => 'Diminta', 'align' => 'right', 'class' => 'tabular-nums'],
                     ['key' => 'picked_quantity', 'label' => 'Diambil', 'align' => 'right', 'class' => 'tabular-nums'],
                 ]"

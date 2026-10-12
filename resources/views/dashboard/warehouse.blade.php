@@ -12,7 +12,7 @@
     @include('dashboard.partials.quick-actions', ['actions' => [
         ['label' => 'Catat Barang Masuk', 'icon' => 'inbox', 'route' => 'receipts.create', 'permission' => 'receipts.manage'],
         ['label' => 'Daftar Penerimaan', 'icon' => 'fileText', 'route' => 'receipts.index', 'permission' => 'receipts.view'],
-        ['label' => 'Stok Buku', 'icon' => 'boxes', 'route' => 'stock.index', 'permission' => 'stock.view'],
+        ['label' => 'Stok Barang', 'icon' => 'boxes', 'route' => 'stock.index', 'permission' => 'stock.view'],
         ['label' => 'Mutasi Stok', 'icon' => 'refresh', 'route' => 'stock.movements', 'permission' => 'stock.view'],
         ['label' => 'Picking & Packing', 'icon' => 'clipboard', 'route' => 'pickings.index', 'permission' => 'fulfillment.view'],
         ['label' => 'Pengiriman', 'icon' => 'truck', 'route' => 'shipments.index', 'permission' => 'shipments.view'],
@@ -85,7 +85,7 @@
             empty-icon="refresh"
             :rows="$data['stock_movements']"
             :columns="[
-                ['key' => 'book', 'label' => 'Buku'],
+                ['key' => 'product', 'label' => 'Barang'],
                 ['key' => 'warehouse', 'label' => 'Gudang'],
                 ['key' => 'type', 'label' => 'Jenis'],
                 ['key' => 'quantity', 'label' => 'Jumlah', 'align' => 'right', 'class' => 'tabular-nums'],

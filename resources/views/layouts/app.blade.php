@@ -4,6 +4,16 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
+    <meta name="description" content="ARKARA PM (Aplikasi Rekapitulasi, Kendali, dan Analisis Rekening dan Administrasi – Prana Media) merupakan aplikasi berbasis digital yang dirancang untuk membantu CV. Prana Media meningkatkan efektivitas pengelolaan operasional dan keuangan usaha melalui pencatatan pemasukan dan pengeluaran, pengelolaan stok dan penjualan buku, penyusunan laporan keuangan, serta penyajian dashboard analisis keuangan secara terintegrasi.">
+    <meta name="theme-color" content="#2560e8">
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="ARKARA PM — Kelola Lebih Mudah, Pantau Lebih Akurat.">
+    <meta property="og:description" content="Sistem manajemen operasional dan keuangan usaha CV. Prana Media: pencatatan pemasukan dan pengeluaran, pengelolaan stok dan penjualan buku, laporan keuangan, dan dashboard analisis keuangan terintegrasi.">
+    <meta property="og:image" content="{{ asset('logo.png') }}">
+    <meta name="twitter:card" content="summary_large_image">
+    <link rel="icon" type="image/png" sizes="32x32" href="{{ asset('favicon-32.png') }}">
+    <link rel="icon" type="image/png" sizes="512x512" href="{{ asset('logo-mark.png') }}">
+    <link rel="apple-touch-icon" sizes="180x180" href="{{ asset('apple-touch-icon.png') }}">
 
     <title>@yield('title', 'Dashboard') · {{ config('app.name') }}</title>
 

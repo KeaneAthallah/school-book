@@ -105,7 +105,7 @@
                             x-on:keydown.arrow-up.prevent="cursor = Math.max(cursor - 1, 0)"
                             x-on:keydown.enter.prevent="go()"
                             type="search"
-                            placeholder="Cari pesanan, invoice, sekolah, atau buku…"
+                            placeholder="Cari pesanan, invoice, sekolah, atau barang…"
                             aria-label="Kata kunci pencarian"
                             class="w-full bg-transparent py-3.5 text-sm text-ink outline-none placeholder:text-ink-muted"
                         />

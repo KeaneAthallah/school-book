@@ -22,7 +22,7 @@ class StoreGoodsReceiptRequest extends FormRequest
             'receipt_date' => ['required', 'date'],
             'notes' => ['nullable', 'string'],
             'items' => ['required', 'array', 'min:1'],
-            'items.*.book_id' => ['required', 'integer', 'exists:books,id'],
+            'items.*.product_id' => ['required', 'integer', 'exists:products,id'],
             'items.*.quantity' => ['required', 'integer', 'min:1'],
             'items.*.unit_cost' => ['nullable', 'numeric', 'min:0'],
         ];

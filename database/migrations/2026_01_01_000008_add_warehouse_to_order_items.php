@@ -11,7 +11,7 @@ return new class extends Migration
         Schema::table('order_items', function (Blueprint $table) {
             $table->foreignId('warehouse_id')
                 ->nullable()
-                ->after('book_id')
+                ->after('product_id')
                 ->constrained()
                 ->nullOnDelete();
         });

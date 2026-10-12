@@ -6,9 +6,9 @@ use App\Enums\OrderStatus;
 use App\Http\Requests\StoreOrderRequest;
 use App\Http\Requests\UpdateOrderRequest;
 use App\Models\Backorder;
-use App\Models\Book;
 use App\Models\Order;
 use App\Models\OrderSource;
+use App\Models\Product;
 use App\Models\School;
 use App\Models\Stock;
 use App\Models\User;
@@ -95,17 +95,16 @@ class OrderController extends Controller
             'school:id,name,npsn',
             'orderSource:id,name',
             'operator:id,name',
-            'items' => fn ($query) => $query->with('book:id,code,title')->orderBy('id'),
+            'items' => fn ($query) => $query->with('product:id,code,title')->orderBy('id'),
             'items.warehouse:id,name',
             'shipments' => fn ($query) => $query->orderBy('id'),
             'shipments.items',
             'invoices' => fn ($query) => $query->orderBy('id'),
-            'items.book',
         ]);
 
         $backorders = Backorder::query()
             ->whereIn('order_item_id', $order->items->pluck('id'))
-            ->with('book:id,title')
+            ->with('product:id,title')
             ->get();
 
         return view('orders.show', [
@@ -127,8 +126,8 @@ class OrderController extends Controller
                 'total_amount' => $order->total_amount,
                 'items' => $order->items->map(fn ($item): array => [
                     'id' => $item->getKey(),
-                    'book' => $item->book?->title,
-                    'code' => $item->book?->code,
+                    'product' => $item->product?->title,
+                    'code' => $item->product?->code,
                     'warehouse' => $item->warehouse?->name,
                     'quantity' => $item->quantity,
                     'reserved_quantity' => $item->reserved_quantity,
@@ -158,7 +157,7 @@ class OrderController extends Controller
                 ])->all(),
                 'backorders' => $backorders->map(fn ($backorder): array => [
                     'id' => $backorder->getKey(),
-                    'book' => $backorder->book?->title,
+                    'product' => $backorder->product?->title,
                     'quantity' => $backorder->quantity,
                     'fulfilled_quantity' => $backorder->fulfilled_quantity,
                     'status' => $backorder->status->value,
@@ -196,7 +195,7 @@ class OrderController extends Controller
                 'external_reference' => $order->external_reference,
                 'discount_amount' => $order->discount_amount,
                 'items' => $order->items()->get()->map(fn ($item): array => [
-                    'book_id' => $item->book_id,
+                    'product_id' => $item->product_id,
                     'quantity' => $item->quantity,
                     'unit_price' => $item->unit_price,
                     'discount_amount' => $item->discount_amount,
@@ -236,9 +235,9 @@ class OrderController extends Controller
     private function formProps(Request $request): array
     {
         $availability = Stock::query()
-            ->selectRaw('book_id, COALESCE(SUM(quantity - reserved_quantity), 0) as available')
-            ->groupBy('book_id')
-            ->pluck('available', 'book_id');
+            ->selectRaw('product_id, COALESCE(SUM(quantity - reserved_quantity), 0) as available')
+            ->groupBy('product_id')
+            ->pluck('available', 'product_id');
 
         return [
             'schools' => School::query()->active()->orderBy('name')->get(['id', 'name', 'npsn'])
@@ -247,12 +246,12 @@ class OrderController extends Controller
             'sources' => OrderSource::query()->active()->orderBy('name')->get(['id', 'name'])
                 ->map(fn (OrderSource $source): array => ['value' => $source->getKey(), 'label' => $source->name])
                 ->all(),
-            'books' => Book::query()->active()->orderBy('title')->get(['id', 'code', 'title', 'price'])
-                ->map(fn (Book $book): array => [
-                    'value' => $book->getKey(),
-                    'label' => $book->code.' - '.$book->title,
-                    'price' => $book->price,
-                    'available' => (int) ($availability[$book->getKey()] ?? 0),
+            'products' => Product::query()->active()->orderBy('title')->get(['id', 'code', 'title', 'price'])
+                ->map(fn (Product $product): array => [
+                    'value' => $product->getKey(),
+                    'label' => $product->code.' - '.$product->title,
+                    'price' => $product->price,
+                    'available' => (int) ($availability[$product->getKey()] ?? 0),
                 ])
                 ->all(),
             'defaultDate' => now()->toDateString(),

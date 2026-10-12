@@ -10,10 +10,10 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property int $id
  * @property int $shipment_id
  * @property int $order_item_id
- * @property int $book_id
+ * @property int $product_id
  * @property int $quantity
  */
-#[Fillable(['shipment_id', 'order_item_id', 'book_id', 'quantity'])]
+#[Fillable(['shipment_id', 'order_item_id', 'product_id', 'quantity'])]
 class ShipmentItem extends Model
 {
     /**
@@ -43,10 +43,10 @@ class ShipmentItem extends Model
     }
 
     /**
-     * @return BelongsTo<Book, $this>
+     * @return BelongsTo<Product, $this>
      */
-    public function book(): BelongsTo
+    public function product(): BelongsTo
     {
-        return $this->belongsTo(Book::class);
+        return $this->belongsTo(Product::class);
     }
 }
