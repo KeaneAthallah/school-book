@@ -39,26 +39,39 @@
                     Ya
                 </label>
             @elseif (($field['type'] ?? 'text') === 'file')
-                @if (! empty($value))
-                    <span class="mb-1.5 block">
-                        <img src="{{ Storage::url((string) $value) }}" alt="{{ $field['label'] }}" loading="lazy" class="h-14 w-14 rounded-control border border-line object-cover" />
-                    </span>
-                @endif
-                <input
-                    type="file"
-                    name="{{ $name }}"
-                    accept="image/jpeg,image/png,image/webp"
-                    aria-label="{{ $field['label'] }}"
-                    class="w-full rounded-control border border-line bg-canvas px-2.5 py-1.5 text-xs text-ink file:mr-1.5 file:rounded-control file:border-0 file:bg-brand-600 file:px-2 file:py-1 file:text-xs file:font-medium file:text-white"
-                />
+                <div x-data="photoPreview" class="space-y-1.5">
+                    @if (! empty($value))
+                        <span class="block">
+                            <img src="{{ Storage::url((string) $value) }}" alt="{{ $field['label'] }}" loading="lazy" class="h-16 w-16 rounded-control border border-line object-cover" />
+                        </span>
+                    @endif
+                    <input
+                        type="file"
+                        name="{{ $name }}"
+                        accept="image/jpeg,image/png,image/webp"
+                        aria-label="{{ $field['label'] }}"
+                        class="w-full rounded-control border border-line bg-canvas px-2.5 py-1.5 text-xs text-ink file:mr-1.5 file:rounded-control file:border-0 file:bg-brand-600 file:px-2 file:py-1 file:text-xs file:font-medium file:text-white"
+                        @change="pick($event)"
+                    />
+                    <img x-show="preview" :src="preview" alt="Pratinjau {{ $field['label'] }}" class="h-20 w-20 rounded-control border border-line object-cover sm:h-24 sm:w-24" />
+                </div>
             @else
-                <x-input
-                    type="{{ ($field['type'] ?? 'text') === 'number' ? 'number' : ($field['type'] ?? 'text') }}"
-                    :name="$name"
-                    :value="$value"
-                    :invalid="$invalid"
-                    @if (($field['type'] ?? 'text') === 'number') step="any" @endif
-                />
+                @if (($field['type'] ?? 'text') === 'number')
+                    <x-input
+                        type="number"
+                        :name="$name"
+                        :value="$value"
+                        :invalid="$invalid"
+                        step="any"
+                    />
+                @else
+                    <x-input
+                        type="{{ $field['type'] ?? 'text' }}"
+                        :name="$name"
+                        :value="$value"
+                        :invalid="$invalid"
+                    />
+                @endif
             @endif
         </x-field>
     @endforeach

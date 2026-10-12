@@ -31,7 +31,7 @@
                         @php
                             $value = data_get($row, $column['key'] ?? '');
                         @endphp
-                        <td class="px-3 py-2.5 align-middle {{ $alignClass($column) }} {{ $column['class'] ?? '' }}">
+                        <td class="px-3 py-2.5 align-middle whitespace-nowrap {{ $alignClass($column) }} {{ $column['class'] ?? '' }}">
                             @if (isset($column['view']))
                                 @include($column['view'], ['row' => $row, 'value' => $value, 'column' => $column])
                             @elseif (isset($column['link']))

@@ -341,6 +341,34 @@ Alpine.data('lineItems', (config = {}) => ({
     },
 }));
 
+/**
+ * Client-side preview for photo inputs.
+ *
+ * Usage:
+ *   <div x-data="photoPreview">
+ *       <input type="file" accept="image/*" @change="pick($event)" />
+ *       <img x-show="preview" :src="preview" />
+ *   </div>
+ */
+Alpine.data('photoPreview', () => ({
+    preview: null,
+
+    pick(event) {
+        const file = event.target.files?.[0];
+
+        if (!file) {
+            this.preview = null;
+            return;
+        }
+
+        const reader = new FileReader();
+        reader.onload = () => {
+            this.preview = reader.result;
+        };
+        reader.readAsDataURL(file);
+    },
+}));
+
 Alpine.data('permissionPicker', (selected = []) => ({
     selected: (Array.isArray(selected) ? selected : []).map(Number),
 

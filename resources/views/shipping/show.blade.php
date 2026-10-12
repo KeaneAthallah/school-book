@@ -31,11 +31,15 @@
             @endif
 
             @if ($can['confirm'])
-                <form method="POST" action="{{ route('shipments.confirm', $shipment['id']) }}" enctype="multipart/form-data" x-data x-on:submit="if (! confirm('Konfirmasi pengiriman? Stok akan berkurang.')) $event.preventDefault()" class="flex items-center gap-2">
+                <form method="POST" action="{{ route('shipments.confirm', $shipment['id']) }}" enctype="multipart/form-data" x-data x-on:submit="if (! confirm('Konfirmasi pengiriman? Stok akan berkurang.')) $event.preventDefault()" class="flex flex-col items-stretch gap-2 sm:flex-row sm:items-center">
                     @csrf
-                    <input type="file" name="proof_photo" accept="image/jpeg,image/png,image/webp" required
-                        aria-label="Bukti foto pengiriman"
-                        class="rounded-control border border-line bg-canvas px-2.5 py-1.5 text-xs text-ink file:mr-1.5 file:rounded-control file:border-0 file:bg-brand-600 file:px-2 file:py-1 file:text-xs file:font-medium file:text-white">
+                    <div x-data="photoPreview" class="flex flex-1 flex-col gap-2 sm:flex-row sm:items-center">
+                        <input type="file" name="proof_photo" accept="image/jpeg,image/png,image/webp" required
+                            aria-label="Bukti foto pengiriman"
+                            class="w-full rounded-control border border-line bg-canvas px-2.5 py-1.5 text-xs text-ink file:mr-1.5 file:rounded-control file:border-0 file:bg-brand-600 file:px-2 file:py-1 file:text-xs file:font-medium file:text-white"
+                            @change="pick($event)">
+                        <img x-show="preview" :src="preview" alt="Pratinjau bukti foto pengiriman" class="h-20 w-20 self-start rounded-control border border-line object-cover sm:h-24 sm:w-24" />
+                    </div>
                     <x-button type="submit">Konfirmasi Kirim</x-button>
                 </form>
             @endif
@@ -99,11 +103,15 @@
         <x-card-header title="Bukti Pengiriman" subtitle="Pesanan telah dikirim berikut bukti foto" icon="checkCircle">
             <x-slot:action>
                 @if ($can['attach'])
-                    <form method="POST" action="{{ route('shipments.attachments.store', $shipment['id']) }}" enctype="multipart/form-data" class="flex items-center gap-2">
+                    <form method="POST" action="{{ route('shipments.attachments.store', $shipment['id']) }}" enctype="multipart/form-data" class="flex flex-col items-stretch gap-2 sm:flex-row sm:items-center">
                         @csrf
-                        <input type="file" name="photo" accept="image/jpeg,image/png,image/webp" required
-                            aria-label="Tambah bukti foto"
-                            class="w-40 rounded-control border border-line bg-canvas px-2.5 py-1.5 text-xs text-ink file:mr-1.5 file:rounded-control file:border-0 file:bg-brand-600 file:px-2 file:py-1 file:text-xs file:font-medium file:text-white">
+                        <div x-data="photoPreview" class="flex flex-1 flex-col gap-2 sm:flex-row sm:items-center">
+                            <input type="file" name="photo" accept="image/jpeg,image/png,image/webp" required
+                                aria-label="Tambah bukti foto"
+                                class="w-full rounded-control border border-line bg-canvas px-2.5 py-1.5 text-xs text-ink file:mr-1.5 file:rounded-control file:border-0 file:bg-brand-600 file:px-2 file:py-1 file:text-xs file:font-medium file:text-white"
+                                @change="pick($event)">
+                            <img x-show="preview" :src="preview" alt="Pratinjau bukti foto" class="h-20 w-20 self-start rounded-control border border-line object-cover sm:h-24 sm:w-24" />
+                        </div>
                         <x-button type="submit" variant="secondary">Tambah Foto</x-button>
                     </form>
                 @endif
