@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Dashboard\DashboardScope;
 use App\Enums\BackorderStatus;
 use App\Enums\GoodsReceiptStatus;
 use App\Enums\InvoiceStatus;
@@ -21,31 +22,37 @@ use Illuminate\Support\Facades\DB;
 /**
  * Derives the actionable alerts shown in the notification menu and on the
  * dashboard. Every entry is computed from real records; nothing is stubbed.
+ *
+ * Alerts are gated twice: a permission decides whether a category is relevant
+ * to the user at all, and the optional DashboardScope restricts the records
+ * inside that category to what the user is actually allowed to see. Passing a
+ * scope is what stops a Sales / PIC user from being told about another
+ * portfolio's overdue invoices.
  */
 class NotificationService
 {
     /**
      * @return list<array<string, mixed>>
      */
-    public function for(User $user): array
+    public function for(User $user, ?DashboardScope $scope = null): array
     {
         $alerts = [];
 
         if ($user->hasPermission('invoices.view')) {
-            $this->push($alerts, $this->overdueInvoices());
-            $this->push($alerts, $this->invoicesDueSoon());
+            $this->push($alerts, $this->overdueInvoices($scope));
+            $this->push($alerts, $this->invoicesDueSoon($scope));
         }
 
         if ($user->hasPermission('payments.verify')) {
-            $this->push($alerts, $this->paymentsToVerify());
+            $this->push($alerts, $this->paymentsToVerify($scope));
         }
 
         if ($user->hasPermission('fulfillment.view')) {
-            $this->push($alerts, $this->readyToPick());
+            $this->push($alerts, $this->readyToPick($scope));
         }
 
         if ($user->hasPermission('shipments.view')) {
-            $this->push($alerts, $this->shipmentsToDispatch());
+            $this->push($alerts, $this->shipmentsToDispatch($scope));
         }
 
         if ($user->hasPermission('receipts.confirm')) {
@@ -53,7 +60,7 @@ class NotificationService
         }
 
         if ($user->hasPermission('orders.view')) {
-            $this->push($alerts, $this->openBackorders());
+            $this->push($alerts, $this->openBackorders($scope));
         }
 
         if ($user->hasPermission('integrations.view')) {
@@ -63,11 +70,11 @@ class NotificationService
         return $alerts;
     }
 
-    public function count(User $user): int
+    public function count(User $user, ?DashboardScope $scope = null): int
     {
         return array_sum(array_map(
             fn (array $alert): int => $alert['count'],
-            $this->for($user),
+            $this->for($user, $scope),
         ));
     }
 
@@ -85,12 +92,16 @@ class NotificationService
     /**
      * @return array<string, mixed>|null
      */
-    private function overdueInvoices(): ?array
+    private function overdueInvoices(?DashboardScope $scope): ?array
     {
         $query = Invoice::query()
             ->whereNotIn('status', [InvoiceStatus::Cancelled->value, InvoiceStatus::Draft->value])
             ->whereDate('due_date', '<', now()->toDateString())
             ->whereColumn('paid_amount', '<', 'total_amount');
+
+        if ($scope !== null) {
+            $query = $scope->invoices($query);
+        }
 
         $count = (clone $query)->count();
 
@@ -114,13 +125,17 @@ class NotificationService
     /**
      * @return array<string, mixed>|null
      */
-    private function invoicesDueSoon(): ?array
+    private function invoicesDueSoon(?DashboardScope $scope): ?array
     {
         $query = Invoice::query()
             ->whereNotIn('status', [InvoiceStatus::Cancelled->value, InvoiceStatus::Draft->value])
             ->whereDate('due_date', '>=', now()->toDateString())
             ->whereDate('due_date', '<=', now()->addDays(7)->toDateString())
             ->whereColumn('paid_amount', '<', 'total_amount');
+
+        if ($scope !== null) {
+            $query = $scope->invoices($query);
+        }
 
         $count = (clone $query)->count();
 
@@ -142,9 +157,14 @@ class NotificationService
     /**
      * @return array<string, mixed>|null
      */
-    private function paymentsToVerify(): ?array
+    private function paymentsToVerify(?DashboardScope $scope): ?array
     {
         $query = Payment::query()->where('status', PaymentStatus::Draft->value);
+
+        if ($scope !== null) {
+            $query = $scope->payments($query);
+        }
+
         $count = (clone $query)->count();
 
         if ($count === 0) {
@@ -165,12 +185,17 @@ class NotificationService
     /**
      * @return array<string, mixed>|null
      */
-    private function readyToPick(): ?array
+    private function readyToPick(?DashboardScope $scope): ?array
     {
         $query = Order::query()->whereIn('status', [
             OrderStatus::PartialReady->value,
             OrderStatus::Ready->value,
         ]);
+
+        if ($scope !== null) {
+            $query = $scope->orders($query);
+        }
+
         $count = (clone $query)->count();
 
         if ($count === 0) {
@@ -191,12 +216,17 @@ class NotificationService
     /**
      * @return array<string, mixed>|null
      */
-    private function shipmentsToDispatch(): ?array
+    private function shipmentsToDispatch(?DashboardScope $scope): ?array
     {
         $query = Shipment::query()->whereIn('status', [
             ShipmentStatus::Draft->value,
             ShipmentStatus::ReadyToShip->value,
         ]);
+
+        if ($scope !== null) {
+            $query = $scope->shipments($query);
+        }
+
         $count = (clone $query)->count();
 
         if ($count === 0) {
@@ -240,10 +270,23 @@ class NotificationService
     /**
      * @return array<string, mixed>|null
      */
-    private function openBackorders(): ?array
+    private function openBackorders(?DashboardScope $scope): ?array
     {
-        $outstanding = (int) DB::table('backorders')
-            ->whereIn('status', [BackorderStatus::Open->value, BackorderStatus::Partial->value])
+        $query = DB::table('backorders')
+            ->whereIn('status', [BackorderStatus::Open->value, BackorderStatus::Partial->value]);
+
+        if ($scope !== null && $scope->isRestricted()) {
+            $query->whereIn('order_item_id', fn ($sub) => $sub
+                ->select('order_items.id')
+                ->from('order_items')
+                ->join('orders', 'orders.id', '=', 'order_items.order_id')
+                ->whereIn('orders.school_id', fn ($schools) => $schools
+                    ->select('id')
+                    ->from('schools')
+                    ->where('sales_user_id', $scope->ownerId)));
+        }
+
+        $outstanding = (int) (clone $query)
             ->selectRaw('COALESCE(SUM(quantity - fulfilled_quantity), 0) as total')
             ->value('total');
 
@@ -258,7 +301,7 @@ class NotificationService
             'tone' => 'warning',
             'count' => $outstanding,
             'href' => '/reports?type=backorders',
-            'time' => DB::table('backorders')->max('updated_at'),
+            'time' => (clone $query)->max('updated_at'),
         ];
     }
 

@@ -1,5 +1,7 @@
 <?php
 
+use App\Dashboard\DashboardScope;
+use App\Dashboard\Period;
 use App\Models\Book;
 use App\Models\Invoice;
 use App\Models\Order;
@@ -8,7 +10,7 @@ use App\Models\PaymentAllocation;
 use App\Models\School;
 use App\Models\Stock;
 use App\Models\User;
-use App\Services\DashboardService;
+use App\Services\Dashboard\DashboardMetrics;
 use Database\Seeders\DashboardDemoSeeder;
 use Database\Seeders\DatabaseSeeder;
 use Illuminate\Support\Facades\DB;
@@ -125,19 +127,21 @@ it('produces meaningful dashboard figures from persisted records', function () {
     seedReferenceData();
     $this->seed(DashboardDemoSeeder::class);
 
-    $report = app(DashboardService::class)->report();
+    $metrics = app(DashboardMetrics::class);
+    $period = Period::make();
+    $scope = DashboardScope::unrestricted();
 
     // Current-month KPIs are populated from real rows.
-    expect((int) $report['kpis']['orders_received']['value'])->toBeGreaterThan(0)
-        ->and((float) $report['kpis']['paid']['value'])->toBeGreaterThan(0)
-        ->and((float) $report['kpis']['receivable']['value'])->toBeGreaterThan(0);
+    expect($metrics->ordersInPeriod($period, $scope))->toBeGreaterThan(0)
+        ->and((float) $metrics->paymentTotal($period, $scope))->toBeGreaterThan(0)
+        ->and((float) $metrics->outstandingTotal($scope))->toBeGreaterThan(0);
 
     // Point-in-time widget data is present.
-    expect(count($report['recent_orders']))->toBeGreaterThan(0)
-        ->and(count($report['top_books']))->toBeGreaterThan(0)
-        ->and(collect($report['order_status'])->sum('value'))->toBeGreaterThan(0)
-        ->and(collect($report['invoice_status'])->sum('value'))->toBeGreaterThan(0)
-        ->and(count($report['recent_activity']))->toBeGreaterThan(0);
+    expect(count($metrics->recentOrders($scope)))->toBeGreaterThan(0)
+        ->and(count($metrics->stockRows()))->toBeGreaterThan(0)
+        ->and(collect($metrics->orderStatusDistribution($scope))->sum('value'))->toBeGreaterThan(0)
+        ->and(collect($metrics->invoiceStatusDistribution($scope))->sum('value'))->toBeGreaterThan(0)
+        ->and(count($metrics->recentActivity()))->toBeGreaterThan(0);
 });
 
 it('shows the seeded data on the dashboard page for an administrator', function () {
@@ -149,6 +153,6 @@ it('shows the seeded data on the dashboard page for an administrator', function 
     $this->actingAs($admin)
         ->get('/dashboard')
         ->assertOk()
-        ->assertViewIs('dashboard.index')
-        ->assertViewHas('notifications', fn (array $alerts): bool => count($alerts) > 0);
+        ->assertViewIs('dashboard.admin')
+        ->assertViewHas('data', fn (array $data): bool => count($data['notifications']) > 0);
 });

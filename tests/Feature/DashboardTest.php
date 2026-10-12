@@ -1,5 +1,7 @@
 <?php
 
+use App\Dashboard\DashboardRole;
+use App\Dashboard\Period;
 use App\Models\Role;
 use App\Models\Shipment;
 use App\Models\User;
@@ -14,34 +16,35 @@ function dashboardUser(string $email): User
     return User::query()->where('email', $email)->firstOrFail();
 }
 
-it('renders the dashboard with real KPI data', function () {
+it('renders the role dashboard with real KPI data', function () {
     $this->actingAs(dashboardUser('admin@sekolah.test'))
         ->get('/dashboard')
         ->assertOk()
-        ->assertViewIs('dashboard.index')
-        ->assertViewHas('report', function (array $report): bool {
+        ->assertViewIs('dashboard.admin')
+        ->assertViewHas('role', fn ($role): bool => $role === DashboardRole::Admin)
+        ->assertViewHas('data', function (array $data): bool {
             return isset(
-                $report['kpis']['orders_received'],
-                $report['kpis']['total_invoice'],
-                $report['kpis']['receivable'],
-                $report['kpis']['overdue'],
-                $report['sales_series']['labels'],
-                $report['order_status'],
-                $report['invoice_status'],
-                $report['fulfillment'],
+                $data['kpis'],
+                $data['sales_series']['labels'],
+                $data['order_status'],
+                $data['invoice_status'],
+                $data['recent_orders'],
+                $data['role_breakdown'],
+                $data['stock_rows'],
+                $data['recent_activity'],
+                $data['notifications'],
             );
-        })
-        ->assertViewHas('notifications');
+        });
 });
 
 it('applies the requested date range to period metrics', function () {
     $this->actingAs(dashboardUser('admin@sekolah.test'))
         ->get('/dashboard?date_from=2026-03-01&date_to=2026-03-31')
         ->assertOk()
-        ->assertViewHas('report', function (array $report): bool {
-            return $report['range']['from'] === '2026-03-01'
-                && $report['range']['to'] === '2026-03-31'
-                && $report['range']['days'] === 31;
+        ->assertViewHas('period', function (Period $period): bool {
+            return $period->start->toDateString() === '2026-03-01'
+                && $period->end->toDateString() === '2026-03-31'
+                && $period->days() === 31;
         });
 });
 

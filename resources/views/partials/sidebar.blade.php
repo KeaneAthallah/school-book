@@ -6,6 +6,16 @@
     $allowed = fn (?string $permission): bool => $permission === null
         || ($user !== null && $user->hasPermission($permission));
 
+    // A Sales / PIC user can only ever browse their own portfolio, so the entry
+    // is labelled accordingly. Anyone who can manage schools sees the neutral
+    // label instead. This is presentation only - the record restriction itself
+    // is enforced by the server.
+    $schoolLabel = $user !== null
+        && $user->hasRole('sales')
+        && ! $user->hasPermission('schools.manage')
+            ? 'Sekolah Saya'
+            : 'Sekolah';
+
     $nav = [
         ['kind' => 'link', 'label' => 'Dashboard', 'icon' => 'dashboard', 'route' => 'dashboard', 'match' => 'dashboard', 'permission' => 'dashboard.view'],
 
@@ -15,10 +25,12 @@
             ['label' => 'Sumber SIPLah', 'route' => 'orders.index', 'query' => ['source' => 'SIPLAH'], 'match' => 'orders.index', 'permission' => 'orders.view'],
             ['label' => 'Sumber e-Katalog', 'route' => 'orders.index', 'query' => ['source' => 'EKATALOG'], 'match' => 'orders.index', 'permission' => 'orders.view'],
             ['label' => 'Pesanan Manual', 'route' => 'orders.index', 'query' => ['source' => 'MANUAL'], 'match' => 'orders.index', 'permission' => 'orders.view'],
+            ['label' => 'Perlu Validasi', 'route' => 'orders.index', 'query' => ['status' => 'received'], 'match' => 'orders.index', 'permission' => 'orders.view'],
+            ['label' => 'Menunggu Stok', 'route' => 'orders.index', 'query' => ['status' => 'processing'], 'match' => 'orders.index', 'permission' => 'orders.view'],
         ]],
 
         ['kind' => 'group', 'label' => 'Master Data', 'icon' => 'database', 'items' => [
-            ['label' => 'Sekolah', 'route' => 'master.index', 'params' => ['resource' => 'schools'], 'match' => 'master.index', 'permission' => 'schools.view'],
+            ['label' => $schoolLabel, 'route' => 'master.index', 'params' => ['resource' => 'schools'], 'match' => 'master.index', 'permission' => 'schools.view'],
             ['label' => 'Penerbit', 'route' => 'master.index', 'params' => ['resource' => 'publishers'], 'match' => 'master.index', 'permission' => 'publishers.view'],
             ['label' => 'Buku', 'route' => 'master.index', 'params' => ['resource' => 'books'], 'match' => 'master.index', 'permission' => 'books.view'],
             ['label' => 'Kategori Buku', 'route' => 'master.index', 'params' => ['resource' => 'categories'], 'match' => 'master.index', 'permission' => 'categories.manage'],
