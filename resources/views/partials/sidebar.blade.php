@@ -30,18 +30,18 @@
         ]],
 
         ['kind' => 'group', 'label' => 'Master Data', 'icon' => 'database', 'items' => [
-            ['label' => $schoolLabel, 'route' => 'master.index', 'params' => ['resource' => 'schools'], 'match' => 'master.index', 'permission' => 'schools.view'],
-            ['label' => 'Penerbit', 'route' => 'master.index', 'params' => ['resource' => 'publishers'], 'match' => 'master.index', 'permission' => 'publishers.view'],
-            ['label' => 'Buku', 'route' => 'master.index', 'params' => ['resource' => 'books'], 'match' => 'master.index', 'permission' => 'books.view'],
-            ['label' => 'Barang Lainnya', 'route' => 'master.index', 'params' => ['resource' => 'barang-lainnya'], 'match' => 'master.index', 'permission' => 'goods.view'],
-            ['label' => 'Kategori Buku', 'route' => 'master.index', 'params' => ['resource' => 'categories'], 'match' => 'master.index', 'permission' => 'categories.manage'],
-            ['label' => 'Gudang', 'route' => 'master.index', 'params' => ['resource' => 'warehouses'], 'match' => 'master.index', 'permission' => 'warehouses.manage'],
-            ['label' => 'Sumber Pesanan', 'route' => 'master.index', 'params' => ['resource' => 'order-sources'], 'match' => 'master.index', 'permission' => 'order-sources.manage'],
-            ['label' => 'Kurir', 'route' => 'master.index', 'params' => ['resource' => 'couriers'], 'match' => 'master.index', 'permission' => 'couriers.manage'],
-            ['label' => 'Metode Kirim', 'route' => 'master.index', 'params' => ['resource' => 'shipping-methods'], 'match' => 'master.index', 'permission' => 'couriers.manage'],
-            ['label' => 'Metode Bayar', 'route' => 'master.index', 'params' => ['resource' => 'payment-methods'], 'match' => 'master.index', 'permission' => 'payment-methods.manage'],
-            ['label' => 'Aturan Rebate', 'route' => 'master.index', 'params' => ['resource' => 'rebate-rules'], 'match' => 'master.index', 'permission' => 'rebate-rules.manage'],
-            ['label' => 'Konfigurasi', 'route' => 'master.index', 'params' => ['resource' => 'settings'], 'match' => 'master.index', 'permission' => 'settings.manage'],
+            ['label' => $schoolLabel, 'route' => 'master.index', 'params' => ['resource' => 'schools'], 'match' => 'master.*', 'permission' => 'schools.view'],
+            ['label' => 'Penerbit', 'route' => 'master.index', 'params' => ['resource' => 'publishers'], 'match' => 'master.*', 'permission' => 'publishers.view'],
+            ['label' => 'Buku', 'route' => 'master.index', 'params' => ['resource' => 'books'], 'match' => 'master.*', 'permission' => 'books.view'],
+            ['label' => 'Barang Lainnya', 'route' => 'master.index', 'params' => ['resource' => 'barang-lainnya'], 'match' => 'master.*', 'permission' => 'goods.view'],
+            ['label' => 'Kategori Buku', 'route' => 'master.index', 'params' => ['resource' => 'categories'], 'match' => 'master.*', 'permission' => 'categories.manage'],
+            ['label' => 'Gudang', 'route' => 'master.index', 'params' => ['resource' => 'warehouses'], 'match' => 'master.*', 'permission' => 'warehouses.manage'],
+            ['label' => 'Sumber Pesanan', 'route' => 'master.index', 'params' => ['resource' => 'order-sources'], 'match' => 'master.*', 'permission' => 'order-sources.manage'],
+            ['label' => 'Kurir', 'route' => 'master.index', 'params' => ['resource' => 'couriers'], 'match' => 'master.*', 'permission' => 'couriers.manage'],
+            ['label' => 'Metode Kirim', 'route' => 'master.index', 'params' => ['resource' => 'shipping-methods'], 'match' => 'master.*', 'permission' => 'couriers.manage'],
+            ['label' => 'Metode Bayar', 'route' => 'master.index', 'params' => ['resource' => 'payment-methods'], 'match' => 'master.*', 'permission' => 'payment-methods.manage'],
+            ['label' => 'Aturan Rebate', 'route' => 'master.index', 'params' => ['resource' => 'rebate-rules'], 'match' => 'master.*', 'permission' => 'rebate-rules.manage'],
+            ['label' => 'Konfigurasi', 'route' => 'master.index', 'params' => ['resource' => 'settings'], 'match' => 'master.*', 'permission' => 'settings.manage'],
         ]],
 
         ['kind' => 'group', 'label' => 'Stok & Gudang', 'icon' => 'boxes', 'permission' => 'stock.view', 'items' => [
@@ -88,6 +88,13 @@
 
     $isActive = function (array $item) use ($queryKeys): bool {
         if (! request()->routeIs($item['match'] ?? '')) {
+            return false;
+        }
+
+        // Master data entries share the master.* routes, so the active
+        // entry is the one whose resource segment is in the URL.
+        $resource = $item['params']['resource'] ?? null;
+        if ($resource !== null && (string) request()->route('resource') !== (string) $resource) {
             return false;
         }
 
