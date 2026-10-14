@@ -10,6 +10,7 @@
     <x-page-header
         :title="'Invoice '.$invoice['number']"
         :subtitle="($invoice['school'] ?? '').' · Jatuh tempo '.Format::date($invoice['due_date'])"
+        icon="receipt"
     >
         <x-slot:actions>
             <x-button :href="route('invoices.print', $invoice['id'])" variant="secondary" target="_blank" rel="noreferrer">

@@ -12,6 +12,7 @@
         :subtitle="$activeStatus
             ? 'Menampilkan tugas dengan status '.$activeStatus['label'].'.'
             : 'Daftar tugas pengambilan dan pengepakan barang.'"
+        icon="clipboard"
     />
 
     <x-card>

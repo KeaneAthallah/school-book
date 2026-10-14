@@ -23,7 +23,7 @@
         }
     @endphp
 
-    <x-page-header :title="$resource['title']" :subtitle="'Kelola data '.strtolower($resource['title']).'.'">
+    <x-page-header :title="$resource['title']" :subtitle="'Kelola data '.strtolower($resource['title']).'.'" icon="database">
         <x-slot:actions>
             @if ($resource['can']['manage'])
                 <x-button :href="route('master.create', $resource['slug'])">

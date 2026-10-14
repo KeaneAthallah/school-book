@@ -3,7 +3,7 @@
 @section('title', 'Pengguna')
 
 @section('content')
-    <x-page-header title="Pengguna" subtitle="Akun pengguna dan peran yang dimilikinya.">
+    <x-page-header title="Pengguna" subtitle="Akun pengguna dan peran yang dimilikinya." icon="users">
         <x-slot:actions>
             @if ($can['manage'])
                 <x-button x-on:click="$dispatch('open-modal', 'create-user')">

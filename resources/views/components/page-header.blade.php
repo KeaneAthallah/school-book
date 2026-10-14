@@ -2,7 +2,17 @@
     'title',
     'subtitle' => null,
     'breadcrumbs' => [],
+    'icon' => null,
+    'tone' => null,
 ])
+
+@php
+    use App\Support\Accent;
+
+    $chip = $icon !== null
+        ? Accent::gradientByName($tone ?? Accent::toneFor($icon))
+        : null;
+@endphp
 
 <div {{ $attributes->merge(['class' => 'mb-5 flex flex-wrap items-end justify-between gap-3']) }}>
     <div class="min-w-0">
@@ -25,11 +35,21 @@
             </nav>
         @endif
 
-        <h1 class="text-xl font-semibold tracking-tight text-ink">{{ $title }}</h1>
+        <div class="flex items-center gap-3">
+            @if ($chip)
+                <span class="flex h-10 w-10 shrink-0 items-center justify-center rounded-control {{ $chip }} shadow-sm">
+                    <x-icon :name="$icon" class="h-5 w-5" />
+                </span>
+            @endif
 
-        @if ($subtitle)
-            <p class="mt-1 text-sm text-ink-soft">{{ $subtitle }}</p>
-        @endif
+            <div class="min-w-0">
+                <h1 class="text-xl font-semibold tracking-tight text-ink">{{ $title }}</h1>
+
+                @if ($subtitle)
+                    <p class="mt-0.5 text-sm text-ink-soft">{{ $subtitle }}</p>
+                @endif
+            </div>
+        </div>
     </div>
 
     @if (isset($actions))

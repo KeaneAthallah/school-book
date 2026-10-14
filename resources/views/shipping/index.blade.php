@@ -12,6 +12,7 @@
         :subtitle="$activeStatus
             ? 'Menampilkan pengiriman dengan status '.$activeStatus['label'].'.'
             : 'Surat jalan dan pengiriman barang ke sekolah.'"
+        icon="truck"
     >
         <x-slot:actions>
             @if ($can['create'])

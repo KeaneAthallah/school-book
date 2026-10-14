@@ -3,7 +3,8 @@
     'value',
     'icon' => null,
     'tone' => 'text-ink',
-    'iconTone' => 'bg-brand-50 text-brand-600 dark:bg-brand-500/15 dark:text-brand-300',
+    'chipTone' => 'brand',
+    'iconTone' => null,
     'delta' => null,
     'deltaLabel' => null,
     'goodWhenDown' => false,
@@ -11,6 +12,10 @@
 ])
 
 @php
+    use App\Support\Accent;
+
+    $iconTone = $iconTone ?? Accent::gradientByName($chipTone);
+
     $hasDelta = $delta !== null && $delta !== '' && is_finite((float) $delta);
     $rising = (float) $delta > 0;
     $flat = (float) $delta === 0.0;
@@ -27,8 +32,8 @@
     <div class="flex items-start justify-between gap-3">
         <p class="text-xs font-medium tracking-wide text-ink-soft">{{ $label }}</p>
         @if ($icon)
-            <span class="flex h-9 w-9 shrink-0 items-center justify-center rounded-control {{ $iconTone }}">
-                <x-icon :name="$icon" class="h-4.5 w-4.5" />
+            <span class="flex h-10 w-10 shrink-0 items-center justify-center rounded-control {{ $iconTone }}">
+                <x-icon :name="$icon" class="h-5 w-5" />
             </span>
         @endif
     </div>

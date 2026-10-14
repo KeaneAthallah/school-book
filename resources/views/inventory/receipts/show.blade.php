@@ -10,6 +10,7 @@
     <x-page-header
         :title="'Penerimaan '.$receipt['number']"
         :subtitle="($receipt['publisher'] ?? '').' · '.Format::date($receipt['receipt_date'])"
+        icon="inbox"
     >
         <x-slot:actions>
             <x-button :href="route('receipts.index')" variant="secondary">Kembali</x-button>

@@ -10,6 +10,7 @@
     <x-page-header
         title="Pembayaran"
         subtitle="Pencatatan dan verifikasi pembayaran sekolah."
+        icon="wallet"
     >
         <x-slot:actions>
             @if ($can['manage'])

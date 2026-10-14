@@ -21,6 +21,7 @@
     <x-page-header
         :title="'Pengiriman '.$shipment['number']"
         :subtitle="'Surat Jalan '.($shipment['delivery_note_number'] ?? '-').' · '.($shipment['school'] ?? '')"
+        icon="truck"
     >
         <x-slot:actions>
             @if ($shipment['delivery_note_number'])

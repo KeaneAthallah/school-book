@@ -19,6 +19,7 @@
     <x-page-header
         :title="$editing ? 'Ubah Pesanan '.$order['number'] : 'Buat Pesanan'"
         subtitle="Pilih sekolah, sumber pesanan, dan item barang."
+        icon="cart"
     >
         <x-slot:actions>
             <x-button :href="route('orders.index')" variant="secondary">Kembali</x-button>

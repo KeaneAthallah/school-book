@@ -10,6 +10,7 @@
     <x-page-header
         :title="'Pesanan '.$order['number']"
         :subtitle="($order['school'] ?? '').' · '.Format::date($order['order_date'])"
+        icon="cart"
     >
         <x-slot:actions>
             @if ($can['update'])

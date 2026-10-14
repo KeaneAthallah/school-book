@@ -10,6 +10,7 @@
     <x-page-header
         title="Integrasi & Import"
         subtitle="Status adaptor sumber pesanan eksternal. Integrasi tanpa kredensial tidak akan mengimpor data."
+        icon="bolt"
     />
 
     <x-card class="mb-4">

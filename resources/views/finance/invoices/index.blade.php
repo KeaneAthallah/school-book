@@ -6,6 +6,7 @@
     <x-page-header
         title="Invoice"
         subtitle="Tagihan yang diterbitkan dari kuantitas yang dikirim."
+        icon="receipt"
     />
 
     <x-card>

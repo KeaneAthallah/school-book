@@ -6,6 +6,7 @@
     <x-page-header
         title="Stok Barang"
         subtitle="Saldo stok fisik, reservasi, dan ketersediaan per gudang."
+        icon="boxes"
     >
         <x-slot:actions>
             <x-button :href="route('stock.movements')" variant="secondary">

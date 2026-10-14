@@ -10,6 +10,7 @@
     <x-page-header
         title="Tambah Penerimaan"
         subtitle="Catat barang yang diterima dari penerbit. Stok bertambah setelah konfirmasi."
+        icon="inbox"
     >
         <x-slot:actions>
             <x-button :href="route('receipts.index')" variant="secondary">Kembali</x-button>

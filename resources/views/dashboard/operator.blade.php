@@ -7,7 +7,7 @@
         use App\Support\Chart;
     @endphp
 
-    <x-page-header :title="$role->title()" :subtitle="$role->subtitle()">
+    <x-page-header :title="$role->title()" :subtitle="$role->subtitle()" icon="dashboard">
         <x-slot:actions>
             @include('dashboard.partials.filter', ['period' => $period])
         </x-slot:actions>

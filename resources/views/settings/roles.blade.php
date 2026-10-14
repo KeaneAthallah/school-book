@@ -6,6 +6,7 @@
     <x-page-header
         title="Peran & Izin"
         subtitle="Pilih sebuah peran, lalu centang izin yang boleh dilakukannya."
+        icon="shield"
     />
 
     <div

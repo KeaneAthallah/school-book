@@ -11,7 +11,7 @@
         $indexRoute = route('master.index', $resource['slug']);
     @endphp
 
-    <x-page-header :title="$title" :subtitle="$resource['title']">
+    <x-page-header :title="$title" :subtitle="$resource['title']" icon="database">
         <x-slot:actions>
             <x-button :href="$indexRoute" variant="secondary">Kembali</x-button>
         </x-slot:actions>

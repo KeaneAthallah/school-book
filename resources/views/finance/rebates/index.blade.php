@@ -10,6 +10,7 @@
     <x-page-header
         title="Rebate / Cashback"
         subtitle="Pengajuan, persetujuan, dan pembayaran rebate."
+        icon="percent"
     >
         <x-slot:actions>
             @if ($can['request'])

@@ -1,4 +1,5 @@
 @php
+    use App\Support\Accent;
     use Illuminate\Support\Facades\Route as RouteFacade;
 
     $user = auth()->user();
@@ -156,7 +157,7 @@
                                 @if ($active) aria-current="page" @endif
                                 class="flex items-center gap-2.5 rounded-control px-3 py-2 text-sm transition {{ $active ? 'bg-brand-600 font-medium text-white' : 'text-ink-soft hover:bg-panel-soft hover:text-ink dark:text-navy-200 dark:hover:bg-white/5 dark:hover:text-white' }}"
                             >
-                                <x-icon :name="$entry['icon']" class="h-4.5 w-4.5 shrink-0" />
+                                <x-icon :name="$entry['icon']" class="h-4.5 w-4.5 shrink-0 {{ Accent::iconColor($entry['icon']) }}" />
                                 <span class="truncate">{{ $entry['label'] }}</span>
                             </a>
                         </li>
@@ -189,7 +190,7 @@
                         :aria-expanded="open ? 'true' : 'false'"
                         class="flex w-full items-center gap-2.5 rounded-control px-3 py-2 text-sm transition {{ $containsActive ? 'text-ink dark:text-white' : 'text-ink-soft hover:bg-panel-soft hover:text-ink dark:text-navy-200 dark:hover:bg-white/5 dark:hover:text-white' }}"
                     >
-                        <x-icon :name="$entry['icon']" class="h-4.5 w-4.5 shrink-0" />
+                        <x-icon :name="$entry['icon']" class="h-4.5 w-4.5 shrink-0 {{ Accent::iconColor($entry['icon']) }}" />
                         <span class="flex-1 truncate text-left">{{ $entry['label'] }}</span>
                         <x-icon name="chevronDown" class="h-3.5 w-3.5 shrink-0 transition-transform" x-bind:class="open ? 'rotate-180' : ''" />
                     </button>

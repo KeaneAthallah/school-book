@@ -2,12 +2,21 @@
     'title',
     'subtitle' => null,
     'icon' => null,
+    'tone' => null,
 ])
+
+@php
+    use App\Support\Accent;
+
+    $chip = $icon !== null
+        ? Accent::gradientByName($tone ?? Accent::toneFor($icon))
+        : null;
+@endphp
 
 <div {{ $attributes->merge(['class' => 'flex items-start justify-between gap-3 border-b border-line px-4 py-3.5']) }}>
     <div class="flex min-w-0 items-start gap-2.5">
-        @if ($icon)
-            <span class="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-control bg-brand-50 text-brand-600 dark:bg-brand-500/15 dark:text-brand-300">
+        @if ($chip)
+            <span class="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-control {{ $chip }} shadow-sm">
                 <x-icon :name="$icon" class="h-4.5 w-4.5" />
             </span>
         @endif

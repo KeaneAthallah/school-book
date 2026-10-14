@@ -6,6 +6,7 @@
     <x-page-header
         title="Akses Terbatas"
         subtitle="Akun Anda belum memiliki peran dashboard yang dikenali."
+        icon="alert"
     />
 
     <x-alert tone="warning">

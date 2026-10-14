@@ -6,6 +6,7 @@
     <x-page-header
         title="Mutasi Stok"
         subtitle="Riwayat pergerakan stok dari penerimaan, reservasi, pengiriman, dan penyesuaian."
+        icon="refresh"
     />
 
     <x-card>

@@ -12,6 +12,7 @@
         :subtitle="$activeSource
             ? 'Pesanan dari sumber '.$activeSource['label'].'.'
             : 'Daftar pesanan dari semua sumber.'"
+        icon="cart"
     >
         <x-slot:actions>
             @if ($can['create'])

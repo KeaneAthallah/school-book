@@ -6,6 +6,7 @@
     <x-page-header
         title="Penerimaan Barang"
         subtitle="Penerimaan barang dari penerbit. Stok bertambah setelah dikonfirmasi."
+        icon="inbox"
     >
         <x-slot:actions>
             @if ($can['create'])

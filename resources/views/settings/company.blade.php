@@ -7,7 +7,7 @@
         $value = fn (string $key): string => old($key, (string) ($values[$key] ?? ''));
     @endphp
 
-    <x-page-header title="Profil Perusahaan" subtitle="Identitas yang tercetak pada invoice dan surat jalan">
+    <x-page-header title="Profil Perusahaan" subtitle="Identitas yang tercetak pada invoice dan surat jalan" icon="settings">
         <x-slot:actions>
             <x-button :href="route('dashboard')" variant="ghost">Kembali</x-button>
         </x-slot:actions>

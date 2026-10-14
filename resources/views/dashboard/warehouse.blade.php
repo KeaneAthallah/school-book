@@ -3,7 +3,7 @@
 @section('title', $role->title())
 
 @section('content')
-    <x-page-header :title="$role->title()" :subtitle="$role->subtitle()" />
+    <x-page-header :title="$role->title()" :subtitle="$role->subtitle()" icon="dashboard" />
 
     <p class="-mb-1 text-xs text-ink-soft">Ringkasan operasional gudang berdasarkan kondisi terkini.</p>
 

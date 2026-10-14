@@ -6,6 +6,7 @@
     <x-page-header
         :title="'Picking '.$picking['number']"
         :subtitle="($picking['order'] ?? '').' · '.($picking['school'] ?? '')"
+        icon="clipboard"
     >
         <x-slot:actions>
             <x-button :href="route('pickings.index')" variant="secondary">Kembali</x-button>

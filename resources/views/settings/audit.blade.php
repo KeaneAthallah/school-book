@@ -6,6 +6,7 @@
     <x-page-header
         title="Audit Log"
         subtitle="Riwayat tindakan penting pada sistem."
+        icon="fileText"
     />
 
     <x-card>

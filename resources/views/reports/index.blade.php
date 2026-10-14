@@ -6,6 +6,7 @@
     <x-page-header
         title="Laporan"
         subtitle="Laporan operasional, penjualan, dan keuangan."
+        icon="chart"
     >
         <x-slot:actions>
             <x-button

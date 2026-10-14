@@ -7,6 +7,7 @@
         <x-page-header
             title="Buat Pengiriman"
             subtitle="Pilih pesanan yang memiliki stok siap dikirim."
+            icon="truck"
         >
             <x-slot:actions>
                 <x-button :href="route('shipments.index')" variant="secondary">Kembali</x-button>
@@ -30,6 +31,7 @@
         <x-page-header
             title="Buat Pengiriman"
             :subtitle="'Pesanan '.$order['number'].' · '.($order['school'] ?? '')"
+            icon="truck"
         >
             <x-slot:actions>
                 <x-button :href="route('shipments.index')" variant="secondary">Kembali</x-button>

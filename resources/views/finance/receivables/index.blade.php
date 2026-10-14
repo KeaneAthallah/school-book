@@ -17,13 +17,14 @@
     <x-page-header
         title="Piutang"
         subtitle="Sisa tagihan invoice yang belum dibayar penuh, termasuk yang sudah jatuh tempo."
+        icon="wallet"
     />
 
     <div class="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
-        <x-stat-card label="Total Ditagihkan" :value="Format::idr($summary['total'])" icon="receipt" />
-        <x-stat-card label="Sudah Dibayar" :value="Format::idr($summary['paid'])" icon="wallet" tone="text-emerald-700 dark:text-emerald-400" icon-tone="bg-emerald-50 text-emerald-600 dark:bg-emerald-500/15 dark:text-emerald-300" />
-        <x-stat-card label="Sisa Piutang" :value="Format::idr($summary['outstanding'])" icon="fileText" tone="text-amber-600 dark:text-amber-400" icon-tone="bg-amber-50 text-amber-600 dark:bg-amber-500/15 dark:text-amber-300" />
-        <x-stat-card label="Jatuh Tempo" :value="Format::idr($summary['overdue_amount'])" icon="alert" tone="text-rose-600 dark:text-rose-400" icon-tone="bg-rose-50 text-rose-600 dark:bg-rose-500/15 dark:text-rose-300" :hint="Format::number($summary['overdue_count']).' invoice'" />
+        <x-stat-card label="Total Ditagihkan" :value="Format::idr($summary['total'])" icon="receipt" chip-tone="cyan" />
+        <x-stat-card label="Sudah Dibayar" :value="Format::idr($summary['paid'])" icon="wallet" chip-tone="emerald" tone="text-emerald-700 dark:text-emerald-400" />
+        <x-stat-card label="Sisa Piutang" :value="Format::idr($summary['outstanding'])" icon="fileText" chip-tone="amber" tone="text-amber-600 dark:text-amber-400" />
+        <x-stat-card label="Jatuh Tempo" :value="Format::idr($summary['overdue_amount'])" icon="alert" chip-tone="rose" tone="text-rose-600 dark:text-rose-400" :hint="Format::number($summary['overdue_count']).' invoice'" />
     </div>
 
     <x-card class="mt-4">
