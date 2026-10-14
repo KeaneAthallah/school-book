@@ -128,14 +128,14 @@
     };
 @endphp
 
-<div class="flex h-full flex-col bg-navy-900">
+<div class="flex h-full flex-col bg-panel dark:bg-navy-900">
     <div class="flex h-header items-center gap-2.5 px-4">
         <span class="flex h-10 w-10 shrink-0 items-center justify-center overflow-hidden rounded-control bg-brand-600">
             <img src="{{ asset('logo.png') }}" alt="{{ config('app.name') }}" class="h-10 w-10 object-cover">
         </span>
         <div class="min-w-0">
-            <p class="truncate text-sm font-semibold text-white">{{ config('app.name') }}</p>
-            <p class="truncate text-[11px] text-navy-300">Kelola Lebih Mudah, Pantau Lebih Akurat.</p>
+            <p class="truncate text-sm font-semibold text-ink dark:text-white">{{ config('app.name') }}</p>
+            <p class="truncate text-[11px] text-ink-muted dark:text-navy-300">Kelola Lebih Mudah, Pantau Lebih Akurat.</p>
         </div>
     </div>
 
@@ -154,7 +154,7 @@
                             <a
                                 href="{{ $href($entry) }}"
                                 @if ($active) aria-current="page" @endif
-                                class="flex items-center gap-2.5 rounded-control px-3 py-2 text-sm transition {{ $active ? 'bg-brand-600 font-medium text-white' : 'text-navy-200 hover:bg-white/5 hover:text-white' }}"
+                                class="flex items-center gap-2.5 rounded-control px-3 py-2 text-sm transition {{ $active ? 'bg-brand-600 font-medium text-white' : 'text-ink-soft hover:bg-panel-soft hover:text-ink dark:text-navy-200 dark:hover:bg-white/5 dark:hover:text-white' }}"
                             >
                                 <x-icon :name="$entry['icon']" class="h-4.5 w-4.5 shrink-0" />
                                 <span class="truncate">{{ $entry['label'] }}</span>
@@ -187,7 +187,7 @@
                         type="button"
                         x-on:click="open = ! open"
                         :aria-expanded="open ? 'true' : 'false'"
-                        class="flex w-full items-center gap-2.5 rounded-control px-3 py-2 text-sm transition {{ $containsActive ? 'text-white' : 'text-navy-200 hover:bg-white/5 hover:text-white' }}"
+                        class="flex w-full items-center gap-2.5 rounded-control px-3 py-2 text-sm transition {{ $containsActive ? 'text-ink dark:text-white' : 'text-ink-soft hover:bg-panel-soft hover:text-ink dark:text-navy-200 dark:hover:bg-white/5 dark:hover:text-white' }}"
                     >
                         <x-icon :name="$entry['icon']" class="h-4.5 w-4.5 shrink-0" />
                         <span class="flex-1 truncate text-left">{{ $entry['label'] }}</span>
@@ -197,7 +197,7 @@
                     <ul
                         x-show="open"
                         x-cloak
-                        class="mt-0.5 ml-4 space-y-0.5 border-l border-navy-700 pl-2"
+                        class="mt-0.5 ml-4 space-y-0.5 border-l border-line dark:border-navy-700 pl-2"
                     >
                         @foreach ($items as $item)
                             @php $active = $isActive($item); @endphp
@@ -205,7 +205,7 @@
                                 <a
                                     href="{{ $href($item) }}"
                                     @if ($active) aria-current="page" @endif
-                                    class="block rounded-control px-3 py-1.5 text-[13px] transition {{ $active ? 'bg-white/10 font-medium text-white' : 'text-navy-300 hover:bg-white/5 hover:text-white' }}"
+                                    class="block rounded-control px-3 py-1.5 text-[13px] transition {{ $active ? 'bg-brand-50 font-medium text-brand-700 dark:bg-white/10 dark:text-white' : 'text-ink-soft hover:bg-panel-soft hover:text-ink dark:text-navy-300 dark:hover:bg-white/5 dark:hover:text-white' }}"
                                 >{{ $item['label'] }}</a>
                             </li>
                         @endforeach
@@ -215,7 +215,7 @@
         </ul>
     </nav>
 
-    <div class="border-t border-navy-800 px-4 py-3">
-        <p class="text-[11px] text-navy-400">{{ config('app.timezone') }}</p>
+    <div class="border-t border-line dark:border-navy-800 px-4 py-3">
+        <p class="text-[11px] text-ink-muted dark:text-navy-400">{{ config('app.timezone') }}</p>
     </div>
 </div>

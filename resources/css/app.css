@@ -16,7 +16,7 @@
         'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol',
         'Noto Color Emoji';
 
-    /* Sidebar / dark chrome palette (identical in both themes) */
+    /* Dark chrome palette (sidebar in dark mode, brand panel in dark mode) */
     --color-navy-950: #070d1b;
     --color-navy-900: #0e1729;
     --color-navy-850: #131e35;
@@ -78,6 +78,7 @@
     --t-ink: #0f172a;
     --t-ink-soft: #475569;
     --t-ink-muted: #94a3b8;
+    --t-brand-grid-line: rgb(37 96 232 / 0.08);
 }
 
 [data-theme='dark'] {
@@ -91,6 +92,7 @@
     --t-ink: #e8edf7;
     --t-ink-soft: #a9b6cd;
     --t-ink-muted: #7686a3;
+    --t-brand-grid-line: rgb(255 255 255 / 0.05);
 }
 
 @layer base {
@@ -112,6 +114,16 @@
     .scroll-slim {
         scrollbar-width: thin;
         scrollbar-color: var(--t-line-strong) transparent;
+    }
+
+    /* Decorative blueprint grid for the auth brand panel */
+    .brand-grid {
+        background-image:
+            linear-gradient(var(--t-brand-grid-line) 1px, transparent 1px),
+            linear-gradient(90deg, var(--t-brand-grid-line) 1px, transparent 1px);
+        background-size: 44px 44px;
+        -webkit-mask-image: radial-gradient(ellipse 90% 80% at 60% 20%, black 30%, transparent 75%);
+        mask-image: radial-gradient(ellipse 90% 80% at 60% 20%, black 30%, transparent 75%);
     }
 
     /* Alpine: hide elements until the component is initialised */
