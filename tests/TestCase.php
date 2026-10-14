@@ -19,4 +19,18 @@ abstract class TestCase extends BaseTestCase
         // the token check while keeping authentication and authorization active.
         $this->withoutMiddleware(PreventRequestForgery::class);
     }
+
+    protected function setUpTraits()
+    {
+        // Pest boots the framework before PHPUnit applies the phpunit.xml env
+        // vars, so Laravel's env repository keeps the .env connection. Force
+        // the in-memory test database here — after the app boots but before
+        // RefreshDatabase migrates — so tests never touch the live database.
+        config([
+            'database.default' => 'sqlite',
+            'database.connections.sqlite.database' => ':memory:',
+        ]);
+
+        return parent::setUpTraits();
+    }
 }

@@ -459,7 +459,7 @@ class DashboardMetrics
     public function outstandingTotal(DashboardScope $scope): string
     {
         $total = $this->receivableBase($scope)
-            ->selectRaw('COALESCE(SUM(GREATEST(total_amount - paid_amount, 0)), 0) as total')
+            ->selectRaw('COALESCE(SUM(CASE WHEN total_amount - paid_amount > 0 THEN total_amount - paid_amount ELSE 0 END), 0) as total')
             ->value('total');
 
         return Money::add((string) $total, '0');
