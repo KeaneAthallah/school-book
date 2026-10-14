@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Enums\InvoicePaymentStatus;
 use App\Enums\InvoiceStatus;
+use App\Models\User;
 use App\Support\Money;
 use Database\Factories\InvoiceFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
@@ -86,6 +87,14 @@ class Invoice extends Model
     public function items(): HasMany
     {
         return $this->hasMany(InvoiceItem::class);
+    }
+
+    /**
+     * @return BelongsTo<User, $this>
+     */
+    public function createdBy(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'created_by');
     }
 
     /**

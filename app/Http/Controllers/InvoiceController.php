@@ -177,7 +177,7 @@ class InvoiceController extends Controller
     {
         abort_unless($this->userCan($request, 'invoices.view'), 403);
 
-        $invoice->load(['school', 'items.product', 'order']);
+        $invoice->load(['school', 'items.product', 'order', 'createdBy:id,name']);
 
         return view('print.invoice', [
             'invoice' => $invoice,
