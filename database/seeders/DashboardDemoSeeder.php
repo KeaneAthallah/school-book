@@ -284,7 +284,7 @@ class DashboardDemoSeeder extends Seeder
 
         foreach ($names as $i => $name) {
             $this->schools[] = School::query()->firstOrCreate(
-                ['npsn' => self::NPSN_PREFIX.str_pad((string) ($i + 1), 4, '0')],
+                ['npsn' => self::NPSN_PREFIX.str_pad((string) ($i + 1), 4, '0', STR_PAD_LEFT)],
                 [
                     'name' => $name.' (Demo)',
                     'address' => 'Jl. Demo No. '.($i + 1),
