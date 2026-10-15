@@ -10,6 +10,7 @@ use App\Models\RebateRule;
 use App\Models\Setting;
 use App\Models\User;
 use App\Support\Money;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
 
@@ -132,9 +133,9 @@ class RebateService
         });
     }
 
-    public function markPaid(Rebate $rebate, string $reference, User $user): Rebate
+    public function markPaid(Rebate $rebate, string $reference, User $user, ?UploadedFile $proofPhoto = null): Rebate
     {
-        return DB::transaction(function () use ($rebate, $reference, $user): Rebate {
+        return DB::transaction(function () use ($rebate, $reference, $user, $proofPhoto): Rebate {
             $locked = Rebate::query()->lockForUpdate()->findOrFail((int) $rebate->getKey());
 
             if ($locked->status !== RebateStatus::Approved) {
@@ -148,6 +149,18 @@ class RebateService
                 'payment_reference' => $reference,
                 'paid_at' => now(),
             ])->save();
+
+            if ($proofPhoto !== null) {
+                $path = $proofPhoto->store('rebates/'.((int) $locked->getKey()), 'public');
+
+                $locked->attachments()->create([
+                    'original_name' => $proofPhoto->getClientOriginalName(),
+                    'path' => $path,
+                    'mime_type' => $proofPhoto->getMimeType(),
+                    'size' => $proofPhoto->getSize(),
+                    'uploaded_by' => $user->getKey(),
+                ]);
+            }
 
             $this->audit->log('rebate.paid', $locked, 'Pembayaran rebate '.$locked->number, user: $user);
 

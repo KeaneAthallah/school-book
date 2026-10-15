@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Attachment;
 use App\Models\Invoice;
+use App\Models\Rebate;
 use App\Models\Shipment;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -13,16 +14,22 @@ class AttachmentController extends Controller
 {
     public function destroy(Request $request, Attachment $attachment): RedirectResponse
     {
-        abort_if(! in_array($attachment->attachable_type, [Shipment::class, Invoice::class], true), 404);
+        abort_if(! in_array($attachment->attachable_type, [Shipment::class, Invoice::class, Rebate::class], true), 404);
 
-        $permission = $attachment->attachable_type === Invoice::class ? 'invoices.manage' : 'shipments.manage';
+        $permission = match ($attachment->attachable_type) {
+            Invoice::class => 'invoices.manage',
+            Rebate::class => 'rebates.pay',
+            default => 'shipments.manage',
+        };
         abort_unless($this->userCan($request, $permission), 403);
 
         Storage::disk('public')->delete($attachment->path);
         $attachment->delete();
 
-        return back()->with('success', $attachment->attachable_type === Invoice::class
-            ? 'Bukti foto pembayaran dihapus.'
-            : 'Bukti foto pengiriman dihapus.');
+        return back()->with('success', match ($attachment->attachable_type) {
+            Invoice::class => 'Bukti foto pembayaran dihapus.',
+            Rebate::class => 'Bukti foto pembayaran rebate dihapus.',
+            default => 'Bukti foto pengiriman dihapus.',
+        });
     }
 }

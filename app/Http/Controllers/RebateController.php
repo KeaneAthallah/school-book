@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Attachment;
 use App\Models\Invoice;
 use App\Models\Rebate;
 use App\Models\RebateRule;
@@ -9,6 +10,7 @@ use App\Services\RebateService;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\View\View;
 
 class RebateController extends Controller
@@ -20,7 +22,7 @@ class RebateController extends Controller
         $search = $request->string('search')->toString();
 
         $rebates = Rebate::query()
-            ->with(['school:id,name', 'invoice:id,number,total_amount,paid_amount,due_date,invoice_date,status', 'publisher:id,name'])
+            ->with(['school:id,name', 'invoice:id,number,total_amount,paid_amount,due_date,invoice_date,status', 'publisher:id,name', 'attachments'])
             ->when($search !== '', fn (Builder $query) => $query->where(function (Builder $builder) use ($search): void {
                 $builder->where('number', 'like', '%'.$search.'%')
                     ->orWhereHas('school', fn (Builder $school) => $school->where('name', 'like', '%'.$search.'%'));
@@ -40,6 +42,12 @@ class RebateController extends Controller
                 'status' => $rebate->status->value,
                 'status_label' => $rebate->status->label(),
                 'requested_at' => $rebate->created_at?->toDateTimeString(),
+                'attachments' => $rebate->attachments->sortByDesc('id')->map(fn (Attachment $attachment): array => [
+                    'id' => $attachment->getKey(),
+                    'name' => $attachment->original_name,
+                    'url' => Storage::url($attachment->path),
+                    'time' => $attachment->created_at?->toDateTimeString(),
+                ])->all(),
             ]);
 
         return view('finance.rebates.index', [
@@ -112,9 +120,17 @@ class RebateController extends Controller
     {
         abort_unless($this->userCan($request, 'rebates.pay'), 403);
 
-        $validated = $request->validate(['reference' => ['required', 'string', 'max:255']]);
+        $validated = $request->validate([
+            'reference' => ['required', 'string', 'max:255'],
+            'proof_photo' => ['required', 'file', 'image', 'mimes:jpeg,jpg,png,webp', 'max:5120'],
+        ], [
+            'proof_photo.required' => 'Bukti foto pembayaran rebate wajib dilampirkan.',
+            'proof_photo.image' => 'Bukti pembayaran rebate harus berupa gambar (JPEG, PNG, atau WebP).',
+            'proof_photo.mimes' => 'Bukti pembayaran rebate harus berupa gambar (JPEG, PNG, atau WebP).',
+            'proof_photo.max' => 'Bukti pembayaran rebate maksimal 5 MB.',
+        ]);
 
-        $service->markPaid($rebate, (string) $validated['reference'], $request->user());
+        $service->markPaid($rebate, (string) $validated['reference'], $request->user(), $request->file('proof_photo'));
 
         return back()->with('success', 'Rebate '.$rebate->number.' ditandai dibayarkan.');
     }

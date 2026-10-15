@@ -4,7 +4,6 @@ namespace App\Models;
 
 use App\Enums\InvoicePaymentStatus;
 use App\Enums\InvoiceStatus;
-use App\Models\User;
 use App\Support\Money;
 use Database\Factories\InvoiceFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
