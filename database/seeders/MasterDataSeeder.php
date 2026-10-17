@@ -5,8 +5,10 @@ namespace Database\Seeders;
 use App\Enums\OrderSourceType;
 use App\Models\BookCategory;
 use App\Models\Courier;
+use App\Models\Goods;
 use App\Models\OrderSource;
 use App\Models\PaymentMethod;
+use App\Models\Product;
 use App\Models\Publisher;
 use App\Models\RebateRule;
 use App\Models\Setting;
@@ -96,7 +98,40 @@ class MasterDataSeeder extends Seeder
             ],
         );
 
+        $this->seedGoods();
+
         unset($warehouse);
+    }
+
+    private function seedGoods(): void
+    {
+        $goods = [
+            ['code' => 'GL-001', 'title' => 'Kipas Angin', 'price' => 350000, 'unit' => 'unit'],
+            ['code' => 'GL-002', 'title' => 'Meja Siswa', 'price' => 450000, 'unit' => 'unit'],
+            ['code' => 'GL-003', 'title' => 'Kursi Siswa', 'price' => 250000, 'unit' => 'unit'],
+            ['code' => 'GL-004', 'title' => 'Papan Tulis', 'price' => 750000, 'unit' => 'unit'],
+            ['code' => 'GL-005', 'title' => 'Proyektor', 'price' => 3500000, 'unit' => 'unit'],
+        ];
+
+        foreach ($goods as $data) {
+            $product = Product::query()->updateOrCreate(
+                ['code' => $data['code']],
+                [
+                    'type' => 'goods',
+                    'title' => $data['title'],
+                    'price' => $data['price'],
+                    'cost_price' => (int) ($data['price'] * 0.7),
+                    'min_stock' => 5,
+                    'rack_location' => null,
+                    'status' => 'active',
+                ],
+            );
+
+            Goods::query()->updateOrCreate(
+                ['product_id' => $product->getKey()],
+                ['unit' => $data['unit']],
+            );
+        }
     }
 
     private function seedSettings(): void
