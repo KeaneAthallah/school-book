@@ -1,0 +1,344 @@
+<section class="bagian-pembuka" id="bagian-6">
+  <p class="label-bagian">Bagian VI</p>
+  <h1 class="judul-bagian" style="border:none;padding:0">Laporan</h1>
+  <div class="aturan"></div>
+  <p class="deskripsi">
+    Sembilan laporan siap pakai: apa gunanya, kolom apa saja isinya, penyaring
+    yang berlaku, dan cara mengekspornya.
+  </p>
+</section>
+
+<h1 id="bab-laporan">Bab 7. Sembilan Laporan</h1>
+
+<h2 id="sec-laporan-umum">7.1 Cara Memakai Modul Laporan</h2>
+
+<figure class="fig" id="fig-reports-index">
+  <img src="../screens/149-reports-index.png" alt="Halaman laporan">
+  <figcaption>
+    Halaman Laporan. Pilih jenis laporan pada daftar di kiri; tabel di bawahnya
+    langsung berubah.
+  </figcaption>
+</figure>
+
+<ol class="langkah">
+  <li>Buka <strong>Laporan</strong> dari sidebar.</li>
+  <li>Pilih <strong>Jenis Laporan</strong>. Tabel langsung menampilkan hasilnya.</li>
+  <li>Pada jenis laporan tertentu, isi <strong>Dari</strong> dan <strong>Sampai</strong>, lalu klik <strong>Tampilkan</strong>.</li>
+  <li>Klik <strong>Export CSV</strong> untuk mengunduh isi tabel apa adanya.</li>
+</ol>
+
+<div class="kotak catatan">
+  <span class="judul-kotak">Penyaring tanggal hanya ada pada sebagian laporan</span>
+  <p>
+    Kolom <em>Dari</em> dan <em>Sampai</em> hanya muncul pada empat laporan:
+    <strong>Penjualan per Sekolah</strong>, <strong>Penjualan per Penerbit</strong>,
+    <strong>Penjualan per Barang</strong>, dan <strong>Ringkasan Pesanan</strong>.
+    Lima laporan lainnya selalu menampilkan kondisi saat ini, sehingga tidak perlu
+    rentang tanggal.
+  </p>
+</div>
+
+<div class="kotak penting">
+  <span class="judul-kotak">Ekspor berupa CSV, bukan Excel atau PDF</span>
+  <p>
+    Tombol <strong>Export CSV</strong> mengunduh berkas teks berpemisah koma
+    (.csv). Berkas ini dapat dibuka dengan Excel, tetapi bukan berkas Excel
+    (.xlsx), dan bukan PDF. Untuk membuat PDF, gunakan fasilitas cetak peramban
+    pada tabel yang tampil, atau olah CSV-nya di aplikasi lembar kerja.
+  </p>
+</div>
+
+<div class="kotak peringatan">
+  <span class="judul-kotak">Ekspor mengikuti penyaring yang sedang aktif</span>
+  <p>
+    Berkas CSV yang diunduh memakai jenis laporan dan rentang tanggal yang
+    <strong>sedang tampil</strong>. Bila Anda lupa mengatur tanggal, yang
+    terunduh adalah seluruh data. Biasakan memeriksa penyaring sebelum menekan
+    tombol ekspor.
+  </p>
+</div>
+
+<h2 id="sec-laporan-penjualan-sekolah">7.2 Penjualan per Sekolah</h2>
+
+<div class="ringkas-modul">
+  <dl>
+    <dt>Untuk apa</dt><dd>Mengetahui sekolah mana yang paling banyak membeli.</dd>
+    <dt>Penyaring</dt><dd>Rentang tanggal.</dd>
+  </dl>
+</div>
+
+<figure class="fig" id="fig-reports-sales-by-school">
+  <img src="../screens/150-reports-sales-by-school.png" alt="Laporan penjualan per sekolah">
+  <figcaption>Laporan Penjualan per Sekolah.</figcaption>
+</figure>
+
+<table class="tabel-field">
+  <thead><tr><th>Kolom</th><th>Arti</th></tr></thead>
+  <tbody>
+    <tr><td>Sekolah</td><td>Nama sekolah.</td></tr>
+    <tr><td>Jumlah</td><td>Banyaknya barang yang dikirim ke sekolah tersebut.</td></tr>
+    <tr><td>Nilai</td><td>Nilai barang yang dikirim.</td></tr>
+  </tbody>
+</table>
+
+<div class="kotak penting">
+  <span class="judul-kotak">Laporan penjualan menghitung barang yang SUDAH DIKIRIM</span>
+  <p>
+    Ini penting dan sering disalahpahami. Laporan penjualan hanya menghitung
+    barang yang benar-benar sudah keluar dari gudang. Pesanan yang baru
+    <em>dikonfirmasi</em> tetapi belum dikirim <strong>belum</strong> terhitung.
+    Pesanan berstatus <em>Draft</em> dan <em>Dibatalkan</em> juga tidak dihitung.
+    Jadi bila sebuah pesanan belum muncul di laporan penjualan, periksa dulu
+    apakah sudah dikirim.
+  </p>
+</div>
+
+<h2 id="sec-laporan-penjualan-penerbit">7.3 Penjualan per Penerbit</h2>
+
+<div class="ringkas-modul">
+  <dl>
+    <dt>Untuk apa</dt><dd>Mengetahui penerbit mana yang bukunya paling laku.</dd>
+    <dt>Penyaring</dt><dd>Rentang tanggal.</dd>
+  </dl>
+</div>
+
+<figure class="fig" id="fig-reports-sales-by-publisher">
+  <img src="../screens/151-reports-sales-by-publisher.png" alt="Laporan penjualan per penerbit">
+  <figcaption>Laporan Penjualan per Penerbit.</figcaption>
+</figure>
+
+<table class="tabel-field">
+  <thead><tr><th>Kolom</th><th>Arti</th></tr></thead>
+  <tbody>
+    <tr><td>Penerbit</td><td>Nama penerbit.</td></tr>
+    <tr><td>Jumlah</td><td>Banyaknya barang terjual dari penerbit itu.</td></tr>
+    <tr><td>Nilai</td><td>Nilai penjualannya.</td></tr>
+  </tbody>
+</table>
+
+<h2 id="sec-laporan-penjualan-barang">7.4 Penjualan per Barang</h2>
+
+<div class="ringkas-modul">
+  <dl>
+    <dt>Untuk apa</dt><dd>Mengetahui judul atau barang mana yang paling laku.</dd>
+    <dt>Penyaring</dt><dd>Rentang tanggal.</dd>
+  </dl>
+</div>
+
+<figure class="fig" id="fig-reports-sales-by-book">
+  <img src="../screens/152-reports-sales-by-book.png" alt="Laporan penjualan per barang">
+  <figcaption>Laporan Penjualan per Barang.</figcaption>
+</figure>
+
+<table class="tabel-field">
+  <thead><tr><th>Kolom</th><th>Arti</th></tr></thead>
+  <tbody>
+    <tr><td>Kode</td><td>Kode barang.</td></tr>
+    <tr><td>Judul</td><td>Judul buku atau nama barang.</td></tr>
+    <tr><td>Jumlah</td><td>Banyaknya unit terjual.</td></tr>
+    <tr><td>Nilai</td><td>Nilai penjualannya.</td></tr>
+  </tbody>
+</table>
+
+<p>
+  Laporan ini berguna untuk merencanakan pembelian: judul yang selalu muncul di
+  atas adalah judul yang stoknya harus dijaga.
+</p>
+
+<h2 id="sec-laporan-ringkasan-pesanan">7.5 Ringkasan Pesanan</h2>
+
+<div class="ringkas-modul">
+  <dl>
+    <dt>Untuk apa</dt><dd>Melihat status pemenuhan setiap pesanan: berapa yang dipesan, berapa yang sudah terkirim.</dd>
+    <dt>Penyaring</dt><dd>Rentang tanggal.</dd>
+  </dl>
+</div>
+
+<figure class="fig" id="fig-reports-orders-summary">
+  <img src="../screens/153-reports-orders-summary.png" alt="Laporan ringkasan pesanan">
+  <figcaption>Laporan Ringkasan Pesanan.</figcaption>
+</figure>
+
+<table class="tabel-field">
+  <thead><tr><th>Kolom</th><th>Arti</th></tr></thead>
+  <tbody>
+    <tr><td>No. Pesanan</td><td>Nomor pesanan.</td></tr>
+    <tr><td>Tanggal</td><td>Tanggal pesanan.</td></tr>
+    <tr><td>Sekolah</td><td>Sekolah pemesan.</td></tr>
+    <tr><td>Status</td><td>Status pesanan saat ini.</td></tr>
+    <tr><td>Dipesan</td><td>Total unit yang diminta.</td></tr>
+    <tr><td>Terkirim</td><td>Total unit yang sudah dikirim.</td></tr>
+    <tr><td>Nilai</td><td>Nilai pesanan.</td></tr>
+  </tbody>
+</table>
+
+<p>
+  Laporan ini adalah cara tercepat menemukan pesanan yang &ldquo;mandek&rdquo;:
+  cari baris yang kolom <em>Terkirim</em>-nya masih nol padahal tanggalnya sudah
+  lama.
+</p>
+
+<h2 id="sec-laporan-piutang">7.6 Piutang per Sekolah</h2>
+
+<div class="ringkas-modul">
+  <dl>
+    <dt>Untuk apa</dt><dd>Mengetahui berapa kewajiban tiap sekolah secara keseluruhan.</dd>
+    <dt>Penyaring</dt><dd>Tidak ada; selalu menampilkan kondisi terkini.</dd>
+  </dl>
+</div>
+
+<figure class="fig" id="fig-reports-receivables">
+  <img src="../screens/154-reports-receivables.png" alt="Laporan piutang per sekolah">
+  <figcaption>Laporan Piutang per Sekolah.</figcaption>
+</figure>
+
+<table class="tabel-field">
+  <thead><tr><th>Kolom</th><th>Arti</th></tr></thead>
+  <tbody>
+    <tr><td>Sekolah</td><td>Nama sekolah.</td></tr>
+    <tr><td>Total Invoice</td><td>Jumlah seluruh tagihan ke sekolah itu.</td></tr>
+    <tr><td>Dibayar</td><td>Yang sudah dibayar dan terverifikasi.</td></tr>
+    <tr><td>Sisa Piutang</td><td>Yang masih harus dibayar.</td></tr>
+  </tbody>
+</table>
+
+<h2 id="sec-laporan-jatuh-tempo">7.7 Invoice Jatuh Tempo</h2>
+
+<div class="ringkas-modul">
+  <dl>
+    <dt>Untuk apa</dt><dd>Daftar tagihan yang sudah melewati tanggal jatuh tempo — bahan penagihan.</dd>
+    <dt>Penyaring</dt><dd>Tidak ada.</dd>
+  </dl>
+</div>
+
+<figure class="fig" id="fig-reports-overdue">
+  <img src="../screens/155-reports-overdue.png" alt="Laporan invoice jatuh tempo">
+  <figcaption>Laporan Invoice Jatuh Tempo.</figcaption>
+</figure>
+
+<table class="tabel-field">
+  <thead><tr><th>Kolom</th><th>Arti</th></tr></thead>
+  <tbody>
+    <tr><td>No. Invoice</td><td>Nomor tagihan.</td></tr>
+    <tr><td>Jatuh Tempo</td><td>Tanggal batas pembayaran yang sudah terlewat.</td></tr>
+    <tr><td>Sekolah</td><td>Sekolah yang menunggak.</td></tr>
+    <tr><td>Total</td><td>Nilai tagihan.</td></tr>
+    <tr><td>Sisa</td><td>Yang masih harus dibayar.</td></tr>
+  </tbody>
+</table>
+
+<div class="kotak tips">
+  <span class="judul-kotak">Tips</span>
+  <p>
+    Ekspor CSV laporan ini, lalu urutkan menurut <em>Sisa</em> dari yang
+    terbesar. Itulah daftar prioritas penagihan Anda minggu ini.
+  </p>
+</div>
+
+<h2 id="sec-laporan-stok">7.8 Stok per Barang</h2>
+
+<div class="ringkas-modul">
+  <dl>
+    <dt>Untuk apa</dt><dd>Posisi stok seluruh barang di setiap gudang.</dd>
+    <dt>Penyaring</dt><dd>Tidak ada.</dd>
+  </dl>
+</div>
+
+<figure class="fig" id="fig-reports-stock">
+  <img src="../screens/156-reports-stock.png" alt="Laporan stok per barang">
+  <figcaption>Laporan Stok per Barang.</figcaption>
+</figure>
+
+<table class="tabel-field">
+  <thead><tr><th>Kolom</th><th>Arti</th></tr></thead>
+  <tbody>
+    <tr><td>Kode / Judul</td><td>Identitas barang.</td></tr>
+    <tr><td>Gudang</td><td>Gudang tempat stok berada.</td></tr>
+    <tr><td>Fisik</td><td>Jumlah nyata di gudang.</td></tr>
+    <tr><td>Reservasi</td><td>Jumlah yang sudah dijanjikan ke pesanan.</td></tr>
+    <tr><td>Tersedia</td><td>Fisik dikurangi reservasi.</td></tr>
+  </tbody>
+</table>
+
+<h2 id="sec-laporan-stok-menipis">7.9 Stok Menipis</h2>
+
+<div class="ringkas-modul">
+  <dl>
+    <dt>Untuk apa</dt><dd>Daftar barang yang stoknya sudah menyentuh atau melewati batas minimum.</dd>
+    <dt>Penyaring</dt><dd>Tidak ada.</dd>
+  </dl>
+</div>
+
+<figure class="fig" id="fig-reports-low-stock">
+  <img src="../screens/157-reports-low-stock.png" alt="Laporan stok menipis">
+  <figcaption>Laporan Stok Menipis.</figcaption>
+</figure>
+
+<table class="tabel-field">
+  <thead><tr><th>Kolom</th><th>Arti</th></tr></thead>
+  <tbody>
+    <tr><td>Kode / Judul</td><td>Identitas barang.</td></tr>
+    <tr><td>Gudang</td><td>Gudang tempat stok berada.</td></tr>
+    <tr><td>Fisik</td><td>Jumlah nyata saat ini.</td></tr>
+    <tr><td>Stok Min</td><td>Ambang minimum yang ditetapkan pada data barang.</td></tr>
+  </tbody>
+</table>
+
+<div class="kotak catatan">
+  <span class="judul-kotak">Stok minimum harus diisi lebih dulu</span>
+  <p>
+    Barang yang kolom <em>Stok Min</em>-nya masih nol tidak akan pernah muncul di
+    laporan ini. Bila laporan terasa kosong padahal jelas ada barang yang hampir
+    habis, periksa apakah nilai stok minimum barang tersebut sudah diisi pada
+    formulir Buku atau Barang Lainnya.
+  </p>
+</div>
+
+<h2 id="sec-laporan-backorder">7.10 Back Order</h2>
+
+<div class="ringkas-modul">
+  <dl>
+    <dt>Untuk apa</dt><dd>Daftar kekurangan yang belum terpenuhi, diurutkan dari pesanan terlama.</dd>
+    <dt>Penyaring</dt><dd>Tidak ada.</dd>
+  </dl>
+</div>
+
+<figure class="fig" id="fig-reports-backorders">
+  <img src="../screens/158-reports-backorders.png" alt="Laporan back order">
+  <figcaption>Laporan Back Order.</figcaption>
+</figure>
+
+<table class="tabel-field">
+  <thead><tr><th>Kolom</th><th>Arti</th></tr></thead>
+  <tbody>
+    <tr><td>No. Pesanan</td><td>Pesanan yang masih kekurangan barang.</td></tr>
+    <tr><td>Tanggal</td><td>Tanggal pesanan — yang paling atas paling lama.</td></tr>
+    <tr><td>Sekolah</td><td>Sekolah yang menunggu.</td></tr>
+    <tr><td>Barang</td><td>Judul yang masih kurang.</td></tr>
+    <tr><td>Sisa</td><td>Jumlah yang belum bisa dipenuhi.</td></tr>
+  </tbody>
+</table>
+
+<p>
+  Laporan ini adalah daftar belanja Anda: barang yang muncul di sini adalah
+  barang yang perlu dipesan ke penerbit.
+</p>
+
+<h2 id="sec-laporan-ringkas">7.11 Ringkasan Sembilan Laporan</h2>
+
+<table>
+  <thead>
+    <tr><th style="width:32%">Laporan</th><th style="width:20%">Penyaring tanggal</th><th>Pertanyaan yang dijawab</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>Penjualan per Sekolah</td><td>Ya</td><td>Sekolah mana yang paling banyak membeli?</td></tr>
+    <tr><td>Penjualan per Penerbit</td><td>Ya</td><td>Penerbit mana yang bukunya paling laku?</td></tr>
+    <tr><td>Penjualan per Barang</td><td>Ya</td><td>Judul apa yang paling laku?</td></tr>
+    <tr><td>Ringkasan Pesanan</td><td>Ya</td><td>Pesanan mana yang belum tuntas?</td></tr>
+    <tr><td>Piutang per Sekolah</td><td>Tidak</td><td>Berapa utang tiap sekolah sekarang?</td></tr>
+    <tr><td>Invoice Jatuh Tempo</td><td>Tidak</td><td>Tagihan mana yang sudah telat?</td></tr>
+    <tr><td>Stok per Barang</td><td>Tidak</td><td>Berapa stok tiap barang sekarang?</td></tr>
+    <tr><td>Stok Menipis</td><td>Tidak</td><td>Barang apa yang perlu segera dipesan?</td></tr>
+    <tr><td>Back Order</td><td>Tidak</td><td>Siapa menunggu barang apa?</td></tr>
+  </tbody>
+</table>

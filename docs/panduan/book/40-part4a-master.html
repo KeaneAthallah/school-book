@@ -1,0 +1,589 @@
+<section class="bagian-pembuka" id="bagian-4">
+  <p class="label-bagian">Bagian IV</p>
+  <h1 class="judul-bagian" style="border:none;padding:0">Panduan Modul</h1>
+  <div class="aturan"></div>
+  <p class="deskripsi">
+    Referensi lengkap setiap layar: apa fungsinya, cara membukanya, apa arti
+    kolomnya, langkah memakainya, dan apa yang seharusnya Anda lihat setelahnya.
+  </p>
+  <div class="daftar-isi-bab">
+    <span>Dashboard dan Master Data</span>
+    <span>Pesanan, Stok, dan Gudang</span>
+    <span>Picking, Pengiriman, dan Invoice</span>
+    <span>Piutang, Pembayaran, dan Rebate</span>
+    <span>Laporan, Pengaturan, dan Integrasi</span>
+  </div>
+</section>
+
+<h1 id="bab-modul-master">Bab 4. Dashboard dan Data Induk</h1>
+
+<p>
+  Data induk (<em>master data</em>) adalah fondasi. Pesanan tidak bisa dibuat
+  tanpa sekolah dan buku; buku tidak bisa dijual tanpa penerbit; tagihan tidak
+  bisa ditagih tanpa metode pembayaran. Karena itu, perbaiki dulu data induk
+  sebelum menyalahkan modul transaksi.
+</p>
+
+<p>
+  Seluruh layar data induk memiliki bentuk yang sama: sebuah daftar dengan kolom
+  pencarian, tombol <strong>Tambah</strong>, dan pada setiap baris tersedia
+  tombol <strong>Ubah</strong> dan <strong>Hapus</strong>.
+</p>
+
+<h2 id="sec-modul-dashboard">4.1 Dashboard</h2>
+
+<div class="ringkas-modul">
+  <dl>
+    <dt>Gambaran</dt>
+    <dd>Ringkasan kondisi usaha dalam satu layar. Isinya menyesuaikan peran Anda.</dd>
+    <dt>Cara membuka</dt>
+    <dd>Klik <strong>Dashboard</strong> di urutan teratas sidebar, atau ketik langsung alamat <code>/dashboard</code>.</dd>
+    <dt>Izin</dt>
+    <dd><code>dashboard.view</code> — dimiliki oleh seluruh peran.</dd>
+  </dl>
+</div>
+
+<p>
+  Karena setiap peran bekerja dengan pertanyaan yang berbeda, dashboard-nya pun
+  berbeda. Perbandingan lengkap keenam dashboard ada di
+  <a href="#bagian-3">Bagian III</a>. Yang penting dipahami di sini:
+  <strong>dashboard bersifat ringkasan</strong>. Angka di dalamnya berasal dari
+  data transaksi yang sama dengan yang Anda lihat di menu masing-masing, jadi
+  bila terasa ada kejanggalan, telusuri ke modul asalnya.
+</p>
+
+<p>
+  Dashboard Admin memiliki pemilih periode (<strong>Dari</strong> dan
+  <strong>Sampai</strong>) dengan tombol <strong>Terapkan</strong>, sehingga
+  ringkasan dapat dipersempit ke rentang tanggal tertentu.
+</p>
+
+<div class="kotak catatan">
+  <span class="judul-kotak">Dashboard kosong?</span>
+  <p>
+    Pada data yang benar-benar baru, sebagian panel dashboard memang belum ada
+    isinya dan akan menampilkan keterangan kosong. Itu wajar. Begitu ada
+    transaksi, angkanya terisi sendiri.
+  </p>
+</div>
+
+<h2 id="sec-modul-sekolah">4.2 Sekolah</h2>
+
+<div class="ringkas-modul">
+  <dl>
+    <dt>Gambaran</dt><dd>Daftar sekolah pelanggan beserta data kontak dan penanggung jawabnya.</dd>
+    <dt>Cara membuka</dt><dd><strong>Master Data &rsaquo; Sekolah</strong> (ditampilkan sebagai <em>Sekolah Saya</em> untuk akun Sales).</dd>
+    <dt>Izin</dt><dd>Lihat: <code>schools.view</code> &middot; Kelola: <code>schools.manage</code></dd>
+  </dl>
+</div>
+
+<figure class="fig" id="fig-schools">
+  <img src="../screens/30-master-schools.png" alt="Daftar sekolah">
+  <figcaption>
+    Daftar sekolah. Kolom NPSN dan Nama Sekolah memudahkan pencarian; kolom
+    Sales/PIC menunjukkan siapa penanggung jawabnya.
+  </figcaption>
+</figure>
+
+<p>
+  Daftar ini dapat memuat ribuan baris, jadi selalu gunakan pencarian. Kata
+  kunci dicocokkan dengan <strong>Nama Sekolah</strong>, <strong>NPSN</strong>,
+  dan <strong>Kecamatan</strong>.
+</p>
+
+<table class="tabel-field">
+  <thead><tr><th>Kolom daftar</th><th>Arti</th></tr></thead>
+  <tbody>
+    <tr><td>NPSN</td><td>Nomor Pokok Sekolah Nasional — identitas resmi sekolah.</td></tr>
+    <tr><td>Nama Sekolah</td><td>Nama sekolah.</td></tr>
+    <tr><td>Kecamatan / Kab/Kota</td><td>Wilayah administratif sekolah.</td></tr>
+    <tr><td>Sales/PIC</td><td>Petugas yang menangani sekolah ini.</td></tr>
+    <tr><td>Status</td><td>Aktif atau Nonaktif.</td></tr>
+  </tbody>
+</table>
+
+<h3>Menambah sekolah</h3>
+<ol class="langkah">
+  <li>Klik tombol <strong>Tambah Sekolah</strong>.</li>
+  <li>Isi kolom wajib: <strong>Nama Sekolah</strong> dan <strong>Status</strong>.</li>
+  <li>Isi kolom lain bila datanya tersedia. Lengkapi <strong>Zona</strong> bila sekolah ini memiliki harga khusus wilayah.</li>
+  <li>Klik <strong>Simpan</strong>. Bila berhasil, Anda kembali ke daftar dan muncul pesan keberhasilan.</li>
+</ol>
+
+<figure class="fig" id="fig-schools-form">
+  <img src="../screens/31-master-schools-form.png" alt="Formulir tambah sekolah">
+  <figcaption>Formulir tambah sekolah. Kolom bertanda wajib harus diisi.</figcaption>
+</figure>
+
+<table class="tabel-field">
+  <thead><tr><th>Kolom formulir</th><th>Keterangan</th></tr></thead>
+  <tbody>
+    <tr><td>NPSN</td><td>Opsional, tetapi sebaiknya diisi. Harus unik — tidak boleh sama dengan sekolah lain.</td></tr>
+    <tr><td>Nama Sekolah <em>(wajib)</em></td><td>Nama lengkap sekolah.</td></tr>
+    <tr><td>Alamat, Kecamatan, Kabupaten/Kota, Provinsi, Kode Pos</td><td>Data alamat. Alamat dipakai sebagai alamat pengiriman bawaan.</td></tr>
+    <tr><td>Kontak, Telepon, Email</td><td>Data narahubung sekolah.</td></tr>
+    <tr><td>Kepala Sekolah</td><td>Nama kepala sekolah, untuk keperluan dokumen.</td></tr>
+    <tr><td>Sales/PIC</td><td>Pilih pengguna yang bertanggung jawab atas sekolah ini.</td></tr>
+    <tr><td>Zona</td><td>Menentukan harga jual buku untuk sekolah ini.</td></tr>
+    <tr><td>Status <em>(wajib)</em></td><td>Aktif atau Nonaktif. Sekolah nonaktif tetap tersimpan untuk riwayat.</td></tr>
+  </tbody>
+</table>
+
+<h2 id="sec-modul-penerbit">4.3 Penerbit</h2>
+
+<div class="ringkas-modul">
+  <dl>
+    <dt>Gambaran</dt><dd>Daftar penerbit yang bukunya Anda jual.</dd>
+    <dt>Cara membuka</dt><dd><strong>Master Data &rsaquo; Penerbit</strong></dd>
+    <dt>Izin</dt><dd>Lihat: <code>publishers.view</code> &middot; Kelola: <code>publishers.manage</code></dd>
+  </dl>
+</div>
+
+<figure class="fig" id="fig-publishers">
+  <img src="../screens/32-master-publishers.png" alt="Daftar penerbit">
+  <figcaption>Daftar penerbit beserta data kontak.</figcaption>
+</figure>
+
+<table class="tabel-field">
+  <thead><tr><th>Kolom formulir</th><th>Keterangan</th></tr></thead>
+  <tbody>
+    <tr><td>Nama Penerbit <em>(wajib)</em></td><td>Nama penerbit.</td></tr>
+    <tr><td>Kontak, Telepon, Email, Alamat</td><td>Data narahubung penerbit.</td></tr>
+    <tr><td>Logo</td><td>Berkas gambar (JPEG, PNG, atau WebP), maksimal 5&nbsp;MB.</td></tr>
+    <tr><td>Status <em>(wajib)</em></td><td>Aktif atau Nonaktif.</td></tr>
+  </tbody>
+</table>
+
+<figure class="fig" id="fig-publishers-form">
+  <img src="../screens/33-master-publishers-form.png" alt="Formulir tambah penerbit">
+  <figcaption>
+    Formulir tambah penerbit. Kolom Logo menerima berkas gambar maksimal 5&nbsp;MB.
+  </figcaption>
+</figure>
+
+<div class="kotak peringatan">
+  <span class="judul-kotak">Penerbit tidak dapat dihapus bila masih punya buku</span>
+  <p>
+    Bila sebuah penerbit masih dipakai oleh buku atau penerimaan barang, tombol
+    hapus akan ditolak dan aplikasi menampilkan pesan bahwa data masih dipakai
+    pada transaksi lain. Untuk menghapusnya, pindahkan atau hapus dulu buku
+    terkait.
+  </p>
+</div>
+
+<h2 id="sec-modul-kategori">4.4 Kategori Buku</h2>
+
+<div class="ringkas-modul">
+  <dl>
+    <dt>Gambaran</dt><dd>Pengelompokan buku, misalnya &ldquo;Kurikulum Merdeka&rdquo; atau &ldquo;Umum&rdquo;.</dd>
+    <dt>Cara membuka</dt><dd><strong>Master Data &rsaquo; Kategori Buku</strong></dd>
+    <dt>Izin</dt><dd><code>categories.manage</code> (lihat dan kelola memakai izin yang sama)</dd>
+  </dl>
+</div>
+
+<figure class="fig sempit" id="fig-categories">
+  <img src="../screens/34-master-categories.png" alt="Daftar kategori buku">
+  <figcaption>Daftar kategori buku. Kategori bersifat opsional pada data buku.</figcaption>
+</figure>
+
+<p>
+  Hanya ada dua kolom: <strong>Nama Kategori</strong> (wajib) dan
+  <strong>Deskripsi</strong>. Kategori membantu menyaring laporan, tetapi tidak
+  memengaruhi harga.
+</p>
+
+<h2 id="sec-modul-buku">4.5 Buku</h2>
+
+<div class="ringkas-modul">
+  <dl>
+    <dt>Gambaran</dt><dd>Katalog buku yang dijual, lengkap dengan harga, penerbit, dan lokasi rak.</dd>
+    <dt>Cara membuka</dt><dd><strong>Master Data &rsaquo; Buku</strong></dd>
+    <dt>Izin</dt><dd>Lihat: <code>books.view</code> &middot; Kelola: <code>books.manage</code></dd>
+  </dl>
+</div>
+
+<figure class="fig" id="fig-books">
+  <img src="../screens/36-master-books.png" alt="Daftar buku">
+  <figcaption>
+    Daftar buku. Pencarian mencakup kode, judul, dan ISBN. Kolom Harga
+    menampilkan harga jual standar.
+  </figcaption>
+</figure>
+
+<table class="tabel-field">
+  <thead><tr><th>Kolom daftar</th><th>Arti</th></tr></thead>
+  <tbody>
+    <tr><td>Kode</td><td>Kode unik buku (SKU).</td></tr>
+    <tr><td>Judul</td><td>Judul buku.</td></tr>
+    <tr><td>Penerbit / Kategori</td><td>Penerbit dan kategori buku.</td></tr>
+    <tr><td>Kelas / Mapel</td><td>Kelas dan mata pelajaran yang dituju.</td></tr>
+    <tr><td>Klasifikasi</td><td>Salah satu dari: Het, Reguler, Depag, Banpem, Alcom.</td></tr>
+    <tr><td>Harga</td><td>Harga jual standar.</td></tr>
+    <tr><td>Status</td><td>Aktif atau Nonaktif.</td></tr>
+  </tbody>
+</table>
+
+<h3>Menambah buku</h3>
+<ol class="langkah">
+  <li>Klik <strong>Tambah Buku</strong>.</li>
+  <li>Isi <strong>Kode Buku</strong>, <strong>Judul</strong>, <strong>Penerbit</strong>, <strong>Harga Jual</strong>, dan <strong>Status</strong> — kelimanya wajib.</li>
+  <li>Lengkapi ISBN, kategori, kelas, mata pelajaran, klasifikasi, harga pokok, stok minimum, dan lokasi rak bila tersedia.</li>
+  <li>Klik <strong>Simpan</strong>.</li>
+</ol>
+
+<figure class="fig" id="fig-books-form">
+  <img src="../screens/37-master-books-form.png" alt="Formulir tambah buku">
+  <figcaption>
+    Formulir tambah buku. Kolom <strong>Harga Jual</strong> di sini adalah harga
+    standar; harga khusus per zona diatur terpisah.
+  </figcaption>
+</figure>
+
+<table class="tabel-field">
+  <thead><tr><th>Kolom formulir</th><th>Keterangan</th></tr></thead>
+  <tbody>
+    <tr><td>Kode Buku <em>(wajib)</em></td><td>Harus unik di seluruh katalog.</td></tr>
+    <tr><td>ISBN</td><td>Opsional. Ikut tercari pada pencarian.</td></tr>
+    <tr><td>Judul <em>(wajib)</em></td><td>Judul buku.</td></tr>
+    <tr><td>Penerbit <em>(wajib)</em></td><td>Harus dipilih dari daftar penerbit.</td></tr>
+    <tr><td>Kategori</td><td>Opsional.</td></tr>
+    <tr><td>Kelas, Mata Pelajaran</td><td>Opsional, memudahkan penyaringan.</td></tr>
+    <tr><td>Klasifikasi</td><td>Het, Reguler, Depag, Banpem, atau Alcom.</td></tr>
+    <tr><td>Harga Jual <em>(wajib)</em></td><td>Harga standar bila sekolah tidak punya zona khusus.</td></tr>
+    <tr><td>Harga Pokok</td><td>Modal. Tidak muncul pada dokumen pelanggan, tetapi berguna untuk analisis.</td></tr>
+    <tr><td>Stok Minimum</td><td>Ambang peringatan stok menipis.</td></tr>
+    <tr><td>Lokasi Rak</td><td>Mempermudah petugas gudang menemukan barang.</td></tr>
+    <tr><td>Status <em>(wajib)</em></td><td>Aktif atau Nonaktif.</td></tr>
+  </tbody>
+</table>
+
+<h3 id="sec-harga-zona">Memahami harga per zona</h3>
+
+<p>
+  Satu judul buku bisa memiliki harga berbeda untuk wilayah yang berbeda. Itulah
+  yang disebut <strong>harga zona</strong>. Cara kerjanya sebagai berikut:
+</p>
+
+<ol>
+  <li>Setiap sekolah dapat ditautkan ke satu <strong>zona</strong> (kolom <em>Zona</em> pada data sekolah).</li>
+  <li>Sebuah buku dapat memiliki beberapa harga khusus, satu untuk tiap zona.</li>
+  <li>Saat pesanan dibuat untuk sekolah tertentu, aplikasi mengambil harga sebagai berikut:
+    <ul>
+      <li>bila ada harga khusus untuk zona sekolah tersebut, pakai harga itu;</li>
+      <li>bila tidak ada, pakai <strong>harga jual standar</strong> buku.</li>
+    </ul>
+  </li>
+</ol>
+
+<div class="kotak catatan">
+  <span class="judul-kotak">Kenapa harga di keranjang bisa berbeda dari katalog</span>
+  <p>
+    Bila Anda melihat harga yang tidak sama dengan kolom Harga di daftar Buku,
+    kemungkinan besar itu karena sekolah yang dipilih memiliki zona berharga
+    khusus. Ini bukan kesalahan. Untuk memeriksanya, lihat kolom Zona pada data
+    sekolah tersebut.
+  </p>
+</div>
+
+<div class="kotak penting">
+  <span class="judul-kotak">Zona tidak punya layar tersendiri</span>
+  <p>
+    Saat buku ini disusun, daftar zona hanya muncul sebagai <em>pilihan</em> pada
+    formulir sekolah dan pemilih <em>Zona Harga</em> pada formulir pesanan.
+    Tidak ada layar untuk menambah atau menyunting nama zona dari dalam
+    aplikasi. Bila Anda perlu menambah zona baru, mintalah bantuan
+    administrator sistem.
+  </p>
+</div>
+
+<h2 id="sec-modul-barang">4.6 Barang Lainnya</h2>
+
+<div class="ringkas-modul">
+  <dl>
+    <dt>Gambaran</dt><dd>Barang non-buku yang ikut dijual, misalnya kipas angin atau peralatan sekolah.</dd>
+    <dt>Cara membuka</dt><dd><strong>Master Data &rsaquo; Barang Lainnya</strong></dd>
+    <dt>Izin</dt><dd>Lihat: <code>goods.view</code> &middot; Kelola: <code>goods.manage</code></dd>
+  </dl>
+</div>
+
+<figure class="fig" id="fig-goods">
+  <img src="../screens/38-master-goods.png" alt="Daftar barang lainnya">
+  <figcaption>
+    Daftar barang lainnya. Barang di sini mengikuti alur yang sama dengan buku:
+    ikut dipesan, dipicking, dikirim, dan diinvoice.
+  </figcaption>
+</figure>
+
+<table class="tabel-field">
+  <thead><tr><th>Kolom formulir</th><th>Keterangan</th></tr></thead>
+  <tbody>
+    <tr><td>Kode Barang <em>(wajib)</em></td><td>Harus unik.</td></tr>
+    <tr><td>Nama Barang <em>(wajib)</em></td><td>Nama barang.</td></tr>
+    <tr><td>Harga Jual <em>(wajib)</em></td><td>Harga jual ke sekolah.</td></tr>
+    <tr><td>Harga Pokok, Stok Minimum, Lokasi Rak</td><td>Opsional.</td></tr>
+    <tr><td>Nama Toko</td><td>Nama toko asal barang, bila berasal dari pihak ketiga.</td></tr>
+    <tr><td>Satuan</td><td>Misalnya &ldquo;unit&rdquo;, &ldquo;buah&rdquo;, &ldquo;set&rdquo;.</td></tr>
+    <tr><td>Status <em>(wajib)</em></td><td>Aktif atau Nonaktif.</td></tr>
+  </tbody>
+</table>
+
+<figure class="fig" id="fig-goods-form">
+  <img src="../screens/39-master-goods-form.png" alt="Formulir tambah barang lainnya">
+  <figcaption>Formulir tambah barang lainnya.</figcaption>
+</figure>
+
+<div class="kotak penting">
+  <span class="judul-kotak">Perbedaan pajak buku dan barang lainnya</span>
+  <p>
+    Buku dibebaskan dari PPN, sedangkan barang lainnya tidak. Karena itu jumlah
+    pajak pada invoice akan berbeda tergantung komposisi isinya. Rinciannya ada
+    di <a href="#sec-invoice-pajak">Bagian 5.6</a>.
+  </p>
+</div>
+
+<h2 id="sec-modul-gudang">4.7 Gudang</h2>
+
+<div class="ringkas-modul">
+  <dl>
+    <dt>Gambaran</dt><dd>Daftar gudang tempat stok disimpan.</dd>
+    <dt>Cara membuka</dt><dd><strong>Master Data &rsaquo; Gudang</strong></dd>
+    <dt>Izin</dt><dd><code>warehouses.manage</code></dd>
+  </dl>
+</div>
+
+<figure class="fig sempit" id="fig-warehouses">
+  <img src="../screens/40-master-warehouses.png" alt="Daftar gudang">
+  <figcaption>
+    Daftar gudang. Pada data contoh hanya ada satu gudang, yaitu
+    <em>Gudang Utama</em>.
+  </figcaption>
+</figure>
+
+<p>
+  Kolomnya hanya <strong>Kode</strong> (wajib), <strong>Nama Gudang</strong>
+  (wajib), <strong>Alamat</strong>, dan <strong>Status</strong> (wajib). Salah
+  satu gudang ditandai sebagai gudang bawaan, dan gudang itulah yang dipakai
+  bila tidak ada gudang lain yang memiliki stok memadai.
+</p>
+
+<h2 id="sec-modul-sumber">4.8 Sumber Pesanan</h2>
+
+<div class="ringkas-modul">
+  <dl>
+    <dt>Gambaran</dt><dd>Asal-usul pesanan: SIPLah, e-Katalog, manual, atau sumber lainnya.</dd>
+    <dt>Cara membuka</dt><dd><strong>Master Data &rsaquo; Sumber Pesanan</strong></dd>
+    <dt>Izin</dt><dd><code>order-sources.manage</code></dd>
+  </dl>
+</div>
+
+<figure class="fig" id="fig-order-sources">
+  <img src="../screens/42-master-order-sources.png" alt="Daftar sumber pesanan">
+  <figcaption>Daftar sumber pesanan beserta tipe dan status aktifnya.</figcaption>
+</figure>
+
+<table class="tabel-field">
+  <thead><tr><th>Kolom</th><th>Keterangan</th></tr></thead>
+  <tbody>
+    <tr><td>Kode / Nama</td><td>Penanda sumber pesanan.</td></tr>
+    <tr><td>Tipe</td><td>Menentukan perlakuan awal: e-Katalog, Pesanan Manual, SIPLah, atau Sumber Lainnya.</td></tr>
+    <tr><td>Aktif</td><td>Bila tidak dicentang, sumber ini tidak lagi muncul sebagai pilihan.</td></tr>
+  </tbody>
+</table>
+
+<p>
+  Setiap pesanan <strong>wajib</strong> memiliki sumber pesanan. Sumber ini
+  dipakai untuk menyaring daftar pesanan dan untuk laporan.
+</p>
+
+<h2 id="sec-modul-kurir">4.9 Kurir dan Metode Kirim</h2>
+
+<div class="ringkas-modul">
+  <dl>
+    <dt>Gambaran</dt><dd>Daftar jasa pengiriman dan pilihan cara pengirimannya beserta biaya.</dd>
+    <dt>Cara membuka</dt><dd><strong>Master Data &rsaquo; Kurir</strong> dan <strong>Master Data &rsaquo; Metode Kirim</strong></dd>
+    <dt>Izin</dt><dd><code>couriers.manage</code> (mencakup keduanya)</dd>
+  </dl>
+</div>
+
+<figure class="fig" id="fig-couriers">
+  <img src="../screens/44-master-couriers.png" alt="Daftar kurir">
+  <figcaption>Daftar kurir. Kolom Telepon berguna saat mengoordinasikan penjemputan.</figcaption>
+</figure>
+
+<figure class="fig" id="fig-shipping-methods">
+  <img src="../screens/46-master-shipping-methods.png" alt="Daftar metode pengiriman">
+  <figcaption>
+    Daftar metode pengiriman. Setiap metode dikaitkan ke satu kurir dan punya
+    kolom Biaya.
+  </figcaption>
+</figure>
+
+<table class="tabel-field">
+  <thead><tr><th>Pada Kurir</th><th>Keterangan</th></tr></thead>
+  <tbody>
+    <tr><td>Kode <em>(wajib)</em></td><td>Harus unik.</td></tr>
+    <tr><td>Nama Kurir <em>(wajib)</em></td><td>Nama jasa pengiriman.</td></tr>
+    <tr><td>Telepon</td><td>Nomor kontak kurir.</td></tr>
+    <tr><td>Status <em>(wajib)</em></td><td>Aktif atau Nonaktif.</td></tr>
+  </tbody>
+</table>
+
+<table class="tabel-field">
+  <thead><tr><th>Pada Metode Kirim</th><th>Keterangan</th></tr></thead>
+  <tbody>
+    <tr><td>Nama Metode <em>(wajib)</em></td><td>Misalnya &ldquo;Reguler&rdquo; atau &ldquo;Kargo&rdquo;.</td></tr>
+    <tr><td>Kurir</td><td>Kurir yang melayani metode ini.</td></tr>
+    <tr><td>Biaya</td><td>Biaya pengiriman bawaan untuk metode ini.</td></tr>
+    <tr><td>Status <em>(wajib)</em></td><td>Aktif atau Nonaktif.</td></tr>
+  </tbody>
+</table>
+
+<h2 id="sec-modul-bayar">4.10 Metode Pembayaran</h2>
+
+<div class="ringkas-modul">
+  <dl>
+    <dt>Gambaran</dt><dd>Cara sekolah membayar: transfer bank, tunai, atau virtual account.</dd>
+    <dt>Cara membuka</dt><dd><strong>Master Data &rsaquo; Metode Bayar</strong></dd>
+    <dt>Izin</dt><dd><code>payment-methods.manage</code></dd>
+  </dl>
+</div>
+
+<figure class="fig sempit" id="fig-payment-methods">
+  <img src="../screens/48-master-payment-methods.png" alt="Daftar metode pembayaran">
+  <figcaption>Daftar metode pembayaran.</figcaption>
+</figure>
+
+<p>
+  Hanya tiga kolom: <strong>Kode</strong> (wajib, unik), <strong>Nama</strong>
+  (wajib), dan <strong>Status</strong> (wajib). Pilihan ini muncul pada modal
+  <em>Catat Pembayaran</em>.
+</p>
+
+<h2 id="sec-modul-rebate-rule">4.11 Aturan Rebate</h2>
+
+<div class="ringkas-modul">
+  <dl>
+    <dt>Gambaran</dt><dd>Ketentuan pemberian rebate, misalnya &ldquo;2% dari nilai invoice untuk penerbit tertentu&rdquo;.</dd>
+    <dt>Cara membuka</dt><dd><strong>Master Data &rsaquo; Aturan Rebate</strong></dd>
+    <dt>Izin</dt><dd><code>rebate-rules.manage</code></dd>
+  </dl>
+</div>
+
+<figure class="fig" id="fig-rebate-rules">
+  <img src="../screens/50-master-rebate-rules.png" alt="Daftar aturan rebate">
+  <figcaption>
+    Daftar aturan rebate. Kolom <em>Wajib Lunas</em> menentukan apakah invoice
+    harus lunas lebih dulu.
+  </figcaption>
+</figure>
+
+<table class="tabel-field">
+  <thead><tr><th>Kolom formulir</th><th>Keterangan</th></tr></thead>
+  <tbody>
+    <tr><td>Nama Aturan <em>(wajib)</em></td><td>Nama pengenal aturan.</td></tr>
+    <tr><td>Penerbit</td><td>Bila diisi, aturan hanya berlaku untuk buku penerbit tersebut.</td></tr>
+    <tr><td>Tipe <em>(wajib)</em></td><td><strong>Persentase (%)</strong> — dihitung dari nilai invoice; atau <strong>Nominal Tetap</strong>.</td></tr>
+    <tr><td>Nilai <em>(wajib)</em></td><td>Angka persentase atau nominal, sesuai tipe.</td></tr>
+    <tr><td>Minimum Invoice</td><td>Bila diisi, invoice di bawah nilai ini tidak memenuhi syarat.</td></tr>
+    <tr><td>Wajib Lunas</td><td>Bila dicentang, rebate hanya boleh diajukan setelah invoice lunas.</td></tr>
+    <tr><td>Status <em>(wajib)</em></td><td>Aktif atau Nonaktif.</td></tr>
+  </tbody>
+</table>
+
+<h2 id="sec-modul-pinjaman">4.12 Pinjaman Tunai</h2>
+
+<div class="ringkas-modul">
+  <dl>
+    <dt>Gambaran</dt><dd>Catatan pinjaman tunai kepada perorangan atau sekolah beserta tanggal janji bayar.</dd>
+    <dt>Cara membuka</dt><dd><strong>Master Data &rsaquo; Pinjaman Tunai</strong></dd>
+    <dt>Izin</dt><dd>Lihat: <code>loans.view</code> &middot; Kelola: <code>loans.manage</code></dd>
+  </dl>
+</div>
+
+<figure class="fig" id="fig-cash-loans">
+  <img src="../screens/54-master-cash-loans.png" alt="Daftar pinjaman tunai">
+  <figcaption>
+    Daftar pinjaman tunai. Pada data contoh, daftar ini kosong sehingga
+    menampilkan keterangan kosong — itu tampilan normal untuk data yang belum ada.
+  </figcaption>
+</figure>
+
+<table class="tabel-field">
+  <thead><tr><th>Kolom formulir</th><th>Keterangan</th></tr></thead>
+  <tbody>
+    <tr><td>Nama <em>(wajib)</em></td><td>Nama penerima pinjaman.</td></tr>
+    <tr><td>Nama Sekolah</td><td>Opsional, bila pinjaman dikaitkan ke sebuah sekolah.</td></tr>
+    <tr><td>Tgl Pinjaman <em>(wajib)</em></td><td>Tanggal pinjaman diberikan.</td></tr>
+    <tr><td>Tgl Janji Bayar</td><td>Tanggal kesepakatan pengembalian.</td></tr>
+    <tr><td>Nilai Pinjaman <em>(wajib)</em></td><td>Jumlah yang dipinjamkan.</td></tr>
+    <tr><td>Keterangan</td><td>Catatan tambahan.</td></tr>
+  </tbody>
+</table>
+
+<figure class="fig" id="fig-cash-loans-form">
+  <img src="../screens/55-master-cash-loans-form.png" alt="Formulir tambah pinjaman tunai">
+  <figcaption>Formulir tambah pinjaman tunai.</figcaption>
+</figure>
+
+<p class="catatan-kecil">
+  Nomor pinjaman (berawalan <code>PIN</code>) dibuat otomatis oleh aplikasi saat
+  data disimpan. Anda tidak perlu mengisinya.
+</p>
+
+<h2 id="sec-modul-konfigurasi">4.13 Konfigurasi</h2>
+
+<div class="ringkas-modul">
+  <dl>
+    <dt>Gambaran</dt><dd>Pengaturan teknis aplikasi dalam bentuk pasangan kunci–nilai.</dd>
+    <dt>Cara membuka</dt><dd><strong>Master Data &rsaquo; Konfigurasi</strong></dd>
+    <dt>Izin</dt><dd><code>settings.manage</code></dd>
+  </dl>
+</div>
+
+<figure class="fig" id="fig-settings-master">
+  <img src="../screens/52-master-settings.png" alt="Daftar konfigurasi">
+  <figcaption>
+    Daftar konfigurasi. Ubah nilai di sini hanya bila Anda benar-benar memahami
+    dampaknya.
+  </figcaption>
+</figure>
+
+<p>Beberapa kunci konfigurasi yang penting beserta nilainya pada data contoh:</p>
+
+<table>
+  <thead><tr><th style="width:46%">Kunci</th><th>Nilai contoh &amp; arti</th></tr></thead>
+  <tbody>
+    <tr><td><code>company.name</code></td><td>Nama perusahaan yang dicetak pada dokumen.</td></tr>
+    <tr><td><code>company.address</code></td><td>Alamat perusahaan untuk dokumen.</td></tr>
+    <tr><td><code>company.phone</code></td><td>Telepon perusahaan untuk dokumen.</td></tr>
+    <tr><td><code>finance.invoice_due_days</code></td><td><strong>30</strong> — jumlah hari sampai invoice jatuh tempo, dihitung dari tanggal terbit.</td></tr>
+    <tr><td><code>finance.rebate_requires_full_payment</code></td><td><strong>1</strong> (ya) — rebate hanya boleh diajukan untuk invoice yang sudah lunas, kecuali aturan rebate menyatakan lain.</td></tr>
+    <tr><td><code>finance.book_tax_rate</code></td><td><strong>0.5</strong> — pajak untuk baris <em>buku</em>. Buku tidak dikenai PPN.</td></tr>
+    <tr><td><code>finance.goods_tax_rate</code></td><td><strong>2</strong> — pajak untuk baris <em>barang lainnya</em>, dihitung dari DPP.</td></tr>
+    <tr><td><code>finance.ppn_rate</code></td><td><strong>12</strong> — PPN untuk <em>barang lainnya</em>, dihitung dari DPP.</td></tr>
+    <tr><td><code>inventory.low_stock_notice</code></td><td><strong>1</strong> (ya) — tampilkan peringatan stok menipis.</td></tr>
+    <tr><td><code>finance.tax_rate</code></td><td><strong>0</strong> — kolom lama; tidak dipakai untuk perhitungan pajak.</td></tr>
+  </tbody>
+</table>
+
+<div class="kotak catatan">
+  <span class="judul-kotak">Tarif pajak lebih mudah diubah dari Profil Perusahaan</span>
+  <p>
+    Tiga kunci <code>finance.book_tax_rate</code>,
+    <code>finance.goods_tax_rate</code>, dan <code>finance.ppn_rate</code>
+    sebaiknya diubah melalui <strong>Pengaturan &rsaquo; Profil Perusahaan</strong>
+    (kartu <em>Keuangan</em>), bukan langsung di sini. Formulir itu melakukan
+    pemeriksaan nilai dan menuliskan seluruh kunci terkait sekaligus. Rumus
+    pajaknya dijelaskan di <a href="#sec-invoice-pajak">Bagian 5.6</a>.
+  </p>
+</div>
+
+<div class="kotak peringatan">
+  <span class="judul-kotak">Perubahan konfigurasi berdampak luas</span>
+  <p>
+    Mengubah <code>finance.invoice_due_days</code> tidak mengubah invoice yang
+    sudah terbit — hanya invoice baru yang mengikuti. Mengubah nama perusahaan
+    akan langsung terlihat pada dokumen cetak berikutnya. Ujilah di lingkungan
+    latihan sebelum menerapkannya di lingkungan nyata.
+  </p>
+</div>

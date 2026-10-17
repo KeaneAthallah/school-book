@@ -1,0 +1,514 @@
+/* ============================================================================
+   ARKARA PM — Buku Panduan Pengguna
+   Gaya cetak A4 untuk Paged.js. Serif untuk isi, sans untuk judul & tabel.
+   ========================================================================== */
+
+/* Font merek aplikasi (Instrument Sans) — diambil dari aset build aplikasi. */
+@font-face {
+  font-family: "Instrument Sans";
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("../fonts/instrument-sans-400-normal-DRC__1Mx.woff2") format("woff2");
+}
+@font-face {
+  font-family: "Instrument Sans";
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url("../fonts/instrument-sans-500-normal-Dk9ku72i.woff2") format("woff2");
+}
+@font-face {
+  font-family: "Instrument Sans";
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url("../fonts/instrument-sans-600-normal-B7fBEWYG.woff2") format("woff2");
+}
+
+:root {
+  --brand: #2560e8;
+  --brand-dark: #1b46b0;
+  --brand-soft: #eaf0ff;
+  --navy: #101c3a;
+  --navy-soft: #1b2a52;
+  --ink: #0f172a;
+  --ink-soft: #475569;
+  --muted: #64748b;
+  --line: #dbe2ee;
+  --canvas: #f4f6fb;
+  --amber: #b45309;
+  --amber-soft: #fef6e7;
+  --rose: #be123c;
+  --rose-soft: #fdf0f3;
+  --green: #047857;
+  --green-soft: #ecfdf5;
+}
+
+/* ── Halaman ──────────────────────────────────────────────────────────── */
+@page {
+  size: A4;
+  margin: 19mm 17mm 16mm 17mm;
+
+  @top-left {
+    content: string(chapter);
+    font-family: "Instrument Sans", sans-serif;
+    font-size: 8pt;
+    color: #64748b;
+  }
+  @top-right {
+    content: "ARKARA PM — Panduan Pengguna";
+    font-family: "Instrument Sans", sans-serif;
+    font-size: 8pt;
+    color: #94a3b8;
+  }
+  @bottom-center {
+    content: counter(page);
+    font-family: "Instrument Sans", sans-serif;
+    font-size: 9pt;
+    color: #475569;
+  }
+}
+
+/* Sampul: tanpa margin, tanpa header/footer. */
+@page sampul {
+  margin: 0;
+  @top-left { content: none; }
+  @top-right { content: none; }
+  @bottom-center { content: none; }
+}
+
+/* Halaman pembuka bab: blok penuh warna, tanpa header/footer. */
+@page pembuka {
+  margin: 0;
+  @top-left { content: none; }
+  @top-right { content: none; }
+  @bottom-center { content: none; }
+}
+
+/* Halaman dokumen cetak (invoice/surat jalan) tampil apa adanya. */
+@page dokumen {
+  margin: 12mm;
+  @top-left { content: none; }
+  @top-right { content: none; }
+  @bottom-center { content: counter(page); }
+}
+
+/* ── Dasar ────────────────────────────────────────────────────────────── */
+* { box-sizing: border-box; }
+
+html { font-size: 10.5pt; }
+
+body {
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 10.5pt;
+  line-height: 1.55;
+  color: var(--ink);
+  margin: 0;
+  hyphens: auto;
+  text-align: left;
+}
+
+h1, h2, h3, h4, .sans {
+  font-family: "Instrument Sans", "Segoe UI", sans-serif;
+  text-align: left;
+  hyphens: none;
+}
+
+h1 { string-set: chapter content(); }
+
+/* Only running prose is justified; lists, tables and captions stay ragged right. */
+p { margin: 0 0 0.62em; text-align: justify; }
+a { color: var(--brand-dark); text-decoration: none; }
+strong { font-weight: 700; }
+code, kbd, .mono {
+  font-family: "Cascadia Mono", Consolas, monospace;
+  font-size: 0.88em;
+  background: var(--canvas);
+  border: 0.5pt solid var(--line);
+  border-radius: 3pt;
+  padding: 0 0.28em;
+}
+
+/* ── Sampul ───────────────────────────────────────────────────────────── */
+.sampul {
+  page: sampul;
+  break-after: page;
+  height: 297mm;
+  background: var(--navy);
+  color: #fff;
+  padding: 38mm 24mm 22mm;
+  display: block;
+  position: relative;
+}
+.sampul .merek {
+  font-family: "Instrument Sans", sans-serif;
+  font-size: 30pt;
+  font-weight: 600;
+  letter-spacing: -0.5pt;
+  margin: 0;
+  color: #fff;
+}
+.sampul .slogan {
+  font-family: "Instrument Sans", sans-serif;
+  font-size: 13pt;
+  font-weight: 400;
+  color: #9db6f0;
+  margin: 3mm 0 0;
+}
+.sampul .judul {
+  font-family: "Instrument Sans", sans-serif;
+  font-size: 40pt;
+  font-weight: 600;
+  line-height: 1.1;
+  letter-spacing: -1pt;
+  margin: 46mm 0 0;
+  color: #fff;
+}
+.sampul .anak-judul {
+  font-size: 15pt;
+  color: #cbd9f7;
+  margin-top: 5mm;
+  max-width: 120mm;
+  line-height: 1.4;
+}
+.sampul .aturan {
+  width: 46mm;
+  height: 2.4mm;
+  background: var(--brand);
+  margin: 12mm 0;
+}
+.sampul .meta {
+  position: absolute;
+  bottom: 22mm;
+  left: 24mm;
+  right: 24mm;
+  font-family: "Instrument Sans", sans-serif;
+  font-size: 10pt;
+  color: #9db6f0;
+  display: flex;
+  justify-content: space-between;
+  border-top: 0.5pt solid #2c3f6e;
+  padding-top: 4mm;
+}
+
+/* ── Pembuka bab ──────────────────────────────────────────────────────── */
+.bab-pembuka {
+  page: pembuka;
+  break-before: page;
+  break-after: page;
+  height: 297mm;
+  background: var(--navy);
+  color: #fff;
+  padding: 52mm 22mm 20mm;
+  position: relative;
+}
+.bab-pembuka .nomor-bagian {
+  font-family: "Instrument Sans", sans-serif;
+  font-size: 10pt;
+  font-weight: 600;
+  letter-spacing: 1.6pt;
+  text-transform: uppercase;
+  color: #7f9ee8;
+}
+.bab-pembuka .judul-bab {
+  font-family: "Instrument Sans", sans-serif;
+  font-size: 34pt;
+  font-weight: 600;
+  line-height: 1.12;
+  letter-spacing: -0.8pt;
+  margin: 8mm 0 0;
+  color: #fff;
+}
+.bab-pembuka .ringkas {
+  font-size: 12pt;
+  color: #c3d3f6;
+  margin-top: 8mm;
+  max-width: 130mm;
+  line-height: 1.5;
+}
+.bab-pembuka .daftar-isi-bab {
+  position: absolute;
+  bottom: 26mm;
+  left: 22mm;
+  right: 22mm;
+  color: #9db6f0;
+  font-family: "Instrument Sans", sans-serif;
+  font-size: 10pt;
+  border-top: 0.5pt solid #2c3f6e;
+  padding-top: 5mm;
+}
+.bab-pembuka .daftar-isi-bab span { display: block; margin-bottom: 1.2mm; }
+.bab-pembuka .daftar-isi-bab span::before { content: "— "; color: var(--brand); }
+
+/* ── Judul & bagian ───────────────────────────────────────────────────── */
+h1 {
+  font-size: 19pt;
+  font-weight: 600;
+  color: var(--ink);
+  margin: 0 0 3mm;
+  padding-bottom: 2.2mm;
+  border-bottom: 1.6pt solid var(--brand);
+}
+h2 {
+  font-size: 14pt;
+  font-weight: 600;
+  color: var(--navy-soft);
+  margin: 8mm 0 2.5mm;
+  break-after: avoid;
+}
+h3 {
+  font-size: 11.5pt;
+  font-weight: 600;
+  color: var(--brand-dark);
+  margin: 6mm 0 2mm;
+  break-after: avoid;
+}
+h4 {
+  font-size: 10.5pt;
+  font-weight: 600;
+  color: var(--ink-soft);
+  margin: 4mm 0 1.5mm;
+  break-after: avoid;
+}
+h2 + p, h3 + p, h4 + p { margin-top: 0; }
+
+.bagian-awal { break-before: page; }
+
+/* ── Daftar ───────────────────────────────────────────────────────────── */
+ul, ol { margin: 0 0 0.62em; padding-left: 5.2mm; }
+li { margin-bottom: 0.9mm; }
+ul.tugas { list-style: none; padding-left: 0; }
+ul.tugas > li {
+  padding-left: 6.5mm;
+  position: relative;
+  margin-bottom: 1.4mm;
+}
+ul.tugas > li::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 1.7mm;
+  width: 3.2mm;
+  height: 3.2mm;
+  border: 1pt solid var(--brand);
+  border-radius: 1pt;
+}
+ol.langkah { counter-reset: langkah; list-style: none; padding-left: 0; }
+ol.langkah > li {
+  counter-increment: langkah;
+  padding-left: 8mm;
+  position: relative;
+  margin-bottom: 1.8mm;
+}
+ol.langkah > li::before {
+  content: counter(langkah);
+  position: absolute;
+  left: 0;
+  top: 0.1mm;
+  width: 5.2mm;
+  height: 5.2mm;
+  background: var(--brand);
+  color: #fff;
+  border-radius: 50%;
+  font-family: "Instrument Sans", sans-serif;
+  font-size: 8pt;
+  font-weight: 600;
+  text-align: center;
+  line-height: 5.2mm;
+}
+
+/* ── Daftar isi & daftar gambar ───────────────────────────────────────── */
+.toc { font-family: "Instrument Sans", sans-serif; font-size: 9.5pt; text-align: left; }
+.toc h2 { margin-top: 4mm; }
+.toc ul { list-style: none; padding-left: 0; margin: 0; }
+.toc li { margin: 0; }
+.toc a {
+  display: block;
+  color: var(--ink);
+  padding: 0.9mm 0;
+  text-align: left;
+  border-bottom: 0.4pt dotted var(--line);
+}
+.toc a::after {
+  content: target-counter(attr(href), page);
+  float: right;
+  font-weight: 600;
+  color: var(--brand-dark);
+}
+.toc .lvl1 { font-weight: 600; font-size: 10.5pt; margin-top: 2.4mm; }
+.toc .lvl2 { padding-left: 6mm; color: var(--ink-soft); }
+.toc .lvl3 { padding-left: 12mm; color: var(--muted); font-size: 9pt; }
+
+.dafgam { font-family: "Instrument Sans", sans-serif; font-size: 9pt; text-align: left; }
+.dafgam ul { list-style: none; padding-left: 0; }
+.dafgam a {
+  display: block;
+  color: var(--ink-soft);
+  padding: 0.7mm 0;
+  text-align: left;
+  border-bottom: 0.4pt dotted var(--line);
+}
+.dafgam a::after {
+  content: target-counter(attr(href), page);
+  float: right;
+  font-weight: 600;
+  color: var(--brand-dark);
+}
+.dafgam .nomor { color: var(--brand-dark); font-weight: 600; }
+
+/* ── Tabel ────────────────────────────────────────────────────────────── */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-family: "Instrument Sans", sans-serif;
+  font-size: 8.6pt;
+  margin: 3mm 0 4mm;
+  break-inside: auto;
+}
+thead { display: table-header-group; }
+tr { break-inside: avoid; }
+th {
+  background: var(--brand-soft);
+  color: var(--navy-soft);
+  font-weight: 600;
+  text-align: left;
+  padding: 2mm 2.4mm;
+  border-bottom: 1pt solid #c9d7f7;
+}
+td {
+  padding: 1.9mm 2.4mm;
+  border-bottom: 0.5pt solid var(--line);
+  vertical-align: top;
+  text-align: left;
+}
+tbody tr:nth-child(even) { background: #fafbfe; }
+td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; }
+td.center, th.center { text-align: center; }
+table.tabel-field td:first-child { width: 34%; font-weight: 600; }
+
+/* ── Gambar ───────────────────────────────────────────────────────────── */
+figure.fig {
+  margin: 4mm 0 5mm;
+  break-inside: avoid;
+  text-align: center;
+}
+figure.fig img {
+  max-width: 100%;
+  max-height: 196mm; /* safety net: nothing may spill past the page box */
+  width: auto;
+  height: auto;
+  border: 0.5pt solid var(--line);
+  border-radius: 2pt;
+  box-shadow: 0 0.6mm 2mm rgba(16, 28, 58, 0.09);
+}
+figure.fig figcaption {
+  font-family: "Instrument Sans", sans-serif;
+  font-size: 8.4pt;
+  color: var(--muted);
+  margin-top: 1.8mm;
+  text-align: left;
+  line-height: 1.4;
+}
+figure.fig figcaption .fig-num {
+  color: var(--brand-dark);
+  font-weight: 600;
+}
+figure.fig.sempit img { max-width: 78%; }
+figure.fig.full img { max-width: 100%; }
+
+/* ── Kotak sorotan ────────────────────────────────────────────────────── */
+.kotak {
+  border: 0.6pt solid var(--line);
+  border-left: 3pt solid var(--brand);
+  background: #f8faff;
+  border-radius: 2pt;
+  padding: 3mm 4mm 2mm;
+  margin: 3.5mm 0 4mm;
+  break-inside: avoid;
+  font-size: 9.6pt;
+}
+.kotak .judul-kotak {
+  font-family: "Instrument Sans", sans-serif;
+  font-weight: 600;
+  font-size: 9.4pt;
+  color: var(--brand-dark);
+  margin-bottom: 1.4mm;
+  display: block;
+}
+.kotak p:last-child, .kotak ul:last-child, .kotak ol:last-child { margin-bottom: 0; }
+.kotak.catatan { border-left-color: var(--brand); background: #f6f9ff; }
+.kotak.catatan .judul-kotak { color: var(--brand-dark); }
+.kotak.peringatan { border-left-color: var(--rose); background: var(--rose-soft); }
+.kotak.peringatan .judul-kotak { color: var(--rose); }
+.kotak.tips { border-left-color: var(--green); background: var(--green-soft); }
+.kotak.tips .judul-kotak { color: var(--green); }
+.kotak.penting { border-left-color: var(--amber); background: var(--amber-soft); }
+.kotak.penting .judul-kotak { color: var(--amber); }
+
+/* ── Definisi / ringkasan modul ───────────────────────────────────────── */
+.ringkas-modul {
+  font-family: "Instrument Sans", sans-serif;
+  font-size: 9pt;
+  border: 0.6pt solid var(--line);
+  border-radius: 2pt;
+  padding: 3mm 4mm;
+  margin: 3mm 0 4mm;
+  background: var(--canvas);
+}
+.ringkas-modul dl { margin: 0; display: block; }
+.ringkas-modul dt { font-weight: 600; color: var(--navy-soft); margin-top: 1.6mm; }
+.ringkas-modul dt:first-child { margin-top: 0; }
+.ringkas-modul dd { margin: 0.4mm 0 0; color: var(--ink-soft); }
+
+/* ── Judul bagian (Part) ──────────────────────────────────────────────── */
+.bagian-pembuka {
+  page: sampul;
+  break-before: page;
+  break-after: page;
+  height: 297mm;
+  background: linear-gradient(160deg, #101c3a 0%, #1b2f63 100%);
+  color: #fff;
+  padding: 96mm 24mm 24mm;
+}
+.bagian-pembuka .label-bagian {
+  font-family: "Instrument Sans", sans-serif;
+  font-size: 11pt;
+  letter-spacing: 2.4pt;
+  text-transform: uppercase;
+  color: #7f9ee8;
+  font-weight: 600;
+}
+.bagian-pembuka .judul-bagian {
+  font-family: "Instrument Sans", sans-serif;
+  font-size: 38pt;
+  font-weight: 600;
+  line-height: 1.1;
+  margin: 6mm 0 0;
+  color: #fff;
+}
+.bagian-pembuka .aturan {
+  width: 40mm;
+  height: 2mm;
+  background: var(--brand);
+  margin: 10mm 0;
+}
+.bagian-pembuka .deskripsi { font-size: 12pt; color: #c3d3f6; max-width: 125mm; }
+
+/* ── Referensi cepat ──────────────────────────────────────────────────── */
+.cepat { break-inside: avoid; margin-bottom: 5mm; }
+.cepat h3 { margin-top: 4mm; }
+
+/* ── Kutipan dokumen ──────────────────────────────────────────────────── */
+.dokumen-asli {
+  border: 0.6pt dashed var(--line);
+  background: #fff;
+  padding: 4mm;
+  margin: 4mm 0;
+  break-inside: avoid;
+}
+.dokumen-asli p { font-family: "Cascadia Mono", monospace; font-size: 8pt; }
+
+/* ── Judul kolom & catatan kaki isi ───────────────────────────────────── */
+.catatan-kecil { font-size: 8.6pt; color: var(--muted); font-family: "Instrument Sans", sans-serif; }
+.lampiran-hr { border: 0; border-top: 0.6pt solid var(--line); margin: 6mm 0; }

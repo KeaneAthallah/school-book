@@ -1,0 +1,22 @@
+{
+  "chapters": [
+    "00-cover.html",
+    "01-frontmatter.html",
+    "10-part1.html",
+    "20-part2.html",
+    "30-part3.html",
+    "40-part4a-master.html",
+    "42-part4b-operasional.html",
+    "50-part5.html",
+    "60-part6.html",
+    "70-part7.html",
+    "80-part8.html",
+    "99-appendix.html"
+  ],
+  "figureNumber": 96,
+  "images": 96,
+  "missing": [],
+  "pages": 147,
+  "problems": [],
+  "pdf": "D:\\school-book\\docs\\Panduan-Pengguna-School-Book-Sales-Monitoring-System.pdf"
+}

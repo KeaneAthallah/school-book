@@ -1,0 +1,269 @@
+<section class="bagian-pembuka" id="bagian-5">
+  <p class="label-bagian">Bagian V</p>
+  <h1 class="judul-bagian" style="border:none;padding:0">Alur Kerja Lengkap</h1>
+  <div class="aturan"></div>
+  <p class="deskripsi">
+    Satu contoh dikerjakan dari awal sampai akhir, dari barang masuk gudang
+    sampai uang diterima — agar Anda melihat bagaimana modul-modul saling
+    menyambung dalam pekerjaan nyata.
+  </p>
+</section>
+
+<h1 id="bab-alur">Bab 6. Dari Barang Datang sampai Uang Masuk</h1>
+
+<p>
+  Bab ini mengikuti satu kasus: <strong>TK Pembina Nur Ikhlas memesan buku
+  pelajaran</strong>. Kita kerjakan bertahap, dan di akhir setiap tahap disebutkan
+  <em>apa yang seharusnya berubah</em> — sehingga Anda dapat memeriksa sendiri
+  apakah pekerjaannya berjalan benar.
+</p>
+
+<div class="kotak catatan">
+  <span class="judul-kotak">Peran yang terlibat</span>
+  <p>
+    Satu orang bisa memegang beberapa tahap, tetapi pada organisasi yang lebih
+    besar, tiap tahap dikerjakan orang yang berbeda: <strong>Gudang</strong> untuk
+    tahap 1–4, <strong>Operator</strong> untuk tahap 2, <strong>Keuangan</strong>
+    untuk tahap 8–9, dan <strong>Sales</strong> untuk tahap 10.
+  </p>
+</div>
+
+<h2 id="sec-alur-tahap1">Tahap 1 — Barang datang ke gudang</h2>
+
+<ol class="langkah">
+  <li>Masuk sebagai <strong>Gudang</strong>.</li>
+  <li>Buka <strong>Stok &amp; Gudang &rsaquo; Barang Masuk</strong>, klik <strong>Tambah Penerimaan</strong>.</li>
+  <li>Pilih <strong>Penerbit</strong>, <strong>Gudang Utama</strong>, dan isi tanggal kedatangan.</li>
+  <li>Tambahkan baris barang beserta jumlah dan harga pokoknya.</li>
+  <li>Simpan, lalu buka dokumennya dan klik <strong>Konfirmasi</strong>.</li>
+</ol>
+
+<p><strong>Yang seharusnya berubah:</strong></p>
+<ul>
+  <li>Status dokumen menjadi <em>Dikonfirmasi</em>.</li>
+  <li>Pada <strong>Mutasi Stok</strong> muncul baris bertipe <em>Penerimaan</em> untuk setiap barang, dengan saldo baru.</li>
+  <li>Pada halaman <strong>Stok Barang</strong>, kolom <em>Fisik</em> bertambah.</li>
+</ul>
+
+<h2 id="sec-alur-tahap2">Tahap 2 — Pesanan diterima dari sekolah</h2>
+
+<ol class="langkah">
+  <li>Masuk sebagai <strong>Operator Pesanan</strong>.</li>
+  <li>Buka <strong>Pesanan &rsaquo; Buat Pesanan</strong>.</li>
+  <li>Pilih sekolah <em>TK Pembina Nur Ikhlas</em>, pilih sumber pesanan, dan isi referensi eksternal bila pesanan datang dari SIPLah.</li>
+  <li>Pilih <strong>Zona Harga</strong> bila sekolah itu punya harga khusus, lalu tambahkan barang beserta jumlahnya.</li>
+  <li>Periksa harga dan subtotal pada ringkasan, lalu klik <strong>Simpan Pesanan</strong>.</li>
+  <li>Pada halaman detail yang terbuka, klik <strong>Konfirmasi</strong> dan setujui penegasan.</li>
+</ol>
+
+<p><strong>Yang seharusnya berubah:</strong></p>
+<ul>
+  <li>Pesanan mendapat nomor <code>ORD-YYYYMMDD-nnnn</code>.</li>
+  <li>Status pesanan berpindah dari <em>Draft</em> ke <em>Diproses</em>, lalu menjadi <em>Ready</em> bila seluruh barang tersedia, atau <em>Sebagian Ready</em> bila hanya sebagian.</li>
+  <li>Kolom <em>Ready</em> pada tabel barang terisi. Bila stok kurang, kolom <em>Back Order</em> menunjukkan sisanya.</li>
+  <li>Pada halaman Stok Barang, kolom <em>Reservasi</em> bertambah — kolom <em>Tersedia</em> berkurang.</li>
+</ul>
+
+<div class="kotak penting">
+  <span class="judul-kotak">Bila stok tidak cukup</span>
+  <p>
+    Jangan panik, dan jangan menaikkan jumlah secara paksa. Pesanan tetap
+    berjalan sebagai <em>Sebagian Ready</em>, dan sisanya tercatat sebagai back
+    order. Ketika penerimaan barang berikutnya dikonfirmasi, back order itu
+    terisi otomatis berdasarkan urutan tanggal pesanan.
+  </p>
+</div>
+
+<h2 id="sec-alur-tahap3">Tahap 3 — Barang diambil dan dikemas (picking &amp; packing)</h2>
+
+<ol class="langkah">
+  <li>Buka <strong>Picking &amp; Packing &rsaquo; Daftar Picking</strong>.</li>
+  <li>Buka picking untuk pesanan tersebut — biasanya berstatus <em>Belum Ready</em>.</li>
+  <li>Ambil barang dari rak, isi kolom <strong>Diambil</strong> sesuai jumlah nyata.</li>
+  <li>Klik <strong>Simpan Hasil Picking</strong>; status menjadi <em>Packing</em>.</li>
+  <li>Kemas barang, lalu klik <strong>Selesai Packing</strong>. Status menjadi <em>Siap Kirim</em>.</li>
+</ol>
+
+<p><strong>Yang seharusnya berubah:</strong> status picking naik menjadi
+<em>Siap Kirim</em>, dan pesanan kini punya barang yang siap diberangkatkan.</p>
+
+<div class="kotak tips">
+  <span class="judul-kotak">Tips</span>
+  <p>
+    Bila picking dan packing dikerjakan berurutan tanpa jeda, gunakan tombol
+    <strong>Simpan &amp; Selesai Packing</strong> agar tidak perlu dua kali
+    menyimpan.
+  </p>
+</div>
+
+<h2 id="sec-alur-tahap4">Tahap 4 — Barang dikirim</h2>
+
+<ol class="langkah">
+  <li>Buka <strong>Pengiriman &rsaquo; Daftar Pengiriman</strong> dan klik <strong>Buat Pengiriman</strong>.</li>
+  <li>Pilih pesanan TK Pembina Nur Ikhlas, lalu klik <strong>Lanjutkan</strong>.</li>
+  <li>Isi kurir, metode kirim, tanggal kirim, nomor resi, dan nama penerima.</li>
+  <li>Periksa kolom <em>Jumlah Kirim</em> pada setiap baris; kurangi bila hanya sebagian yang diberangkatkan.</li>
+  <li>Klik <strong>Simpan Pengiriman</strong>.</li>
+  <li>Buka dokumen pengiriman yang baru, lampirkan <strong>Bukti foto</strong>, lalu klik <strong>Konfirmasi Kirim</strong>.</li>
+</ol>
+
+<p><strong>Yang seharusnya berubah:</strong></p>
+<ul>
+  <li>Status pengiriman menjadi <em>Terkirim</em>, dan kolom <em>Dikonfirmasi</em> terisi waktu.</li>
+  <li>Kolom <em>Fisik</em> pada stok berkurang; kolom <em>Reservasi</em> juga berkurang.</li>
+  <li>Kolom <em>Terkirim</em> pada baris pesanan bertambah.</li>
+  <li>Status pesanan menjadi <em>Sebagian Terkirim</em> atau <em>Terkirim Lengkap</em>.</li>
+  <li>Foto bukti terlihat pada kartu <em>Bukti Pengiriman</em>.</li>
+</ul>
+
+<figure class="fig" id="fig-alur-shipment">
+  <img src="../screens/105-shipments-print.png" alt="Surat jalan hasil tahap pengiriman">
+  <figcaption>Surat jalan dari tahap pengiriman, siap diserahkan ke kurir.</figcaption>
+</figure>
+
+<h2 id="sec-alur-tahap5">Tahap 5 — Invoice diterbitkan</h2>
+
+<ol class="langkah">
+  <li>Masuk sebagai <strong>Keuangan</strong>.</li>
+  <li>Buka <strong>Invoice</strong>, lalu buka pengiriman terkait (atau detail pesanan).</li>
+  <li>Klik <strong>Terbitkan Invoice</strong>.</li>
+  <li>Buka invoice yang terbentuk dan periksa rincian serta pajaknya.</li>
+  <li>Klik tautan cetak untuk mencetak, atau catat nomor invoice untuk dikirimkan ke sekolah.</li>
+</ol>
+
+<p><strong>Yang seharusnya berubah:</strong> invoice baru muncul di daftar
+dengan nomor <code>INV-YYYYMMDD-nnnn</code>, status <em>Terbit</em>, kolom
+<em>Dibayar</em> bernilai nol, dan <em>Sisa</em> sama dengan total.</p>
+
+<div class="kotak catatan">
+  <span class="judul-kotak">Periksa pajaknya</span>
+  <p>
+    Untuk pesanan berisi buku, PPN seharusnya nol dan PPh hanya 0,5% dari nilai.
+    Bila Anda melihat angka PPN, kemungkinan ada barang non-buku ikut tertagih —
+    yang memang seharusnya begitu.
+  </p>
+</div>
+
+<figure class="fig" id="fig-alur-invoice">
+  <img src="../screens/112-invoices-print.png" alt="Invoice hasil tahap penerbitan">
+  <figcaption>Invoice dari tahap penerbitan, siap dikirim ke sekolah.</figcaption>
+</figure>
+
+<h2 id="sec-alur-tahap6">Tahap 6 — Uang masuk</h2>
+
+<ol class="langkah">
+  <li>Setelah sekolah mentransfer, buka <strong>Piutang &rsaquo; Riwayat Pembayaran</strong>.</li>
+  <li>Klik <strong>Catat Pembayaran</strong>, pilih sekolah, isi tanggal, jumlah, metode, dan referensi transfer.</li>
+  <li>Simpan. Pembayaran berstatus <em>Draft</em> — perhatikan bahwa piutang belum berkurang.</li>
+  <li>Setelah dana dipastikan masuk ke rekening, klik <strong>Verifikasi</strong> pada baris tersebut.</li>
+</ol>
+
+<p><strong>Yang seharusnya berubah:</strong></p>
+<ul>
+  <li>Status pembayaran menjadi <em>Terverifikasi</em>.</li>
+  <li>Kolom <em>Dibayar</em> pada invoice bertambah; <em>Sisa</em> berkurang.</li>
+  <li>Bila sisa menjadi nol, status invoice berubah menjadi <em>Lunas</em>.</li>
+</ul>
+
+<figure class="fig" id="fig-alur-payment">
+  <img src="../screens/131-payments-record.png" alt="Modal catat pembayaran pada alur kerja">
+  <figcaption>Mencatat pembayaran pada alur kerja: perhatikan bagian alokasi invoice.</figcaption>
+</figure>
+
+<h2 id="sec-alur-tahap7">Tahap 7 — Bila invoice harus dibatalkan</h2>
+
+<p>
+  Kadang tagihan perlu dibatalkan, misalnya karena salah sekolah atau salah
+  nominal. Urutannya penting:
+</p>
+
+<ol class="langkah">
+  <li>Bila invoice sudah punya pembayaran, <strong>balik dulu</strong> pembayarannya di halaman Riwayat Pembayaran.</li>
+  <li>Barulah buka invoice dan klik <strong>Batalkan</strong>.</li>
+</ol>
+
+<div class="kotak peringatan">
+  <span class="judul-kotak">Mengapa urutannya begitu</span>
+  <p>
+    Invoice yang masih memiliki pembayaran akan <strong>menolak</strong>
+    pembatalan. Ini mencegah hilangnya keterkaitan antara uang yang sudah masuk
+    dan tagihannya. Membalik pembayaran tidak menghapus riwayat — ia mencatat
+    pembatalan, lalu menghitung ulang invoice.
+  </p>
+</div>
+
+<h2 id="sec-alur-tahap8">Tahap 8 — Rebate</h2>
+
+<ol class="langkah">
+  <li>Masuk sebagai <strong>Sales/PIC</strong>. Buka <strong>Rebate / Cashback</strong> dan klik <strong>Ajukan Rebate</strong>.</li>
+  <li>Pilih invoice yang sudah lunas dan aturan rebate yang berlaku, lalu simpan.</li>
+  <li>Masuk sebagai <strong>Keuangan</strong> (atau <strong>Pimpinan</strong>) dan klik <strong>Setujui</strong> pada baris tersebut.</li>
+  <li>Setelah disetujui, klik <strong>Bayar</strong>, isi referensi pembayaran, lampirkan bukti foto, lalu simpan.</li>
+</ol>
+
+<p><strong>Yang seharusnya berubah:</strong> status rebate bergerak dari
+<em>Diajukan</em> → <em>Disetujui</em> → <em>Dibayarkan</em>, dan nilai rebate
+tercatat pada laporan keuangan.</p>
+
+<h2 id="sec-alur-tahap9">Tahap 9 — Laporan dan pemeriksaan</h2>
+
+<ol class="langkah">
+  <li>Buka <strong>Laporan</strong>.</li>
+  <li>Pilih jenis <em>Penjualan per Sekolah</em> untuk melihat nilai yang dibukukan ke sekolah tersebut.</li>
+  <li>Pilih <em>Piutang per Sekolah</em> untuk memastikan sisanya sudah sesuai.</li>
+  <li>Buka <strong>Pengaturan &rsaquo; Audit Log</strong> dan cari aktivitas terkait untuk memastikan seluruh langkah tercatat.</li>
+</ol>
+
+<h2 id="sec-alur-koreksi">6.1 Prosedur Perbaikan Data</h2>
+
+<p>
+  Kesalahan adalah hal biasa. Yang penting adalah memperbaikinya dengan cara yang
+  tidak merusak jejak. Tabel berikut merangkum situasi yang paling sering
+  terjadi.
+</p>
+
+<table>
+  <thead>
+    <tr><th style="width:32%">Situasi</th><th>Cara memperbaiki</th></tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Salah mengisi alamat atau telepon sekolah</td>
+      <td>Ubah langsung di <strong>Master Data &rsaquo; Sekolah</strong>. Data induk tidak memiliki riwayat transaksi, jadi aman diubah.</td>
+    </tr>
+    <tr>
+      <td>Salah jumlah pada pesanan yang masih <em>Draft</em></td>
+      <td>Buka pesanan dan klik <strong>Ubah</strong>. Pesanan draft masih bebas diubah.</td>
+    </tr>
+    <tr>
+      <td>Perlu mengubah pesanan yang sudah diproses</td>
+      <td>Tidak bisa. Aplikasi menolak dengan pesan <em>&ldquo;Pesanan yang sudah diproses tidak dapat diubah.&rdquo;</em> Batalkan pesanan tersebut, lalu buat pesanan baru yang benar.</td>
+    </tr>
+    <tr>
+      <td>Salah mencatat penerimaan barang</td>
+      <td>Bila belum dikonfirmasi, hapus dokumennya. Bila sudah dikonfirmasi, perbaiki dengan <strong>Penyesuaian Stok</strong> disertai alasan, jangan menghapus dokumen.</td>
+    </tr>
+    <tr>
+      <td>Salah mencatat pembayaran</td>
+      <td>Klik <strong>Balik</strong> pada pembayaran tersebut, lalu catat ulang yang benar.</td>
+    </tr>
+    <tr>
+      <td>Salah menerbitkan invoice</td>
+      <td>Balik pembayaran (bila ada), lalu batalkan invoice, lalu terbitkan ulang dari pengiriman yang benar.</td>
+    </tr>
+    <tr>
+      <td>Salah mengirim barang</td>
+      <td>Tidak ada tombol &ldquo;batal kirim&rdquo;. Catat pengiriman baru dengan jumlah yang benar, dan gunakan Penyesuaian Stok bila barangnya kembali ke gudang.</td>
+    </tr>
+  </tbody>
+</table>
+
+<div class="kotak penting">
+  <span class="judul-kotak">Prinsip umum: jangan hapus, tambahkan koreksi</span>
+  <p>
+    Aplikasi ini dirancang untuk <strong>menambah</strong> catatan koreksi,
+    bukan menghapus catatan lama. Data yang sudah dipakai pada transaksi memang
+    sulit dihapus — dan itu disengaja. Dengan begitu, laporan bulan lalu tetap
+    dapat dipertanggungjawabkan meski ada kesalahan yang sudah diperbaiki.
+  </p>
+</div>

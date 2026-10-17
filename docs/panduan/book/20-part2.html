@@ -1,0 +1,297 @@
+<section class="bagian-pembuka" id="bagian-2">
+  <p class="label-bagian">Bagian II</p>
+  <h1 class="judul-bagian" style="border:none;padding:0">Memulai</h1>
+  <div class="aturan"></div>
+  <p class="deskripsi">
+    Dari nol sampai siap bekerja: membuka aplikasi, masuk dengan akun Anda,
+    mengenali tata letak layar, dan memahami alat bantu di bilah atas.
+  </p>
+  <div class="daftar-isi-bab">
+    <span>Membuka aplikasi di peramban</span>
+    <span>Anatomi halaman masuk</span>
+    <span>Masuk dan akun contoh</span>
+    <span>Mengenal dashboard</span>
+    <span>Navigasi dan bilah atas</span>
+    <span>Pencarian, notifikasi, dan tema</span>
+    <span>Keluar dengan aman</span>
+  </div>
+</section>
+
+<h1 id="bab-memulai">Bab 2. Langkah Pertama Anda</h1>
+
+<h2 id="sec-buka-aplikasi">2.1 Membuka Aplikasi di Peramban</h2>
+
+<p>
+  ARKARA PM dijalankan di dalam peramban (<em>browser</em>) — tidak ada
+  aplikasi yang perlu dipasang di komputer Anda. Peramban yang disarankan
+  adalah <strong>Microsoft Edge</strong> atau <strong>Google Chrome</strong>
+  versi terbaru.
+</p>
+
+<ol class="langkah">
+  <li>Buka peramban Anda.</li>
+  <li>Pada kolom alamat di bagian atas, ketikkan alamat aplikasi yang diberikan administrator Anda — misalnya <code>http://localhost:8000</code> pada lingkungan latihan lokal.</li>
+  <li>Tekan <kbd>Enter</kbd>. Bila alamat benar, halaman masuk akan muncul.</li>
+  <li>Simpan alamat ini sebagai penanda (<em>bookmark</em>) agar Anda tidak perlu mengetiknya lagi.</li>
+</ol>
+
+<div class="kotak catatan">
+  <span class="judul-kotak">Jika halaman tidak muncul</span>
+  <p>
+    Pastikan alamat ditulis lengkap, termasuk <code>http://</code> di depan.
+    Bila tetap gagal, kemungkinan server aplikasi sedang tidak berjalan —
+    hubungi administrator.
+  </p>
+</div>
+
+<h2 id="sec-anatomi-login">2.2 Anatomi Halaman Masuk</h2>
+
+<p>
+  Halaman masuk sengaja dibuat sesederhana mungkin. Hanya ada dua kolom isian.
+</p>
+
+<figure class="fig" id="fig-login">
+  <img src="../screens/01-login.png" alt="Halaman masuk ARKARA PM">
+  <figcaption>
+    Halaman masuk ARKARA PM. Di bagian bawah kartu terdapat keterangan pemilik
+    sistem: sistem manajemen operasional dan keuangan CV. Prana Media.
+  </figcaption>
+</figure>
+
+<table>
+  <thead>
+    <tr><th style="width:26%">Bagian layar</th><th>Keterangan</th></tr>
+  </thead>
+  <tbody>
+    <tr><td><strong>Email</strong></td><td>Alamat email akun Anda. Contoh akun latihan: <code>admin@sekolah.test</code>.</td></tr>
+    <tr><td><strong>Kata Sandi</strong></td><td>Kata sandi akun. Ikon mata di ujung kanan kolom dapat ditekan untuk menampilkan atau menyembunyikan apa yang Anda ketik.</td></tr>
+    <tr><td><strong>Ingat saya</strong></td><td>Bila dicentang, Anda tetap masuk meski peramban ditutup. Jangan dipakai pada komputer bersama.</td></tr>
+    <tr><td><strong>Masuk</strong></td><td>Tombol biru untuk memproses. Dapat juga ditekan dengan menekan <kbd>Enter</kbd> dari kolom kata sandi.</td></tr>
+  </tbody>
+</table>
+
+<h2 id="sec-langkah-masuk">2.3 Masuk ke Aplikasi</h2>
+
+<ol class="langkah">
+  <li>Pada kolom <strong>Email</strong>, ketik alamat email Anda.</li>
+  <li>Pada kolom <strong>Kata Sandi</strong>, ketik kata sandi Anda.</li>
+  <li>Tekan tombol <strong>Masuk</strong>.</li>
+  <li>Bila berhasil, Anda akan langsung dibawa ke halaman <strong>Dashboard</strong> sesuai peran Anda.</li>
+</ol>
+
+<p>
+  Untuk keperluan latihan, data contoh menyediakan enam akun — satu untuk setiap
+  peran. Semuanya memakai kata sandi yang sama.
+</p>
+
+<table>
+  <thead>
+    <tr><th style="width:34%">Email</th><th style="width:26%">Peran</th><th>Nama tampilan</th></tr>
+  </thead>
+  <tbody>
+    <tr><td><code>admin@sekolah.test</code></td><td>Admin</td><td>Administrator</td></tr>
+    <tr><td><code>operator@sekolah.test</code></td><td>Operator Pesanan</td><td>Operator Pesanan</td></tr>
+    <tr><td><code>gudang@sekolah.test</code></td><td>Gudang</td><td>Petugas Gudang</td></tr>
+    <tr><td><code>keuangan@sekolah.test</code></td><td>Keuangan</td><td>Bagian Keuangan</td></tr>
+    <tr><td><code>sales@sekolah.test</code></td><td>Sales / PIC</td><td>Sales PIC</td></tr>
+    <tr><td><code>pimpinan@sekolah.test</code></td><td>Pimpinan</td><td>Pimpinan</td></tr>
+  </tbody>
+</table>
+
+<p class="catatan-kecil">
+  Kata sandi seluruh akun contoh di atas adalah <code>password</code>. Ini hanya
+  untuk latihan. Pada pemakaian sesungguhnya, kata sandi wajib diganti.
+</p>
+
+<div class="kotak peringatan">
+  <span class="judul-kotak">Jangan pakai akun contoh di lingkungan nyata</span>
+  <p>
+    Akun <code>@sekolah.test</code> beserta kata sandi <code>password</code>
+    adalah pintu terbuka. Administrator harus menghapus atau menggantinya
+    sebelum aplikasi dipakai untuk data sungguhan.
+  </p>
+</div>
+
+<h2 id="sec-gagal-masuk">2.4 Bila Gagal Masuk</h2>
+
+<p>
+  Aplikasi akan menahan Anda di halaman masuk dan menampilkan pesan bila email
+  atau kata sandi tidak cocok. Perhatikan pesan tersebut — ia menandai kolom mana
+  yang bermasalah.
+</p>
+
+<figure class="fig" id="fig-login-error">
+  <img src="../screens/02-login-error.png" alt="Halaman masuk dengan pesan kesalahan">
+  <figcaption>
+    Kolom kata sandi ditandai merah dan pesan kesalahan muncul setelah email
+    atau kata sandi salah.
+  </figcaption>
+</figure>
+
+<div class="kotak tips">
+  <span class="judul-kotak">Tips</span>
+  <ul>
+    <li>Pastikan tidak ada spasi ikut terketik di awal atau akhir email.</li>
+    <li>Perhatikan huruf besar/kecil pada kata sandi — keduanya berbeda.</li>
+    <li>Bila berkali-kali gagal, jangan menebak terus. Hubungi administrator untuk pengaturan ulang.</li>
+  </ul>
+</div>
+
+<h2 id="sec-dashboard">2.5 Mengenal Dashboard</h2>
+
+<p>
+  Setelah masuk, Anda langsung tiba di <strong>Dashboard</strong>. Inilah layar
+  yang paling sering Anda lihat, dan isinya menyesuaikan peran Anda.
+</p>
+
+<figure class="fig" id="fig-shell">
+  <img src="../screens/10-shell.png" alt="Kerangka aplikasi: sidebar dan bilah atas">
+  <figcaption>
+    Kerangka aplikasi. Di kiri: sidebar navigasi. Di atas: bilah atas berisi
+    pencarian, notifikasi, pengalih tema, dan menu akun.
+  </figcaption>
+</figure>
+
+<p>Layar aplikasi terbagi menjadi tiga wilayah tetap:</p>
+
+<table>
+  <thead>
+    <tr><th style="width:24%">Wilayah</th><th>Isi</th></tr>
+  </thead>
+  <tbody>
+    <tr><td><strong>Sidebar</strong> (kiri)</td><td>Daftar menu. Menu dikelompokkan dan dapat dibuka-tutup.</td></tr>
+    <tr><td><strong>Bilah atas</strong> (atas)</td><td>Judul halaman, pencarian global, notifikasi, pengalih tema, dan menu akun.</td></tr>
+    <tr><td><strong>Isi</strong> (tengah)</td><td>Konten halaman yang sedang dibuka, misalnya daftar pesanan atau sebuah formulir.</td></tr>
+  </tbody>
+</table>
+
+<h2 id="sec-navigasi">2.6 Menelusuri Menu di Sidebar</h2>
+
+<figure class="fig sempit" id="fig-sidebar">
+  <img src="../screens/10-sidebar.png" alt="Sidebar navigasi ARKARA PM">
+  <figcaption>
+    Sidebar navigasi. Kelompok menu seperti <em>Pesanan</em>, <em>Master Data</em>,
+    dan <em>Stok &amp; Gudang</em> dapat dibuka dengan satu klik.
+  </figcaption>
+</figure>
+
+<p>
+  Menu yang Anda lihat bergantung pada peran Anda. Bagian atas sidebar selalu
+  memuat <strong>Dashboard</strong>; setelah itu ada kelompok menu. Klik nama
+  kelompok untuk membuka daftar isinya, lalu klik nama halaman yang dituju.
+  Menu yang sedang aktif ditandai dengan latar biru.
+</p>
+
+<p class="catatan-kecil">
+  Sebagian entri memuat Anda ke daftar yang sudah tersaring, misalnya
+  <em>Perlu Validasi</em> membuka daftar pesanan dengan status &ldquo;Pesanan
+  Diterima&rdquo;. Ini sekadar jalan pintas; daftar yang sama dapat dicapai
+  lewat menu utama lalu menyaring manual.
+</p>
+
+<h2 id="sec-bilah-atas">2.7 Bilah Atas dan Alat Bantunya</h2>
+
+<figure class="fig" id="fig-topbar">
+  <img src="../screens/11-topbar.png" alt="Bilah atas aplikasi">
+  <figcaption>
+    Bilah atas: judul halaman di kiri; tombol pencarian, lonceng notifikasi,
+    pengalih tema, dan menu akun di kanan.
+  </figcaption>
+</figure>
+
+<h3 id="sec-pencarian-global">Pencarian global</h3>
+
+<p>
+  Pencarian global mencari sekaligus ke beberapa jenis data — pesanan, invoice,
+  sekolah, dan barang. Buka dengan menekan tombol <strong>Cari…</strong> atau
+  pintasan <kbd>Ctrl</kbd>+<kbd>K</kbd> dari halaman mana pun.
+</p>
+
+<ol class="langkah">
+  <li>Tekan <kbd>Ctrl</kbd>+<kbd>K</kbd> (atau <kbd>Cmd</kbd>+<kbd>K</kbd> di Mac).</li>
+  <li>Ketik minimal <strong>dua huruf</strong> kata kunci. Hasil muncul seketika.</li>
+  <li>Gunakan tombol panah <kbd>↑</kbd> dan <kbd>↓</kbd> untuk berpindah hasil, lalu <kbd>Enter</kbd> untuk membukanya.</li>
+  <li>Tekan <kbd>Esc</kbd> untuk menutup tanpa memilih apa pun.</li>
+</ol>
+
+<figure class="fig" id="fig-global-search">
+  <img src="../screens/12-global-search.png" alt="Dialog pencarian global dengan hasil">
+  <figcaption>
+    Pencarian global. Hasil dikelompokkan menurut jenis data sehingga mudah
+    dibedakan antara pesanan, invoice, sekolah, dan barang.
+  </figcaption>
+</figure>
+
+<h3 id="sec-notifikasi">Notifikasi</h3>
+
+<p>
+  Ikon lonceng di bilah atas menampilkan hal-hal yang perlu perhatian, seperti
+  pesanan yang perlu diproses, invoice yang mendekati atau melewati jatuh tempo,
+  dan pesanan yang menunggu stok. Bila ada angka merah kecil di atas lonceng,
+  berarti ada peringatan yang belum ditangani.
+</p>
+
+<figure class="fig sempit" id="fig-notifications">
+  <img src="../screens/13-notifications.png" alt="Panel notifikasi">
+  <figcaption>
+    Panel notifikasi. Setiap baris dapat diklik untuk langsung menuju data yang
+    dimaksud. Bila tidak ada yang perlu ditangani, panel menampilkan pesan
+    bahwa tidak ada peringatan.
+  </figcaption>
+</figure>
+
+<h3 id="sec-menu-akun">Menu akun dan keluar</h3>
+
+<figure class="fig sempit" id="fig-user-menu">
+  <img src="../screens/14-user-menu.png" alt="Menu akun">
+  <figcaption>
+    Menu akun menampilkan nama, email, dan peran Anda, serta tombol
+    <strong>Keluar</strong>.
+  </figcaption>
+</figure>
+
+<h3 id="sec-tema">Pengalih tema</h3>
+
+<p>
+  Ikon matahari/bulan/monitor di bilah atas menukar tampilan antara <em>Terang</em>,
+  <em>Gelap</em>, dan <em>Sistem</em>. Pilihan &ldquo;Sistem&rdquo; berarti
+  aplikasi mengikuti pengaturan tema sistem operasi Anda. Pilihan ini tersimpan
+  di peramban, jadi tetap berlaku saat Anda kembali lagi.
+</p>
+
+<figure class="fig" id="fig-dark">
+  <img src="../screens/15-dark-sample.png" alt="Contoh tampilan tema gelap">
+  <figcaption>
+    Contoh tampilan dengan tema gelap. Isi dan tata letak tidak berubah; hanya
+    warnanya yang menyesuaikan.
+  </figcaption>
+</figure>
+
+<h2 id="sec-keluar">2.8 Keluar dengan Aman</h2>
+
+<ol class="langkah">
+  <li>Klik logo bulat berisi inisial nama Anda di pojok kanan atas bilah atas.</li>
+  <li>Pada menu yang muncul, klik <strong>Keluar</strong>.</li>
+  <li>Anda akan kembali ke halaman masuk.</li>
+</ol>
+
+<div class="kotak peringatan">
+  <span class="judul-kotak">Selalu keluar di komputer bersama</span>
+  <p>
+    Bila Anda memakai komputer yang dipakai bergantian, jangan hanya menutup
+    tab peramban. Tekan <strong>Keluar</strong> agar sesi Anda benar-benar
+    berakhir dan orang berikutnya tidak memakai akun Anda.
+  </p>
+</div>
+
+<h2 id="sec-ganti-sandi">2.9 Mengganti Kata Sandi</h2>
+
+<div class="kotak penting">
+  <span class="judul-kotak">Penggantian kata sandi dilakukan oleh Admin</span>
+  <p>
+    Aplikasi ini <strong>tidak menyediakan</strong> menu &ldquo;ubah kata
+    sandi&rdquo; untuk pemakai biasa. Bila Anda perlu mengganti kata sandi,
+    hubungi <strong>administrator</strong>. Administrator dapat mengatur ulang
+    kata sandi melalui menu <strong>Pengaturan &rsaquo; Pengguna</strong>.
+  </p>
+</div>

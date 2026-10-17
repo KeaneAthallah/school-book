@@ -1,0 +1,132 @@
+<section class="bagian-pembuka" id="bagian-8">
+  <p class="label-bagian">Bagian VIII</p>
+  <h1 class="judul-bagian" style="border:none;padding:0">Keamanan &amp; Praktik Baik</h1>
+  <div class="aturan"></div>
+  <p class="deskripsi">
+    Kebiasaan kecil yang melindungi data perusahaan — dan kebiasaan buruk yang
+    harus dihindari.
+  </p>
+</section>
+
+<h1 id="bab-keamanan">Bab 9. Menjaga Data Tetap Terpercaya</h1>
+
+<h2 id="sec-aman-akun">9.1 Akun dan Kata Sandi</h2>
+
+<ul class="tugas">
+  <li><strong>Jangan berbagi akun.</strong> Satu akun untuk satu orang. Audit Log mencatat tindakan berdasarkan akun, sehingga akun bersama membuat jejak audit tidak bermakna.</li>
+  <li><strong>Jangan menulis kata sandi di tempat yang terlihat</strong> — di bawah papan ketik, di catatan yang menempel di monitor, atau dalam berkas berbagi.</li>
+  <li><strong>Ganti kata sandi bawaan.</strong> Akun contoh (<code>@sekolah.test</code> dengan kata sandi <code>password</code>) hanya untuk latihan dan harus dihapus atau diganti sebelum aplikasi dipakai sungguhan.</li>
+  <li><strong>Penggantian kata sandi dilakukan administrator.</strong> Aplikasi ini tidak menyediakan menu ubah kata sandi mandiri; hubungi administrator bila perlu diganti.</li>
+</ul>
+
+<h2 id="sec-aman-peran">9.2 Prinsip Hak Sekecil Mungkin</h2>
+
+<p>
+  Berikan seseorang hanya kewenangan yang benar-benar dibutuhkannya. Aplikasi
+  ini sudah dirancang dengan pemisahan yang jelas — jangan dipermudah tanpa
+  alasan.
+</p>
+
+<table>
+  <thead><tr><th style="width:34%">Pemisahan yang sudah dibangun</th><th>Manfaatnya</th></tr></thead>
+  <tbody>
+    <tr><td>Yang menginput pesanan berbeda dari yang membatalkan</td><td>Mengurangi risiko pesanan dihapus untuk menutupi kekeliruan.</td></tr>
+    <tr><td>Yang mengajukan rebate berbeda dari yang menyetujui</td><td>Mencegah pengajuan dana yang disetujui sendiri.</td></tr>
+    <tr><td>Gudang mengurus barang, Keuangan mengurus uang</td><td>Tidak ada satu orang yang menguasai barang sekaligus tagihannya.</td></tr>
+    <tr><td>Pembayaran harus diverifikasi terpisah dari pencatatannya</td><td>Angka piutang tidak berubah sebelum uang benar-benar dipastikan masuk.</td></tr>
+  </tbody>
+</table>
+
+<div class="kotak peringatan">
+  <span class="judul-kotak">Jangan memberi izin seluruhnya kepada semua orang</span>
+  <p>
+    Memberi semua orang peran Admin terasa praktis, tetapi menghapus seluruh
+    pengamanan di atas. Bila seseorang merasa kewenangannya kurang, tambahkan
+    izin yang benar-benar perlu — jangan naikkan perannya menjadi Admin.
+  </p>
+</div>
+
+<h2 id="sec-aman-sesi">9.3 Keluar dan Sesi</h2>
+
+<ul class="tugas">
+  <li>Selalu tekan <strong>Keluar</strong> di komputer bersama; menutup tab saja tidak cukup.</li>
+  <li>Hindari mencentang <strong>Ingat saya</strong> pada perangkat bersama.</li>
+  <li>Jangan biarkan sesi terbuka dalam keadaan tidak terkunci saat meninggalkan meja.</li>
+</ul>
+
+<h2 id="sec-aman-audit">9.4 Memanfaatkan Jejak Audit</h2>
+
+<figure class="fig" id="fig-security-audit">
+  <img src="../screens/165-settings-audit.png" alt="Audit log sebagai alat pengawasan">
+  <figcaption>
+    Audit Log mencatat waktu, pengguna, tindakan, deskripsi, dan alamat IP
+    setiap langkah penting.
+  </figcaption>
+</figure>
+
+<p>Jejak ini berguna untuk dua hal yang berbeda:</p>
+
+<ul>
+  <li><strong>Menelusuri kesalahan.</strong> Ketika sebuah angka dipertanyakan, inilah tempat pertama yang menjawab &ldquo;siapa mengubah apa, kapan&rdquo;.</li>
+  <li><strong>Menjaga kejujuran.</strong> Orang yang tahu setiap tindakannya tercatat cenderung lebih berhati-hati. Sifat ini sendiri sudah merupakan pengamanan.</li>
+</ul>
+
+<p>
+  Contoh tindakan yang tercatat antara lain: pembuatan pesanan, konfirmasi
+  pesanan, pembatalannya, konfirmasi penerimaan barang, penyesuaian stok,
+  pembuatan picking, penyelesaian picking dan packing, pembuatan dan konfirmasi
+  pengiriman, penerbitan dan pembatalan invoice, pencatatan/verifikasi/pembalikan
+  pembayaran, serta seluruh tahapan rebate.
+</p>
+
+<h2 id="sec-aman-praktik">9.5 Sepuluh Kebiasaan Baik</h2>
+
+<ol class="langkah">
+  <li>Periksa dashboard pada awal dan akhir hari kerja.</li>
+  <li>Konfirmasi pesanan segera setelah divalidasi, agar stok terkunci dan tidak direbut pesanan lain.</li>
+  <li>Konfirmasi penerimaan barang pada hari yang sama, agar back order terisi cepat.</li>
+  <li>Isi kolom <em>Alasan</em> pada setiap penyesuaian stok dengan keterangan yang jelas dan jujur.</li>
+  <li>Jangan pernah mengakali stok agar sebuah pesanan terlihat siap.</li>
+  <li>Verifikasi pembayaran hanya setelah dana dipastikan masuk ke rekening.</li>
+  <li>Gunakan penyaring pencarian, jangan menggulir ribuan baris.</li>
+  <li>Periksa laporan <em>Invoice Jatuh Tempo</em> setiap minggu dan hubungi sekolah lebih awal.</li>
+  <li>Periksa laporan <em>Back Order</em> sebelum memesan buku ke penerbit.</li>
+  <li>Saat ragu, cari di Audit Log dulu sebelum menyimpulkan ada kerusakan.</li>
+</ol>
+
+<h2 id="sec-aman-larangan">9.6 Yang Tidak Boleh Dilakukan</h2>
+
+<table>
+  <thead><tr><th style="width:46%">Jangan</th><th>Alasannya</th></tr></thead>
+  <tbody>
+    <tr><td>Menyerahkan akun kepada orang lain</td><td>Jejak audit menjadi tidak dapat dipercaya.</td></tr>
+    <tr><td>Memakai akun contoh di lingkungan nyata</td><td>Kata sandinya terbuka bagi siapa pun yang membaca buku ini.</td></tr>
+    <tr><td>Menekan tombol penyimpanan berulang kali saat lambat</td><td>Berisiko menggandakan data.</td></tr>
+    <tr><td>Mengubah konfigurasi tanpa memahami dampaknya</td><td>Perubahan berlaku menyeluruh dan sulit ditelusuri.</td></tr>
+    <tr><td>Membatalkan invoice yang sudah dibayar tanpa membalik pembayarannya</td><td>Aplikasi akan menolak, dan upaya memaksanya merusak keterkaitan data.</td></tr>
+    <tr><td>Membiarkan stok minimum bernilai nol untuk semua barang</td><td>Laporan <em>Stok Menipis</em> tidak akan pernah memberi peringatan.</td></tr>
+  </tbody>
+</table>
+
+<h2 id="sec-aman-cadangan">9.7 Cadangan Data</h2>
+
+<div class="kotak penting">
+  <span class="judul-kotak">Pencadangan bukan tugas pengguna harian</span>
+  <p>
+    Buku ini tidak mengatur pencadangan data, karena pencadangan berada di
+    wilayah administrator sistem dan bergantung pada cara aplikasi dipasang.
+    Yang perlu Anda ketahui sebagai pengguna: <strong>tidak ada tombol
+    &ldquo;kembalikan&rdquo;</strong> di dalam aplikasi. Karena itu, berhati-hatilah
+    sebelum melakukan tindakan yang sulit dibatalkan, dan pastikan administrator
+    Anda menjalankan pencadangan secara berkala.
+  </p>
+</div>
+
+<h2 id="sec-aman-batas">9.8 Batas Tanggung Jawab Buku Ini</h2>
+
+<p>
+  Buku ini menjelaskan cara memakai aplikasi. Buku ini tidak menggantikan
+  kebijakan internal perusahaan mengenai kewenangan, batas nilai transaksi,
+  atau prosedur persetujuan. Bila kebijakan perusahaan Anda lebih ketat daripada
+  yang diizinkan aplikasi, <strong>kebijakan itulah yang berlaku</strong>.
+</p>

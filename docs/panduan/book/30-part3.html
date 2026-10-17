@@ -1,0 +1,272 @@
+<section class="bagian-pembuka" id="bagian-3">
+  <p class="label-bagian">Bagian III</p>
+  <h1 class="judul-bagian" style="border:none;padding:0">Peran &amp; Izin</h1>
+  <div class="aturan"></div>
+  <p class="deskripsi">
+    Enam peran, enam pekerjaan yang berbeda. Bagian ini menjelaskan apa yang
+    terlihat dan apa yang boleh dilakukan oleh masing-masing peran.
+  </p>
+</section>
+
+<h1 id="bab-peran">Bab 3. Enam Peran Pengguna</h1>
+
+<h2 id="sec-cara-kerja-izin">3.1 Bagaimana Izin Bekerja</h2>
+
+<p>
+  Aplikasi memakai dua lapis aturan. Pertama, <strong>peran</strong> menentukan
+  kumpulan <strong>izin</strong> yang dipegang seseorang. Kedua, setiap halaman
+  dan setiap tombol memeriksa satu izin tertentu.
+</p>
+
+<p>Nama izin mengikuti pola <code>modul.aksi</code>. Contohnya:</p>
+
+<ul>
+  <li><code>orders.view</code> — boleh <em>melihat</em> daftar pesanan.</li>
+  <li><code>orders.manage</code> — boleh <em>membuat dan mengubah</em> pesanan.</li>
+  <li><code>orders.confirm</code> — boleh <em>mengonfirmasi</em> pesanan.</li>
+</ul>
+
+<p>
+  Perhatikan bahwa <code>manage</code> belum tentu mencakup
+  <code>confirm</code>. Seseorang bisa saja boleh membuat pesanan tetapi tidak
+  boleh mengonfirmasinya — dan itu memang disengaja.
+</p>
+
+<div class="kotak catatan">
+  <span class="judul-kotak">Yang tidak terlihat, tidak bisa dipakai</span>
+  <p>
+    Bila sebuah menu tidak muncul untuk Anda, biasanya itu karena peran Anda
+    tidak memegang izinnya. Namun tampil-tidaknya menu hanyalah kerapian
+    tampilan: pemeriksaan yang sesungguhnya juga dilakukan di sisi peladen.
+    Mengetik alamat halaman secara langsung pun tetap akan ditolak bila izinnya
+    tidak dimiliki.
+  </p>
+</div>
+
+<p>
+  Peran <strong>Admin</strong> memegang izin bertanda bintang (<code>*</code>),
+  yaitu seluruh izin yang ada. Karena itu Admin dapat membuka apa saja, dan
+  itulah sebabnya akun Admin harus dijaga ketat.
+</p>
+
+<h2 id="sec-peran-admin">3.2 Admin</h2>
+
+<figure class="fig" id="fig-dash-admin">
+  <img src="../screens/20-dashboard-admin.png" alt="Dashboard peran Admin">
+  <figcaption>Dashboard Admin — ringkasan seluruh sistem: pesanan, barang, dan piutang.</figcaption>
+</figure>
+
+<table>
+  <thead><tr><th style="width:30%">Hal</th><th>Keterangan</th></tr></thead>
+  <tbody>
+    <tr><td>Akun contoh</td><td><code>admin@sekolah.test</code></td></tr>
+    <tr><td>Jumlah izin</td><td>51 izin (seluruhnya)</td></tr>
+    <tr><td>Tugas utama</td><td>Mengelola data induk, pengguna, peran, konfigurasi, dan seluruh transaksi.</td></tr>
+    <tr><td>Halaman khusus</td><td>Pengguna, Peran &amp; Izin, Profil Perusahaan, Konfigurasi, Integrasi &amp; Impor.</td></tr>
+  </tbody>
+</table>
+
+<p>
+  Admin adalah satu-satunya peran yang dapat mengubah <strong>peran dan
+  izin</strong> serta mengelola <strong>pengguna</strong>. Admin juga satu-satunya
+  yang dapat menyunting <strong>Profil Perusahaan</strong> dan
+  <strong>Konfigurasi</strong>.
+</p>
+
+<h2 id="sec-peran-operator">3.3 Operator Pesanan</h2>
+
+<figure class="fig" id="fig-dash-operator">
+  <img src="../screens/21-dashboard-operator.png" alt="Dashboard peran Operator Pesanan">
+  <figcaption>Dashboard Operator Pesanan — fokus pada pesanan yang perlu divalidasi dan diproses.</figcaption>
+</figure>
+
+<table>
+  <thead><tr><th style="width:30%">Hal</th><th>Keterangan</th></tr></thead>
+  <tbody>
+    <tr><td>Akun contoh</td><td><code>operator@sekolah.test</code></td></tr>
+    <tr><td>Jumlah izin</td><td>9 izin</td></tr>
+    <tr><td>Tugas utama</td><td>Menginput pesanan baru dan mengonfirmasinya ke gudang.</td></tr>
+    <tr><td>Izin yang dipegang</td><td>Lihat dashboard; lihat sekolah, buku, dan barang lainnya; lihat &amp; kelola pesanan; konfirmasi pesanan; lihat stok; lihat laporan.</td></tr>
+  </tbody>
+</table>
+
+<p>
+  Operator <strong>tidak dapat</strong> membatalkan pesanan, mengurus
+  penerimaan barang, atau menyentuh invoice. Batas ini membuat alur kerja
+  terjaga: yang menginput tidak sekaligus menghapus jejaknya.
+</p>
+
+<h2 id="sec-peran-gudang">3.4 Gudang</h2>
+
+<figure class="fig" id="fig-dash-gudang">
+  <img src="../screens/22-dashboard-gudang.png" alt="Dashboard peran Gudang">
+  <figcaption>Dashboard Gudang — penerimaan, picking, packing, dan pengiriman yang menunggu dikerjakan.</figcaption>
+</figure>
+
+<table>
+  <thead><tr><th style="width:30%">Hal</th><th>Keterangan</th></tr></thead>
+  <tbody>
+    <tr><td>Akun contoh</td><td><code>gudang@sekolah.test</code></td></tr>
+    <tr><td>Jumlah izin</td><td>16 izin</td></tr>
+    <tr><td>Tugas utama</td><td>Mengurus seluruh barang fisik: penerimaan, stok, picking, packing, pengiriman.</td></tr>
+    <tr><td>Izin yang dipegang</td><td>Lihat dashboard; lihat buku &amp; barang lainnya; lihat pesanan; lihat/kelola/konfirmasi penerimaan; lihat stok &amp; penyesuaian stok; lihat/picking/packing; lihat/kelola/konfirmasi pengiriman; lihat laporan.</td></tr>
+  </tbody>
+</table>
+
+<p>
+  Perhatikan: Gudang dapat <strong>melihat</strong> pesanan, tetapi tidak dapat
+  membuat atau mengubahnya. Gudang juga tidak menyentuh invoice — pemisahan ini
+  mencegah satu orang menguasai barang sekaligus tagihannya.
+</p>
+
+<h2 id="sec-peran-keuangan">3.5 Keuangan</h2>
+
+<figure class="fig" id="fig-dash-keuangan">
+  <img src="../screens/23-dashboard-keuangan.png" alt="Dashboard peran Keuangan">
+  <figcaption>Dashboard Keuangan — piutang, invoice jatuh tempo, dan pembayaran terbaru.</figcaption>
+</figure>
+
+<table>
+  <thead><tr><th style="width:30%">Hal</th><th>Keterangan</th></tr></thead>
+  <tbody>
+    <tr><td>Akun contoh</td><td><code>keuangan@sekolah.test</code></td></tr>
+    <tr><td>Jumlah izin</td><td>13 izin</td></tr>
+    <tr><td>Tugas utama</td><td>Menerbitkan invoice, mencatat dan memverifikasi pembayaran, memantau piutang, menyetujui dan membayarkan rebate.</td></tr>
+    <tr><td>Izin yang dipegang</td><td>Lihat dashboard; lihat sekolah &amp; pesanan; lihat/kelola/terbitkan invoice; lihat/kelola/verifikasi pembayaran; lihat/setujui/bayar rebate; lihat laporan.</td></tr>
+  </tbody>
+</table>
+
+<div class="kotak catatan">
+  <span class="judul-kotak">Keuangan boleh mengajukan rebate?</span>
+  <p>
+    Tidak. Izin <code>rebates.request</code> (mengajukan) dipegang oleh
+    <strong>Sales/PIC</strong>, sedangkan Keuangan memegang
+    <code>rebates.approve</code> dan <code>rebates.pay</code>. Jadi yang
+    mengajukan dan yang menyetujui adalah orang yang berbeda — sebuah
+    pengamanan yang lazim.
+  </p>
+</div>
+
+<h2 id="sec-peran-sales">3.6 Sales / PIC</h2>
+
+<figure class="fig" id="fig-dash-sales">
+  <img src="../screens/24-dashboard-sales.png" alt="Dashboard peran Sales">
+  <figcaption>Dashboard Sales/PIC — kinerja sekolah yang menjadi tanggung jawabnya.</figcaption>
+</figure>
+
+<table>
+  <thead><tr><th style="width:30%">Hal</th><th>Keterangan</th></tr></thead>
+  <tbody>
+    <tr><td>Akun contoh</td><td><code>sales@sekolah.test</code></td></tr>
+    <tr><td>Jumlah izin</td><td>11 izin</td></tr>
+    <tr><td>Tugas utama</td><td>Menangani sekolah yang ditugaskan, membuat pesanan, mengajukan rebate.</td></tr>
+    <tr><td>Izin yang dipegang</td><td>Lihat dashboard, sekolah, buku &amp; barang lainnya; lihat &amp; kelola pesanan; lihat invoice, pembayaran, dan rebate; ajukan rebate; lihat laporan.</td></tr>
+  </tbody>
+</table>
+
+<div class="kotak penting">
+  <span class="judul-kotak">Sales hanya melihat sekolahnya sendiri</span>
+  <p>
+    Bila akun Sales tidak memegang izin kelola sekolah, menu
+    <em>Sekolah</em> berubah nama menjadi <strong>Sekolah Saya</strong> dan
+    hanya menampilkan sekolah yang ditugaskan kepadanya. Pembatasan ini
+    diberlakukan di sisi peladen, bukan sekadar penyaringan tampilan.
+  </p>
+</div>
+
+<h2 id="sec-peran-pimpinan">3.7 Pimpinan</h2>
+
+<figure class="fig" id="fig-dash-pimpinan">
+  <img src="../screens/25-dashboard-pimpinan.png" alt="Dashboard peran Pimpinan">
+  <figcaption>Dashboard Pimpinan — gambaran manajemen: tren penjualan dan kesehatan piutang.</figcaption>
+</figure>
+
+<table>
+  <thead><tr><th style="width:30%">Hal</th><th>Keterangan</th></tr></thead>
+  <tbody>
+    <tr><td>Akun contoh</td><td><code>pimpinan@sekolah.test</code></td></tr>
+    <tr><td>Jumlah izin</td><td>8 izin</td></tr>
+    <tr><td>Tugas utama</td><td>Memantau kinerja dan menyetujui permintaan rebate.</td></tr>
+    <tr><td>Izin yang dipegang</td><td>Lihat dashboard; lihat pesanan, invoice, pembayaran, dan rebate; setujui rebate; lihat laporan; lihat audit log.</td></tr>
+  </tbody>
+</table>
+
+<p>
+  Pimpinan adalah satu-satunya peran selain Admin yang dapat membuka
+  <strong>Audit Log</strong>. Ini masuk akal: fungsi pengawasan memerlukan akses
+  ke catatan jejak.
+</p>
+
+<h2 id="sec-matriks-izin">3.8 Matriks Izin Ringkas</h2>
+
+<p>
+  Tabel berikut merangkum siapa boleh apa. Tanda <strong>•</strong> berarti izin
+  dimiliki; tanda <strong>—</strong> berarti tidak.
+</p>
+
+<table>
+  <thead>
+    <tr>
+      <th style="width:34%">Kewenangan</th>
+      <th class="center">Admin</th>
+      <th class="center">Operator</th>
+      <th class="center">Gudang</th>
+      <th class="center">Keuangan</th>
+      <th class="center">Sales</th>
+      <th class="center">Pimpinan</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr><td>Lihat dashboard</td><td class="center">•</td><td class="center">•</td><td class="center">•</td><td class="center">•</td><td class="center">•</td><td class="center">•</td></tr>
+    <tr><td>Kelola master data</td><td class="center">•</td><td class="center">—</td><td class="center">—</td><td class="center">—</td><td class="center">—</td><td class="center">—</td></tr>
+    <tr><td>Buat / ubah pesanan</td><td class="center">•</td><td class="center">•</td><td class="center">—</td><td class="center">—</td><td class="center">•</td><td class="center">—</td></tr>
+    <tr><td>Konfirmasi pesanan</td><td class="center">•</td><td class="center">•</td><td class="center">—</td><td class="center">—</td><td class="center">—</td><td class="center">—</td></tr>
+    <tr><td>Batalkan pesanan</td><td class="center">•</td><td class="center">—</td><td class="center">—</td><td class="center">—</td><td class="center">—</td><td class="center">—</td></tr>
+    <tr><td>Penerimaan barang</td><td class="center">•</td><td class="center">—</td><td class="center">•</td><td class="center">—</td><td class="center">—</td><td class="center">—</td></tr>
+    <tr><td>Penyesuaian stok</td><td class="center">•</td><td class="center">—</td><td class="center">•</td><td class="center">—</td><td class="center">—</td><td class="center">—</td></tr>
+    <tr><td>Picking &amp; packing</td><td class="center">•</td><td class="center">—</td><td class="center">•</td><td class="center">—</td><td class="center">—</td><td class="center">—</td></tr>
+    <tr><td>Kelola pengiriman</td><td class="center">•</td><td class="center">—</td><td class="center">•</td><td class="center">—</td><td class="center">—</td><td class="center">—</td></tr>
+    <tr><td>Kelola invoice</td><td class="center">•</td><td class="center">—</td><td class="center">—</td><td class="center">•</td><td class="center">—</td><td class="center">—</td></tr>
+    <tr><td>Kelola pembayaran</td><td class="center">•</td><td class="center">—</td><td class="center">—</td><td class="center">•</td><td class="center">—</td><td class="center">—</td></tr>
+    <tr><td>Verifikasi pembayaran</td><td class="center">•</td><td class="center">—</td><td class="center">—</td><td class="center">•</td><td class="center">—</td><td class="center">—</td></tr>
+    <tr><td>Ajukan rebate</td><td class="center">•</td><td class="center">—</td><td class="center">—</td><td class="center">—</td><td class="center">•</td><td class="center">—</td></tr>
+    <tr><td>Setujui rebate</td><td class="center">•</td><td class="center">—</td><td class="center">—</td><td class="center">•</td><td class="center">—</td><td class="center">•</td></tr>
+    <tr><td>Bayarkan rebate</td><td class="center">•</td><td class="center">—</td><td class="center">—</td><td class="center">•</td><td class="center">—</td><td class="center">—</td></tr>
+    <tr><td>Kelola pengguna &amp; peran</td><td class="center">•</td><td class="center">—</td><td class="center">—</td><td class="center">—</td><td class="center">—</td><td class="center">—</td></tr>
+    <tr><td>Lihat audit log</td><td class="center">•</td><td class="center">—</td><td class="center">—</td><td class="center">—</td><td class="center">—</td><td class="center">•</td></tr>
+  </tbody>
+</table>
+
+<h3 id="sec-sunting-peran">Menyunting peran (hanya Admin)</h3>
+
+<p>
+  Admin dapat mengubah isi sebuah peran melalui
+  <strong>Pengaturan &rsaquo; Peran &amp; Izin</strong>. Halaman ini
+  menampilkan setiap peran beserta jumlah izin dan jumlah pengguna yang
+  memegangnya. Pilih satu peran untuk membuka matriks izinnya.
+</p>
+
+<figure class="fig" id="fig-roles">
+  <img src="../screens/163-settings-roles.png" alt="Halaman Peran dan Izin">
+  <figcaption>
+    Halaman Peran &amp; Izin. Setiap kartu menampilkan jumlah izin dan jumlah
+    pengguna untuk peran tersebut.
+  </figcaption>
+</figure>
+
+<figure class="fig" id="fig-role-edit">
+  <img src="../screens/164-settings-role-edit.png" alt="Menyunting izin sebuah peran">
+  <figcaption>
+    Matriks izin sebuah peran. Izin dikelompokkan per modul dan dapat
+    dicentang satu per satu.
+  </figcaption>
+</figure>
+
+<div class="kotak peringatan">
+  <span class="judul-kotak">Peran Admin terkunci</span>
+  <p>
+    Peran Admin memegang izin bertanda bintang dan tidak dapat dikurangi. Ini
+    pengaman agar tidak ada yang keliru mengunci dirinya sendiri di luar
+    sistem.
+  </p>
+</div>

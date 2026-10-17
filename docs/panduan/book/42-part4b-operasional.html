@@ -1,0 +1,1286 @@
+<h1 id="bab-modul-operasional">Bab 5. Transaksi dan Keuangan</h1>
+
+<h2 id="sec-modul-pesanan">5.1 Pesanan</h2>
+
+<div class="ringkas-modul">
+  <dl>
+    <dt>Gambaran</dt><dd>Pusat seluruh transaksi. Pesanan mencatat apa yang diminta sekolah, lalu menggerakkan stok, pengiriman, dan tagihan.</dd>
+    <dt>Cara membuka</dt><dd>Sidebar <strong>Pesanan &rsaquo; Nota Pesanan</strong> (daftar) atau <strong>Pesanan &rsaquo; Buat Pesanan</strong> (formulir).</dd>
+    <dt>Izin</dt><dd>Lihat: <code>orders.view</code> &middot; Buat/ubah: <code>orders.manage</code> &middot; Konfirmasi: <code>orders.confirm</code> &middot; Batalkan: <code>orders.cancel</code></dd>
+  </dl>
+</div>
+
+<h3>Memahami daftar pesanan</h3>
+
+<figure class="fig" id="fig-orders-index">
+  <img src="../screens/60-orders-index.png" alt="Daftar pesanan">
+  <figcaption>
+    Daftar pesanan. Kolom Status memakai warna berbeda untuk tiap keadaan
+    sehingga mudah dipindai sekilas.
+  </figcaption>
+</figure>
+
+<table class="tabel-field">
+  <thead><tr><th>Kolom</th><th>Arti</th></tr></thead>
+  <tbody>
+    <tr><td>No. Pesanan</td><td>Nomor otomatis berformat <code>ORD-YYYYMMDD-nnnn</code>, misalnya <code>ORD-20260701-0001</code>.</td></tr>
+    <tr><td>Tanggal</td><td>Tanggal pesanan.</td></tr>
+    <tr><td>Sekolah</td><td>Sekolah pemesan.</td></tr>
+    <tr><td>Sumber</td><td>Asal pesanan (SIPLah, e-Katalog, manual, dan sebagainya).</td></tr>
+    <tr><td>Status</td><td>Keadaan pesanan saat ini.</td></tr>
+    <tr><td>Item</td><td>Jumlah baris barang pada pesanan.</td></tr>
+    <tr><td>Total</td><td>Nilai pesanan setelah pajak dan diskon.</td></tr>
+  </tbody>
+</table>
+
+<p>
+  Dua penyaring tersedia: <strong>status</strong> dan <strong>sumber</strong>.
+  Keduanya dapat dipakai bersamaan, dan hasilnya dapat dicari lagi dengan kata
+  kunci pada kolom pencarian.
+</p>
+
+<figure class="fig" id="fig-orders-filter">
+  <img src="../screens/61-orders-filter.png" alt="Daftar pesanan dengan penyaring">
+  <figcaption>Daftar pesanan setelah disaring menurut sumber dan status.</figcaption>
+</figure>
+
+<h3>Arti setiap status pesanan</h3>
+
+<table>
+  <thead><tr><th style="width:26%">Status</th><th style="width:20%">Arti singkat</th><th>Penjelasan</th></tr></thead>
+  <tbody>
+    <tr><td>Draft</td><td>Belum diajukan</td><td>Pesanan baru dibuat dan masih dapat diubah bebas. Stok belum dipesan.</td></tr>
+    <tr><td>Pesanan Diterima</td><td>Menunggu validasi</td><td>Pesanan tercatat dan menunggu ditindaklanjuti operator.</td></tr>
+    <tr><td>Diproses</td><td>Sudah dikonfirmasi</td><td>Sudah dikonfirmasi, tetapi belum ada barang yang berhasil dipesan untuk pesanan ini.</td></tr>
+    <tr><td>Sebagian Ready</td><td>Siap sebagian</td><td>Sebagian barang sudah tersedia; sisanya menunggu stok.</td></tr>
+    <tr><td>Ready</td><td>Siap sepenuhnya</td><td>Seluruh barang sudah tersedia dan siap dipicking.</td></tr>
+    <tr><td>Sebagian Terkirim</td><td>Sudah dikirim sebagian</td><td>Sebagian barang sudah keluar dari gudang.</td></tr>
+    <tr><td>Terkirim Lengkap</td><td>Sudah dikirim semua</td><td>Seluruh jumlah pada pesanan sudah dikirim.</td></tr>
+    <tr><td>Selesai</td><td>Tuntas</td><td>Tahap akhir setelah seluruh proses rampung.</td></tr>
+    <tr><td>Dibatalkan</td><td>Tidak jadi</td><td>Pesanan dibatalkan; reservasi stok dilepas.</td></tr>
+  </tbody>
+</table>
+
+<div class="kotak catatan">
+  <span class="judul-kotak">Status bergerak sendiri</span>
+  <p>
+    Anda tidak memilih status secara manual. Aplikasi menghitungnya dari
+    kenyataan: berapa yang sudah dipesan, berapa yang sudah dikirim. Begitu
+    gudang mengonfirmasi pengiriman, status pesanan ikut berubah.
+  </p>
+</div>
+
+<h3>Membuat pesanan</h3>
+
+<figure class="fig" id="fig-orders-create">
+  <img src="../screens/62-orders-create.png" alt="Formulir buat pesanan">
+  <figcaption>
+    Formulir buat pesanan. Bagian atas memuat identitas pesanan; bagian bawah
+    memuat daftar barang.
+  </figcaption>
+</figure>
+
+<ol class="langkah">
+  <li>Buka <strong>Pesanan &rsaquo; Buat Pesanan</strong>.</li>
+  <li>Isi <strong>Tanggal</strong> (biasanya sudah terisi hari ini).</li>
+  <li>Pilih <strong>Sekolah</strong>. Kolom ini wajib.</li>
+  <li>Pilih <strong>Sumber Pesanan</strong>. Kolom ini wajib.</li>
+  <li>Isi <strong>Referensi Eksternal</strong> bila pesanan berasal dari sistem luar seperti SIPLah. Referensi yang sama tidak boleh dipakai dua kali untuk sekolah yang sama.</li>
+  <li>Bila perlu, isi <strong>Diskon Pesanan</strong> dan <strong>Catatan</strong>.</li>
+  <li>Pada kartu <strong>Item Pesanan</strong>, pilih <strong>Zona Harga</strong> bila sekolah memiliki zona khusus.</li>
+  <li>Klik kolom <strong>Cari/pilih barang…</strong> lalu ketik sebagian judul atau kode. Pilih barang dari daftar yang muncul.</li>
+  <li>Isi <strong>Qty</strong> dan periksa <strong>Harga</strong>. Harga terisi otomatis dari data barang; sesuaikan hanya bila memang perlu.</li>
+  <li>Klik <strong>Tambah Item</strong> untuk menambah baris barang lain.</li>
+  <li>Klik <strong>Simpan Pesanan</strong>. Bila berhasil, Anda dibawa ke halaman detail pesanan yang baru dibuat.</li>
+</ol>
+
+<figure class="fig" id="fig-orders-item-picker">
+  <img src="../screens/63-orders-item-picker.png" alt="Pemilih barang saat membuat pesanan">
+  <figcaption>
+    Pemilih barang. Ketik sebagian judul atau kode, lalu klik baris yang
+    diinginkan untuk mengisinya ke keranjang.
+  </figcaption>
+</figure>
+
+<table class="tabel-field">
+  <thead><tr><th>Kolom</th><th>Wajib?</th><th>Keterangan</th></tr></thead>
+  <tbody>
+    <tr><td>Tanggal</td><td>Ya</td><td>Tanggal pesanan. Ikut menentukan nomor dokumen.</td></tr>
+    <tr><td>Sekolah</td><td>Ya</td><td>Menentukan zona harga dan alamat kirim.</td></tr>
+    <tr><td>Sumber Pesanan</td><td>Ya</td><td>Asal pesanan.</td></tr>
+    <tr><td>Referensi Eksternal</td><td>Tidak</td><td>Nomor pesanan dari sistem asal. Harus unik per sekolah.</td></tr>
+    <tr><td>Diskon Pesanan</td><td>Tidak</td><td>Potongan atas keseluruhan pesanan.</td></tr>
+    <tr><td>Catatan</td><td>Tidak</td><td>Keterangan tambahan.</td></tr>
+    <tr><td>Barang (per baris)</td><td>Ya</td><td>Harus dipilih dari katalog.</td></tr>
+    <tr><td>Qty (per baris)</td><td>Ya</td><td>Minimal 1.</td></tr>
+    <tr><td>Harga (per baris)</td><td>Ya</td><td>Terisi otomatis; boleh disesuaikan.</td></tr>
+    <tr><td>Diskon (per baris)</td><td>Tidak</td><td>Potongan per baris barang.</td></tr>
+  </tbody>
+</table>
+
+<h3>Bila ada isian yang kurang</h3>
+
+<p>
+  Bila Anda menekan <strong>Simpan Pesanan</strong> tanpa melengkapi kolom
+  wajib, pesanan <strong>tidak</strong> akan tersimpan. Aplikasi menampilkan
+  pesan kesalahan di bawah kolom yang bermasalah.
+</p>
+
+<figure class="fig" id="fig-orders-validation">
+  <img src="../screens/64-orders-validation.png" alt="Pesan kesalahan pada formulir pesanan">
+  <figcaption>
+    Contoh pesan kesalahan saat formulir dikirim kosong. Perhatikan bahwa kolom
+    yang bermasalah ditandai dan pesannya menyebutkan masalahnya secara spesifik.
+  </figcaption>
+</figure>
+
+<div class="kotak tips">
+  <span class="judul-kotak">Tips</span>
+  <p>
+    Perbaiki semua kolom yang ditandai, lalu kirim ulang. Isian yang sudah Anda
+    ketik tidak hilang, jadi Anda tidak perlu mengulang dari awal.
+  </p>
+</div>
+
+<h3>Halaman detail pesanan</h3>
+
+<figure class="fig" id="fig-orders-show">
+  <img src="../screens/65-orders-show.png" alt="Detail pesanan">
+  <figcaption>
+    Detail pesanan. Tabel barang menampilkan kolom <em>Dipesan</em>,
+    <em>Ready</em>, <em>Terkirim</em>, dan <em>Back Order</em> — inilah cara
+    memantau pemenuhan sebuah pesanan baris per baris.
+  </figcaption>
+</figure>
+
+<table class="tabel-field">
+  <thead><tr><th>Kolom pada tabel barang</th><th>Arti</th></tr></thead>
+  <tbody>
+    <tr><td>Dipesan</td><td>Jumlah yang diminta sekolah.</td></tr>
+    <tr><td>Ready</td><td>Jumlah yang sudah berhasil dipesan di gudang.</td></tr>
+    <tr><td>Terkirim</td><td>Jumlah yang sudah keluar dari gudang.</td></tr>
+    <tr><td>Back Order</td><td>Sisa yang belum bisa dipenuhi karena stok kurang.</td></tr>
+    <tr><td>Subtotal</td><td>Nilai baris setelah diskon baris.</td></tr>
+    <tr><td>Status</td><td>Keadaan baris barang tersebut.</td></tr>
+  </tbody>
+</table>
+
+<p>
+  Tombol yang muncul di halaman ini menyesuaikan keadaan pesanan. Pesanan draft
+  memperlihatkan tombol <strong>Konfirmasi</strong> dan <strong>Batalkan</strong>.
+  Pesanan yang sudah terkirim lengkap memperlihatkan tombol
+  <strong>Terbitkan Invoice</strong>.
+</p>
+
+<figure class="fig" id="fig-orders-show-shipped">
+  <img src="../screens/66-orders-show-shipped.png" alt="Detail pesanan yang sudah terkirim">
+  <figcaption>
+    Detail pesanan berstatus <em>Terkirim Lengkap</em>. Pada tahap ini muncul
+    tombol <strong>Terbitkan Invoice</strong>.
+  </figcaption>
+</figure>
+
+<h3>Mengonfirmasi pesanan</h3>
+
+<ol class="langkah">
+  <li>Buka detail pesanan berstatus <em>Draft</em>.</li>
+  <li>Klik <strong>Konfirmasi</strong>. Peramban akan meminta penegasan.</li>
+  <li>Setujui penegasan tersebut.</li>
+</ol>
+
+<p>Setelah dikonfirmasi, tiga hal terjadi sekaligus:</p>
+
+<ol>
+  <li>Aplikasi mencari barang di gudang yang stoknya paling banyak tersedia.</li>
+  <li>Sebanyak mungkin permintaan dipesan (direservasi).</li>
+  <li>Bila stok tidak mencukupi, kekurangannya dicatat sebagai <strong>back order</strong> — bukan sebagai kegagalan.</li>
+</ol>
+
+<div class="kotak penting">
+  <span class="judul-kotak">Konfirmasi tidak pernah membuat stok negatif</span>
+  <p>
+    Aplikasi hanya memesan sebanyak yang benar-benar tersedia. Sisa yang tidak
+    terpenuhi tetap tercatat, sehingga ketika barang datang nanti (lewat
+    penerimaan barang), kekurangan itu otomatis dialokasikan dengan urutan
+    berdasarkan tanggal pesanan — yang memesan lebih dulu dilayani lebih dulu.
+  </p>
+</div>
+
+<div class="kotak peringatan">
+  <span class="judul-kotak">Konfirmasi hanya untuk pesanan Draft / Diterima</span>
+  <p>
+    Bila pesanan sudah berjalan (misalnya sudah dikirim sebagian), tombol
+    konfirmasi tidak akan tersedia, dan upaya konfirmasi akan ditolak dengan
+    pesan bahwa pesanan tidak dapat dikonfirmasi pada status saat ini.
+  </p>
+</div>
+
+<h3>Membatalkan pesanan</h3>
+
+<ol class="langkah">
+  <li>Buka detail pesanan.</li>
+  <li>Klik <strong>Batalkan</strong>, lalu setujui penegasan yang muncul.</li>
+</ol>
+
+<p>
+  Pembatalan akan <strong>melepaskan kembali</strong> stok yang tadinya dipesan,
+  dan menutup semua back order pesanan tersebut. Pesanan tidak dihapus — ia tetap
+  ada sebagai riwayat dengan status <em>Dibatalkan</em>.
+</p>
+
+<div class="kotak peringatan">
+  <span class="judul-kotak">Pesanan yang sudah dikirim sebagian tidak dapat dibatalkan</span>
+  <p>
+    Bila sudah ada barang yang keluar dari gudang, pembatalan akan ditolak.
+    Ini untuk mencegah hilangnya jejak barang yang sudah berpindah tangan.
+  </p>
+</div>
+
+<h3>Mencetak nota pesanan</h3>
+
+<p>
+  Halaman cetak nota pesanan dibuka dengan tombol cetak pada detail pesanan,
+  atau dengan membuka alamat <code>/orders/{nomor}/print</code>. Halaman ini
+  dirancang untuk dicetak: tekan <kbd>Ctrl</kbd>+<kbd>P</kbd> lalu pilih
+  &ldquo;Simpan sebagai PDF&rdquo; bila Anda ingin berkasnya, bukan kertas.
+</p>
+
+<figure class="fig" id="fig-orders-print">
+  <img src="../screens/69-orders-print.png" alt="Nota pesanan siap cetak">
+  <figcaption>Nota pesanan dalam bentuk siap cetak.</figcaption>
+</figure>
+
+<h2 id="sec-modul-penerimaan">5.2 Penerimaan Barang</h2>
+
+<div class="ringkas-modul">
+  <dl>
+    <dt>Gambaran</dt><dd>Mencatat barang yang datang dari penerbit, lalu menambahkannya ke stok.</dd>
+    <dt>Cara membuka</dt><dd><strong>Stok &amp; Gudang &rsaquo; Barang Masuk</strong></dd>
+    <dt>Izin</dt><dd>Lihat: <code>receipts.view</code> &middot; Kelola: <code>receipts.manage</code> &middot; Konfirmasi: <code>receipts.confirm</code></dd>
+  </dl>
+</div>
+
+<figure class="fig" id="fig-receipts-index">
+  <img src="../screens/70-receipts-index.png" alt="Daftar penerimaan barang">
+  <figcaption>
+    Daftar penerimaan barang. Dokumen berstatus <em>Draft</em> belum menambah
+    stok — stok baru bertambah setelah dikonfirmasi.
+  </figcaption>
+</figure>
+
+<table class="tabel-field">
+  <thead><tr><th>Kolom</th><th>Arti</th></tr></thead>
+  <tbody>
+    <tr><td>No. Penerimaan</td><td>Nomor otomatis berformat <code>GR-YYYYMMDD-nnnn</code>.</td></tr>
+    <tr><td>Tanggal</td><td>Tanggal penerimaan.</td></tr>
+    <tr><td>Penerbit</td><td>Asal barang.</td></tr>
+    <tr><td>Gudang</td><td>Gudang yang menerima.</td></tr>
+    <tr><td>Item</td><td>Jumlah baris barang.</td></tr>
+    <tr><td>Status</td><td><em>Draft</em> atau <em>Dikonfirmasi</em>.</td></tr>
+  </tbody>
+</table>
+
+<h3>Membuat penerimaan</h3>
+
+<figure class="fig" id="fig-receipts-create">
+  <img src="../screens/71-receipts-create.png" alt="Formulir penerimaan barang">
+  <figcaption>Formulir penerimaan barang baru.</figcaption>
+</figure>
+
+<ol class="langkah">
+  <li>Klik <strong>Tambah Penerimaan</strong>.</li>
+  <li>Pilih <strong>Penerbit</strong> dan <strong>Gudang</strong>.</li>
+  <li>Isi <strong>Tanggal</strong> penerimaan.</li>
+  <li>Tambahkan baris barang lewat <strong>Tambah Item</strong>, lalu isi jumlah (<em>qty</em>) dan harga pokok.</li>
+  <li>Klik <strong>Simpan</strong>. Dokumen tersimpan dengan status <em>Draft</em>.</li>
+</ol>
+
+<h3>Mengonfirmasi penerimaan</h3>
+
+<p>
+  Inilah langkah yang benar-benar mengubah stok. Sebelum dikonfirmasi, penerimaan
+  hanyalah catatan.
+</p>
+
+<figure class="fig" id="fig-receipts-show">
+  <img src="../screens/72-receipts-show.png" alt="Detail penerimaan barang">
+  <figcaption>Detail penerimaan yang sudah dikonfirmasi.</figcaption>
+</figure>
+
+<figure class="fig" id="fig-receipts-show-draft">
+  <img src="../screens/72b-receipts-show-draft.png" alt="Detail penerimaan berstatus draft">
+  <figcaption>
+    Detail penerimaan berstatus <em>Draft</em>. Pada keadaan ini tombol
+    <strong>Konfirmasi</strong> tersedia.
+  </figcaption>
+</figure>
+
+<ol class="langkah">
+  <li>Buka penerimaan berstatus <em>Draft</em>.</li>
+  <li>Klik <strong>Konfirmasi</strong>, lalu setujui penegasan.</li>
+</ol>
+
+<p>Setelah dikonfirmasi, aplikasi akan:</p>
+
+<ul>
+  <li>menambah <strong>stok fisik</strong> di gudang tujuan sebanyak jumlah yang diterima;</li>
+  <li>mencatat setiap penambahan pada <strong>Mutasi Stok</strong>;</li>
+  <li>langsung <strong>mengalokasikan</strong> stok baru itu ke back order yang menunggu, dengan urutan tanggal pesanan terlama lebih dulu;</li>
+  <li>mengubah status pesanan terkait bila kini barangnya sudah cukup.</li>
+</ul>
+
+<div class="kotak catatan">
+  <span class="judul-kotak">Penerimaan tidak dapat dikonfirmasi dua kali</span>
+  <p>
+    Bila Anda mengonfirmasi dokumen yang sudah dikonfirmasi, aplikasi akan
+    menolaknya dengan pesan bahwa penerimaan ini sudah dikonfirmasi sebelumnya.
+    Ini mencegah stok bertambah dua kali.
+  </p>
+</div>
+
+<h2 id="sec-modul-stok">5.3 Stok dan Mutasi Stok</h2>
+
+<div class="ringkas-modul">
+  <dl>
+    <dt>Gambaran</dt><dd>Melihat saldo stok per barang per gudang, menyesuaikannya bila perlu, dan menelusuri riwayat perubahannya.</dd>
+    <dt>Cara membuka</dt><dd><strong>Stok &amp; Gudang &rsaquo; Stok Barang</strong> dan <strong>Stok &amp; Gudang &rsaquo; Mutasi Stok</strong></dd>
+    <dt>Izin</dt><dd>Lihat: <code>stock.view</code> &middot; Sesuaikan: <code>stock.adjust</code></dd>
+  </dl>
+</div>
+
+<h3>Membaca halaman stok</h3>
+
+<figure class="fig" id="fig-stock-index">
+  <img src="../screens/80-stock-index.png" alt="Halaman stok barang">
+  <figcaption>
+    Halaman stok barang. Perhatikan tiga kolom angka: Fisik, Reservasi, dan
+    Tersedia.
+  </figcaption>
+</figure>
+
+<table class="tabel-field">
+  <thead><tr><th>Kolom</th><th>Arti</th></tr></thead>
+  <tbody>
+    <tr><td>Fisik</td><td>Jumlah barang yang benar-benar ada di gudang.</td></tr>
+    <tr><td>Reservasi</td><td>Jumlah yang sudah dijanjikan ke pesanan.</td></tr>
+    <tr><td>Tersedia</td><td><strong>Fisik dikurangi Reservasi.</strong> Inilah yang masih boleh dijual.</td></tr>
+    <tr><td>Stok Min</td><td>Ambang peringatan untuk barang ini.</td></tr>
+    <tr><td>Status</td><td>Menandai barang yang stoknya di bawah atau sama dengan stok minimum.</td></tr>
+  </tbody>
+</table>
+
+<div class="kotak catatan">
+  <span class="judul-kotak">Mengapa &ldquo;Fisik&rdquo; tidak sama dengan &ldquo;Tersedia&rdquo;</span>
+  <p>
+    Ini pertanyaan yang paling sering muncul. Barang yang sudah dijanjikan ke
+    sekolah lain secara fisik masih ada di rak, tetapi sudah bukan milik siapa
+    pun lagi untuk dijual. Karena itu yang menentukan ketersediaan adalah kolom
+    <strong>Tersedia</strong>, bukan Fisik.
+  </p>
+</div>
+
+<h3>Menyesuaikan stok</h3>
+
+<p>
+  Penyesuaian stok dipakai bila ada selisih antara catatan dan kenyataan —
+  misalnya barang rusak, hilang, atau hasil hitung ulang. Setiap penyesuaian
+  <strong>wajib disertai alasan</strong>, dan alasannya akan tersimpan di riwayat.
+</p>
+
+<ol class="langkah">
+  <li>Pada halaman Stok Barang, klik tombol <strong>Penyesuaian Stok</strong>.</li>
+  <li>Pilih <strong>Barang</strong> dan <strong>Gudang</strong>.</li>
+  <li>Isi <strong>Jumlah</strong>. Angka positif menambah stok; angka negatif menguranginya.</li>
+  <li>Isi <strong>Alasan</strong>, misalnya &ldquo;barang rusak&rdquo; atau &ldquo;hasil stok opname&rdquo;.</li>
+  <li>Klik <strong>Simpan</strong>.</li>
+</ol>
+
+<figure class="fig" id="fig-stock-adjust">
+  <img src="../screens/81-stock-adjust.png" alt="Modal penyesuaian stok">
+  <figcaption>
+    Modal Penyesuaian Stok. Kolom Jumlah menerima angka positif maupun negatif.
+  </figcaption>
+</figure>
+
+<div class="kotak peringatan">
+  <span class="judul-kotak">Stok tidak boleh menjadi negatif</span>
+  <p>
+    Bila penyesuaian akan membuat stok fisik kurang dari nol, aplikasi menolak
+    dan menampilkan pesan kesalahan pada kolom Jumlah. Periksa kembali angka
+    yang Anda masukkan — mungkin ada kelebihan angka nol, atau barang yang
+    dimaksud berbeda.
+  </p>
+</div>
+
+<figure class="fig" id="fig-stock-adjust-error">
+  <img src="../screens/82-stock-adjust-error.png" alt="Pesan kesalahan penyesuaian stok">
+  <figcaption>
+    Contoh penolakan: penyesuaian sebesar &minus;100.000 ditolak karena akan
+    membuat stok fisik menjadi negatif.
+  </figcaption>
+</figure>
+
+<h3>Menelusuri mutasi stok</h3>
+
+<figure class="fig" id="fig-stock-movements">
+  <img src="../screens/83-stock-movements.png" alt="Halaman mutasi stok">
+  <figcaption>
+    Mutasi stok. Setiap baris mencatat satu perubahan beserta saldo setelah
+    perubahan tersebut.
+  </figcaption>
+</figure>
+
+<table class="tabel-field">
+  <thead><tr><th>Kolom</th><th>Arti</th></tr></thead>
+  <tbody>
+    <tr><td>Waktu</td><td>Kapan perubahan terjadi.</td></tr>
+    <tr><td>Tipe</td><td>Jenis perubahan: Penerimaan, Penyesuaian Masuk/Keluar, Reservasi, Pelepasan Reservasi, atau Pengiriman.</td></tr>
+    <tr><td>Perubahan</td><td>Angka perubahan; negatif berarti berkurang.</td></tr>
+    <tr><td>Saldo</td><td>Saldo setelah perubahan. Untuk reservasi, saldo yang dimaksud adalah jumlah reservasi.</td></tr>
+    <tr><td>Catatan</td><td>Keterangan, misalnya nomor pesanan atau alasan penyesuaian.</td></tr>
+    <tr><td>Oleh</td><td>Pengguna yang memicu perubahan.</td></tr>
+  </tbody>
+</table>
+
+<p>Halaman ini dapat disaring menurut tipe perubahan dan rentang tanggal.</p>
+
+<h2 id="sec-modul-picking">5.4 Picking dan Packing</h2>
+
+<div class="ringkas-modul">
+  <dl>
+    <dt>Gambaran</dt><dd>Daftar kerja gudang: barang apa yang harus diambil, berapa yang benar-benar terambil, dan apakah sudah dikemas.</dd>
+    <dt>Cara membuka</dt><dd><strong>Picking &amp; Packing &rsaquo; Daftar Picking</strong></dd>
+    <dt>Izin</dt><dd>Lihat: <code>fulfillment.view</code> &middot; Catat hasil: <code>fulfillment.pick</code> &middot; Selesaikan packing: <code>fulfillment.pack</code></dd>
+  </dl>
+</div>
+
+<p>
+  Picking dibuat otomatis dari pesanan. Aplikasi hanya memasukkan barang yang
+  benar-benar sudah tersedia — jadi bila sebuah pesanan baru sebagian siap,
+  picking-nya hanya memuat bagian yang siap itu.
+</p>
+
+<figure class="fig" id="fig-pickings-index">
+  <img src="../screens/90-pickings-index.png" alt="Daftar picking">
+  <figcaption>
+    Daftar picking. Nomor picking berformat <code>PCK-YYYYMMDD-nnnn</code>.
+  </figcaption>
+</figure>
+
+<table>
+  <thead><tr><th style="width:24%">Status</th><th>Arti</th></tr></thead>
+  <tbody>
+    <tr><td>Belum Ready</td><td>Picking baru dibuat; belum ada yang diambil.</td></tr>
+    <tr><td>Picking</td><td>Sedang dalam proses pengambilan.</td></tr>
+    <tr><td>Packing</td><td>Barang sudah diambil dan sedang dikemas.</td></tr>
+    <tr><td>Siap Kirim</td><td>Sudah dikemas dan siap diserahkan ke pengiriman.</td></tr>
+  </tbody>
+</table>
+
+<h3>Mencatat hasil picking</h3>
+
+<figure class="fig" id="fig-pickings-show-draft">
+  <img src="../screens/91-pickings-show-draft.png" alt="Halaman picking yang belum dikerjakan">
+  <figcaption>
+    Halaman picking yang belum dikerjakan. Tabel menampilkan jumlah
+    <em>Diminta</em> dan kolom isian <em>Diambil</em>.
+  </figcaption>
+</figure>
+
+<ol class="langkah">
+  <li>Buka picking yang ingin dikerjakan.</li>
+  <li>Ambil barang dari rak sesuai daftar.</li>
+  <li>Isi kolom <strong>Diambil</strong> untuk setiap baris sesuai jumlah nyata yang terambil. Bila jumlahnya kurang dari yang diminta, isi apa adanya — jangan dipaksa penuh.</li>
+  <li>Bila pekerjaan belum tuntas, klik <strong>Simpan Hasil Picking</strong>.</li>
+  <li>Bila sekaligus selesai dikemas, klik <strong>Simpan &amp; Selesai Packing</strong>.</li>
+</ol>
+
+<div class="kotak catatan">
+  <span class="judul-kotak">Jujur pada kolom &ldquo;Diambil&rdquo;</span>
+  <p>
+    Selisih antara <em>Diminta</em> dan <em>Diambil</em> adalah informasi
+    penting: itulah yang belum bisa dipenuhi. Mengisinya penuh padahal barang
+    kurang hanya akan memindahkan masalah ke tahap pengiriman, tempat masalah itu
+    akan muncul lagi sebagai penolakan.
+  </p>
+</div>
+
+<h3>Menyelesaikan packing</h3>
+
+<figure class="fig" id="fig-pickings-show-picked">
+  <img src="../screens/92-pickings-show-picked.png" alt="Halaman picking yang sudah dipicking">
+  <figcaption>
+    Picking berstatus <em>Packing</em>. Barang sudah diambil; tinggal menekan
+    <strong>Selesai Packing</strong>.
+  </figcaption>
+</figure>
+
+<ol class="langkah">
+  <li>Buka picking berstatus <em>Packing</em>.</li>
+  <li>Kemas barang dengan rapi, sertakan dokumen bila perlu.</li>
+  <li>Klik <strong>Selesai Packing</strong>, lalu setujui penegasan.</li>
+</ol>
+
+<div class="kotak peringatan">
+  <span class="judul-kotak">Urutan tidak boleh dibalik</span>
+  <p>
+    Packing hanya dapat diselesaikan setelah picking selesai dicatat. Bila
+    dicoba lebih dulu, aplikasi menolak dengan pesan bahwa picking harus selesai
+    dipicking sebelum packing.
+  </p>
+</div>
+
+<h2 id="sec-modul-pengiriman">5.5 Pengiriman</h2>
+
+<div class="ringkas-modul">
+  <dl>
+    <dt>Gambaran</dt><dd>Menyerahkan barang ke kurir dan menandai pesanan sebagai terkirim, disertai bukti foto.</dd>
+    <dt>Cara membuka</dt><dd><strong>Pengiriman &rsaquo; Daftar Pengiriman</strong></dd>
+    <dt>Izin</dt><dd>Lihat: <code>shipments.view</code> &middot; Kelola/buat: <code>shipments.manage</code> &middot; Konfirmasi &amp; tandai diterima: <code>shipments.confirm</code></dd>
+  </dl>
+</div>
+
+<figure class="fig" id="fig-shipments-index">
+  <img src="../screens/100-shipments-index.png" alt="Daftar pengiriman">
+  <figcaption>
+    Daftar pengiriman. Nomor pengiriman berformat <code>SHP-YYYYMMDD-nnnn</code>,
+    sedangkan nomor surat jalan berformat <code>SJ-YYYYMMDD-nnnn</code>.
+  </figcaption>
+</figure>
+
+<table>
+  <thead><tr><th style="width:24%">Status</th><th>Arti</th></tr></thead>
+  <tbody>
+    <tr><td>Draft</td><td>Pengiriman sudah dibuat tetapi belum dikonfirmasi. <strong>Stok belum berkurang.</strong></td></tr>
+    <tr><td>Siap Kirim</td><td>Pengiriman disiapkan untuk diberangkatkan.</td></tr>
+    <tr><td>Terkirim</td><td>Sudah dikonfirmasi; stok berkurang dan pesanan diperbarui.</td></tr>
+    <tr><td>Diterima</td><td>Penerima sudah menandatangani/menerima barang.</td></tr>
+  </tbody>
+</table>
+
+<h3>Membuat pengiriman (dua langkah)</h3>
+
+<p>Pengiriman dibuat dalam dua langkah: pilih pesanan, lalu tentukan isinya.</p>
+
+<figure class="fig" id="fig-shipments-create-1">
+  <img src="../screens/101-shipments-create-1.png" alt="Langkah pertama membuat pengiriman">
+  <figcaption>
+    Langkah pertama. Pilih pesanan yang memiliki barang siap dikirim, lalu klik
+    <strong>Lanjutkan</strong>.
+  </figcaption>
+</figure>
+
+<ol class="langkah">
+  <li>Klik <strong>Buat Pengiriman</strong>. Daftar hanya memuat pesanan yang benar-benar punya barang siap kirim.</li>
+  <li>Pilih pesanan, lalu klik <strong>Lanjutkan</strong>.</li>
+  <li>Pada langkah kedua, isi data pengiriman: kurir, metode kirim, tanggal kirim, nomor resi, penerima, alamat, dan catatan.</li>
+  <li>Periksa tabel <strong>Item Dikirim</strong>. Kolom <em>Siap Kirim</em> menunjukkan maksimum yang boleh dikirim; sesuaikan kolom <em>Jumlah Kirim</em> bila hanya sebagian yang diberangkatkan.</li>
+  <li>Klik <strong>Simpan Pengiriman</strong>.</li>
+</ol>
+
+<figure class="fig" id="fig-shipments-create-2">
+  <img src="../screens/102-shipments-create-2.png" alt="Langkah kedua membuat pengiriman">
+  <figcaption>Langkah kedua: mengisi data pengiriman dan menentukan jumlah per barang.</figcaption>
+</figure>
+
+<figure class="fig" id="fig-shipments-create-2b">
+  <img src="../screens/102b-shipments-create-2-filled.png" alt="Formulir pengiriman terisi">
+  <figcaption>Contoh formulir langkah kedua setelah pesanan dipilih.</figcaption>
+</figure>
+
+<h3>Konfirmasi pengiriman — bukti foto wajib</h3>
+
+<figure class="fig" id="fig-shipments-show-unconfirmed">
+  <img src="../screens/103b-shipments-show-unconfirmed.png" alt="Detail pengiriman yang belum dikonfirmasi">
+  <figcaption>
+    Detail pengiriman berstatus <em>Draft</em>. Pada bilah judul muncul kolom
+    unggah bukti foto dan tombol <strong>Konfirmasi Kirim</strong>.
+  </figcaption>
+</figure>
+
+<figure class="fig" id="fig-shipments-confirm-form">
+  <img src="../screens/104-shipments-confirm-form.png" alt="Formulir konfirmasi dengan unggah bukti foto">
+  <figcaption>
+    Bilah judul pengiriman: kolom <em>Bukti foto pengiriman</em> dan tombol
+    <strong>Konfirmasi Kirim</strong>.
+  </figcaption>
+</figure>
+
+<ol class="langkah">
+  <li>Buka pengiriman berstatus <em>Draft</em>.</li>
+  <li>Pada bilah judul, klik kolom <strong>Bukti foto pengiriman</strong> dan pilih berkas gambar.</li>
+  <li>Klik <strong>Konfirmasi Kirim</strong>, lalu setujui penegasan.</li>
+</ol>
+
+<div class="kotak peringatan">
+  <span class="judul-kotak">Foto bukti bersifat wajib</span>
+  <p>
+    Tanpa foto, konfirmasi akan ditolak dengan pesan
+    &ldquo;Bukti foto pengiriman wajib dilampirkan.&rdquo; Syarat berkasnya:
+    gambar JPEG, PNG, atau WebP, maksimal 5&nbsp;MB.
+  </p>
+</div>
+
+<p>Konfirmasi pengiriman berdampak besar. Aplikasi akan:</p>
+
+<ul>
+  <li>mengurangi <strong>stok fisik</strong> dan <strong>reservasi</strong> sejumlah yang dikirim;</li>
+  <li>menambah jumlah <em>Terkirim</em> pada baris pesanan;</li>
+  <li>menghitung ulang status pesanan induknya;</li>
+  <li>menyimpan foto bukti pada dokumen pengiriman;</li>
+  <li>mencatat kejadian ini di Audit Log.</li>
+</ul>
+
+<div class="kotak penting">
+  <span class="judul-kotak">Konfirmasi bisa gagal bila stok tidak sinkron</span>
+  <p>
+    Bila reservasi untuk sebuah barang ternyata lebih kecil daripada jumlah yang
+    hendak dikirim, aplikasi menolak dengan pesan bahwa jumlah kirim melebihi
+    stok yang direservasi. Bila ini terjadi, periksa kondisi stok dan pesanan
+    terkait — jangan memaksa.
+  </p>
+</div>
+
+<h3>Menandai barang sudah diterima</h3>
+
+<p>
+  Setelah barang benar-benar sampai, buka pengiriman berstatus <em>Terkirim</em>
+  dan klik <strong>Tandai Diterima</strong>. Hanya pengiriman berstatus
+  <em>Terkirim</em> yang dapat ditandai diterima.
+</p>
+
+<h3>Dokumen pengiriman dan bukti foto</h3>
+
+<figure class="fig" id="fig-shipments-show">
+  <img src="../screens/103-shipments-show.png" alt="Detail pengiriman yang sudah terkirim">
+  <figcaption>
+    Detail pengiriman yang sudah terkirim. Di bagian bawah terdapat kartu
+    <em>Bukti Pengiriman</em> untuk menambah atau menghapus foto.
+  </figcaption>
+</figure>
+
+<figure class="fig" id="fig-shipments-print">
+  <img src="../screens/105-shipments-print.png" alt="Surat jalan siap cetak">
+  <figcaption>Surat jalan dalam bentuk siap cetak.</figcaption>
+</figure>
+
+<h2 id="sec-modul-invoice">5.6 Invoice</h2>
+
+<div class="ringkas-modul">
+  <dl>
+    <dt>Gambaran</dt><dd>Tagihan resmi kepada sekolah atas barang yang sudah dikirim, lengkap dengan perhitungan pajak.</dd>
+    <dt>Cara membuka</dt><dd>Sidebar <strong>Invoice</strong>.</dd>
+    <dt>Izin</dt><dd>Lihat: <code>invoices.view</code> &middot; Kelola &amp; batalkan: <code>invoices.manage</code> &middot; Terbitkan: <code>invoices.issue</code></dd>
+  </dl>
+</div>
+
+<figure class="fig" id="fig-invoices-index">
+  <img src="../screens/110-invoices-index.png" alt="Daftar invoice">
+  <figcaption>
+    Daftar invoice. Kolom <em>Dibayar</em> dan <em>Sisa</em> memperlihatkan
+    posisi pembayaran tiap tagihan.
+  </figcaption>
+</figure>
+
+<table class="tabel-field">
+  <thead><tr><th>Kolom</th><th>Arti</th></tr></thead>
+  <tbody>
+    <tr><td>No. Invoice</td><td>Nomor otomatis berformat <code>INV-YYYYMMDD-nnnn</code>.</td></tr>
+    <tr><td>Tanggal / Jatuh Tempo</td><td>Tanggal terbit dan batas akhir pembayaran.</td></tr>
+    <tr><td>Sekolah</td><td>Sekolah yang ditagih.</td></tr>
+    <tr><td>Total</td><td>Nilai tagihan termasuk pajak.</td></tr>
+    <tr><td>Dibayar</td><td>Jumlah yang sudah masuk dan terverifikasi.</td></tr>
+    <tr><td>Sisa</td><td>Total dikurangi yang sudah dibayar.</td></tr>
+    <tr><td>Status</td><td>Belum Bayar, Sebagian, Lunas, atau Jatuh Tempo.</td></tr>
+  </tbody>
+</table>
+
+<h3>Menerbitkan invoice</h3>
+
+<p>
+  Invoice lahir dari pengiriman, bukan dibuat dari nol. Ada dua jalan untuk
+  menerbitkannya:
+</p>
+
+<ul>
+  <li>Buka detail pesanan atau detail pengiriman, lalu klik <strong>Terbitkan Invoice</strong>.</li>
+  <li>Buka detail pengiriman berstatus <em>Terkirim</em> atau <em>Diterima</em>.</li>
+</ul>
+
+<p>
+  Aplikasi menagih hanya jumlah yang <strong>belum pernah ditagih</strong>. Jadi
+  bila sebuah pesanan dikirim dua kali, invoice kedua tidak akan menagih ulang
+  barang yang sudah ada di invoice pertama.
+</p>
+
+<div class="kotak catatan">
+  <span class="judul-kotak">Bila muncul pesan &ldquo;tidak ada yang dapat diinvoice&rdquo;</span>
+  <p>
+    Ini berarti seluruh barang pada pengiriman tersebut sudah pernah ditagih.
+    Periksa daftar invoice untuk sekolah itu sebelum menganggapnya kesalahan.
+  </p>
+</div>
+
+<p>
+  Tanggal jatuh tempo dihitung otomatis dari tanggal terbit ditambah jumlah hari
+  pada konfigurasi <code>finance.invoice_due_days</code> (data contoh: 30 hari).
+</p>
+
+<h3 id="sec-invoice-pajak">Perhitungan pajak</h3>
+
+<p>
+  Pajak dihitung otomatis dan diperlakukan berbeda antara buku dan barang
+  lainnya. <strong>Tarifnya dapat diubah</strong> oleh Admin melalui
+  <strong>Pengaturan &rsaquo; Profil Perusahaan</strong>, pada kartu
+  <em>Keuangan</em>.
+</p>
+
+<table>
+  <thead><tr><th style="width:34%">Kolom pengaturan</th><th style="width:16%">Nilai awal</th><th>Dipakai untuk</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Pajak Buku (%)</strong></td><td>0,5</td><td>Setiap baris <em>buku</em>.</td></tr>
+    <tr><td><strong>Pajak Barang Lainnya (%)</strong></td><td>2</td><td>Setiap baris <em>barang lainnya</em>.</td></tr>
+    <tr><td><strong>PPN (%)</strong></td><td>12</td><td>Hanya baris <em>barang lainnya</em>.</td></tr>
+  </tbody>
+</table>
+
+<p>Perhitungan dilakukan per baris barang, dengan aturan berikut.</p>
+
+<table>
+  <thead><tr><th style="width:26%">Jenis barang</th><th>Perlakuan</th></tr></thead>
+  <tbody>
+    <tr>
+      <td><strong>Buku</strong></td>
+      <td>
+        <strong>Tidak dikenai PPN.</strong><br>
+        Pajak buku = <em>Pajak Buku (%)</em> &times; nilai baris.<br>
+        Dengan nilai awal 0,5%: pajak buku = 0,5% &times; harga.
+      </td>
+    </tr>
+    <tr>
+      <td><strong>Barang lainnya</strong><br><span class="catatan-kecil">(bukan buku)</span></td>
+      <td>
+        DPP = harga &times; 100 &divide; 111<br>
+        PPN = <em>PPN (%)</em> &times; DPP<br>
+        Pajak barang lainnya = <em>Pajak Barang Lainnya (%)</em> &times; DPP.<br>
+        Dengan nilai awal: PPN = 12% &times; DPP, pajak = 2% &times; DPP.
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<p>
+  Ringkasnya: <strong>buku tidak memakai PPN</strong> — hanya dikenai pajak buku
+  yang kecil. <strong>Barang lainnya memakai keduanya</strong> — PPN dan pajak
+  barang lainnya, dan keduanya dihitung dari DPP yang sama.
+</p>
+
+<p>
+  Pada invoice, kolom <strong>PPh</strong> memuat gabungan dari pajak buku dan
+  pajak barang lainnya. Bila invoice hanya berisi buku, kolom itu berisi pajak
+  buku saja; bila berisi barang lainnya, ditambah pajak barang lainnya.
+</p>
+
+<div class="kotak penting">
+  <span class="judul-kotak">Mengubah tarif hanya memengaruhi dokumen baru</span>
+  <p>
+    Nilai pajak <em>disimpan</em> pada saat dokumen dibuat. Karena itu, mengubah
+    tarif di Profil Perusahaan <strong>tidak</strong> mengubah invoice yang sudah
+    terbit maupun pesanan yang sudah tersimpan. Yang berubah adalah perhitungan
+    untuk pesanan dan invoice <em>berikutnya</em>.
+  </p>
+</div>
+
+<div class="kotak penting">
+  <span class="judul-kotak">Total invoice</span>
+  <p>
+    Susunan totalnya: <span class="mono">Total = Subtotal &minus; Diskon + PPN + PPh</span>.
+    Ingat bahwa <strong>PPh mengurangi</strong> penerimaan kita, sehingga posisinya
+    ditambahkan pada kolom total sebagai kewajiban potong.
+  </p>
+</div>
+
+<h3>Rincian invoice</h3>
+
+<figure class="fig" id="fig-invoices-show">
+  <img src="../screens/111-invoices-show.png" alt="Detail invoice">
+  <figcaption>
+    Detail invoice: daftar barang, ringkasan perhitungan, dan kartu
+    pembayaran.
+  </figcaption>
+</figure>
+
+<table class="tabel-field">
+  <thead><tr><th>Bagian</th><th>Arti</th></tr></thead>
+  <tbody>
+    <tr><td>Deskripsi / Qty / Harga / Subtotal</td><td>Rincian barang yang ditagih pada invoice ini.</td></tr>
+    <tr><td>Subtotal</td><td>Jumlah seluruh baris sebelum pajak.</td></tr>
+    <tr><td>DPP</td><td>Dasar Pengenaan Pajak.</td></tr>
+    <tr><td>PPN</td><td>Pajak Pertambahan Nilai.</td></tr>
+    <tr><td>PPh</td><td>Pajak Penghasilan yang dipotong.</td></tr>
+    <tr><td>Total</td><td>Nilai tagihan akhir.</td></tr>
+    <tr><td>Dibayar / Sisa</td><td>Posisi pembayaran saat ini.</td></tr>
+  </tbody>
+</table>
+
+<h3>Mencetak invoice</h3>
+
+<figure class="fig" id="fig-invoices-print">
+  <img src="../screens/112-invoices-print.png" alt="Invoice siap cetak">
+  <figcaption>
+    Invoice dalam bentuk siap cetak. Tombol <strong>Cetak</strong> membuka dialog
+    cetak peramban.
+  </figcaption>
+</figure>
+
+<h3>Menambahkan bukti pembayaran</h3>
+
+<p>
+  Pada halaman detail invoice tersedia tombol <strong>Tambah Foto</strong> untuk
+  mengunggah bukti transfer dari sekolah. Foto ini tersimpan pada dokumen invoice
+  dan berguna sebagai pembanding saat memverifikasi pembayaran.
+</p>
+
+<div class="kotak peringatan">
+  <span class="judul-kotak">Invoice yang sudah dibayar tidak dapat dibatalkan</span>
+  <p>
+    Bila invoice sudah memiliki pembayaran, pembatalan akan ditolak dengan pesan
+    bahwa invoice yang sudah memiliki pembayaran tidak dapat dibatalkan. Untuk
+    memperbaikinya, balik dulu pembayarannya (lihat
+    <a href="#sec-modul-pembayaran">Bagian 5.8</a>), barulah batalkan invoice.
+  </p>
+</div>
+
+<h2 id="sec-modul-piutang">5.7 Piutang dan Barang Belum Dikirim</h2>
+
+<div class="ringkas-modul">
+  <dl>
+    <dt>Gambaran</dt><dd>Dua daftar pengawasan keuangan: tagihan yang belum lunas, dan invoice yang sudah dibayar tetapi barangnya belum dikirim.</dd>
+    <dt>Cara membuka</dt><dd><strong>Piutang &rsaquo; Daftar Piutang</strong> dan <strong>Piutang &rsaquo; Barang Belum Dikirim</strong></dd>
+    <dt>Izin</dt><dd><code>invoices.view</code></dd>
+  </dl>
+</div>
+
+<h3>Daftar piutang</h3>
+
+<figure class="fig" id="fig-receivables">
+  <img src="../screens/120-receivables.png" alt="Daftar piutang">
+  <figcaption>
+    Daftar piutang. Penyaring <em>bucket</em> memisahkan tagihan yang sudah
+    jatuh tempo, sebagian dibayar, dan belum dibayar.
+  </figcaption>
+</figure>
+
+<table class="tabel-field">
+  <thead><tr><th>Kolom</th><th>Arti</th></tr></thead>
+  <tbody>
+    <tr><td>No. Invoice</td><td>Nomor tagihan.</td></tr>
+    <tr><td>Sekolah</td><td>Sekolah yang berutang.</td></tr>
+    <tr><td>Tanggal / Jatuh Tempo</td><td>Tanggal terbit dan batas pembayaran.</td></tr>
+    <tr><td>Total / Dibayar / Sisa</td><td>Nilai tagihan, yang sudah masuk, dan sisanya.</td></tr>
+    <tr><td>Status</td><td>Belum Bayar, Sebagian, Lunas, atau Jatuh Tempo.</td></tr>
+  </tbody>
+</table>
+
+<p>Penyaring yang tersedia: <em>Jatuh tempo</em>, <em>Sebagian dibayar</em>, dan <em>Belum dibayar</em>.</p>
+
+<div class="kotak tips">
+  <span class="judul-kotak">Rutinitas mingguan yang disarankan</span>
+  <p>
+    Buka penyaring <em>Jatuh tempo</em> setiap awal minggu, lalu kirimkan
+    pengingat ke sekolah-sekolah yang tercantum. Keterangan menagih lebih awal
+    jauh lebih menyenangkan daripada menagih setelah lewat.
+  </p>
+</div>
+
+<h3>Barang belum dikirim</h3>
+
+<figure class="fig" id="fig-hutang">
+  <img src="../screens/121-hutang.png" alt="Daftar barang belum dikirim">
+  <figcaption>
+    Daftar barang belum dikirim. Kolom <em>Tgl Bayar</em> dan
+    <em>Tgl Janji Kirim</em> membantu mengurutkan prioritas.
+  </figcaption>
+</figure>
+
+<table class="tabel-field">
+  <thead><tr><th>Kolom</th><th>Arti</th></tr></thead>
+  <tbody>
+    <tr><td>No. Invoice</td><td>Tagihan yang sudah dibayar.</td></tr>
+    <tr><td>No. Pesanan</td><td>Pesanan yang barangnya belum dikirim.</td></tr>
+    <tr><td>Sekolah</td><td>Sekolah yang sudah membayar.</td></tr>
+    <tr><td>Tgl Bayar</td><td>Tanggal pembayaran diterima.</td></tr>
+    <tr><td>Tgl Janji Kirim</td><td>Tanggal janji pengiriman.</td></tr>
+    <tr><td>Nilai</td><td>Nilai yang sudah dibayar tersebut.</td></tr>
+  </tbody>
+</table>
+
+<div class="kotak penting">
+  <span class="judul-kotak">Ini daftar utang kita, bukan utang sekolah</span>
+  <p>
+    Sekolah sudah membayar, tetapi kita belum menyerahkan barangnya. Setiap baris
+    pada daftar ini adalah <strong>kewajiban kita</strong>. Daftar ini sebaiknya
+    diperiksa setiap hari oleh bagian gudang dan keuangan.
+  </p>
+</div>
+
+<h2 id="sec-modul-pembayaran">5.8 Pembayaran</h2>
+
+<div class="ringkas-modul">
+  <dl>
+    <dt>Gambaran</dt><dd>Mencatat uang yang masuk dari sekolah, mengalokasikannya ke invoice, lalu memverifikasinya.</dd>
+    <dt>Cara membuka</dt><dd><strong>Piutang &rsaquo; Riwayat Pembayaran</strong></dd>
+    <dt>Izin</dt><dd>Lihat: <code>payments.view</code> &middot; Catat &amp; balik: <code>payments.manage</code> &middot; Verifikasi: <code>payments.verify</code></dd>
+  </dl>
+</div>
+
+<figure class="fig" id="fig-payments-index">
+  <img src="../screens/130-payments-index.png" alt="Riwayat pembayaran">
+  <figcaption>
+    Riwayat pembayaran. Nomor pembayaran berformat <code>PAY-YYYYMMDD-nnnn</code>.
+  </figcaption>
+</figure>
+
+<table>
+  <thead><tr><th style="width:24%">Status</th><th>Arti</th></tr></thead>
+  <tbody>
+    <tr><td>Draft</td><td>Pembayaran tercatat tetapi <strong>belum</strong> dihitung pada invoice. Sisa piutang belum berkurang.</td></tr>
+    <tr><td>Terverifikasi</td><td>Pembayaran sudah sah. Invoice terkait dihitung ulang dan sisa piutang berkurang.</td></tr>
+    <tr><td>Dibalik</td><td>Pembayaran dibatalkan pengaruhnya, tetapi riwayatnya tetap tersimpan.</td></tr>
+  </tbody>
+</table>
+
+<div class="kotak penting">
+  <span class="judul-kotak">Mencatat belum sama dengan menerima</span>
+  <p>
+    Inilah hal terpenting pada modul ini. Pembayaran yang baru
+    <em>dicatat</em> berstatus Draft dan <strong>belum</strong> mengurangi
+    piutang. Baru setelah <strong>diverifikasi</strong>, uang itu dianggap masuk.
+    Pemisahan ini mencegah angka piutang berubah sebelum uang benar-benar
+    dipastikan masuk ke rekening.
+  </p>
+</div>
+
+<h3>Mencatat pembayaran</h3>
+
+<figure class="fig" id="fig-payments-record">
+  <img src="../screens/131-payments-record.png" alt="Modal catat pembayaran">
+  <figcaption>
+    Modal Catat Pembayaran. Bagian bawah memungkinkan pengalokasian pembayaran
+    ke invoice tertentu.
+  </figcaption>
+</figure>
+
+<ol class="langkah">
+  <li>Klik <strong>Catat Pembayaran</strong>.</li>
+  <li>Pilih <strong>Sekolah</strong>.</li>
+  <li>Isi <strong>Tanggal</strong> pembayaran dan <strong>Jumlah</strong> yang diterima.</li>
+  <li>Pilih <strong>Metode</strong> pembayaran dan isi <strong>Referensi</strong> (misalnya nomor transfer) bila ada.</li>
+  <li>Bila ingin menetapkan sendiri invoice mana yang dibayar, isi bagian alokasi. Bila dibiarkan kosong, aplikasi akan mengalokasikan otomatis ke invoice tertua yang masih berutang.</li>
+  <li>Klik <strong>Simpan</strong>. Pembayaran tersimpan berstatus <em>Draft</em>.</li>
+</ol>
+
+<div class="kotak catatan">
+  <span class="judul-kotak">Aturan pengalokasian otomatis</span>
+  <p>
+    Bila Anda tidak menentukan alokasi, aplikasi membayar invoice sekolah
+    tersebut mulai dari yang <strong>jatuh temponya paling awal</strong>. Ini
+    kebiasaan akuntansi yang lazim, tetapi bila sekolah meminta uangnya
+    dialokasikan ke invoice tertentu, isilah bagian alokasi secara manual.
+  </p>
+</div>
+
+<p>Beberapa aturan pengamanan saat mengalokasikan pembayaran:</p>
+
+<ul>
+  <li>Invoice harus milik sekolah yang sama dengan pembayarannya.</li>
+  <li>Total alokasi tidak boleh melebihi jumlah pembayaran.</li>
+  <li>Alokasi satu invoice tidak boleh melebihi sisa tagihannya.</li>
+</ul>
+
+<h3>Memverifikasi dan membalik</h3>
+
+<p>
+  Setelah uang dipastikan benar-benar masuk, buka baris pembayaran
+  berstatus <em>Draft</em> dan klik <strong>Verifikasi</strong>. Sejak saat itu
+  sisa piutang pada invoice terkait berkurang.
+</p>
+
+<p>
+  Bila ternyata terjadi kekeliruan, gunakan <strong>Balik</strong>. Pembalikan
+  <strong>tidak menghapus</strong> data — ia menambahkan catatan bahwa pembayaran
+  itu dibatalkan, lalu menghitung ulang invoice terkait. Riwayatnya tetap utuh
+  untuk keperluan audit.
+</p>
+
+<h2 id="sec-modul-rebate">5.9 Rebate / Cashback</h2>
+
+<div class="ringkas-modul">
+  <dl>
+    <dt>Gambaran</dt><dd>Pengembalian sebagian nilai transaksi kepada sekolah, dengan alur pengajuan, persetujuan, dan pembayaran.</dd>
+    <dt>Cara membuka</dt><dd>Sidebar <strong>Rebate / Cashback</strong>.</dd>
+    <dt>Izin</dt><dd>Lihat: <code>rebates.view</code> &middot; Ajukan: <code>rebates.request</code> &middot; Setujui: <code>rebates.approve</code> &middot; Bayarkan: <code>rebates.pay</code></dd>
+  </dl>
+</div>
+
+<figure class="fig" id="fig-rebates-index">
+  <img src="../screens/140-rebates-index.png" alt="Daftar rebate">
+  <figcaption>
+    Daftar rebate. Nomor rebate berformat <code>RBT-YYYYMMDD-nnnn</code>. Kolom
+    Aksi menyesuaikan status masing-masing baris.
+  </figcaption>
+</figure>
+
+<table>
+  <thead><tr><th style="width:30%">Status</th><th>Arti &amp; langkah berikutnya</th></tr></thead>
+  <tbody>
+    <tr><td>Draft</td><td>Belum diajukan.</td></tr>
+    <tr><td>Diajukan</td><td>Sudah diajukan, menunggu persetujuan.</td></tr>
+    <tr><td>Menunggu Persetujuan</td><td>Masih dalam proses persetujuan.</td></tr>
+    <tr><td>Disetujui</td><td>Disetujui; berikutnya <strong>dibayarkan</strong>.</td></tr>
+    <tr><td>Ditolak</td><td>Ditolak, disertai alasan penolakan.</td></tr>
+    <tr><td>Dibayarkan</td><td>Selesai; pembayarannya sudah dilakukan.</td></tr>
+  </tbody>
+</table>
+
+<h3>Mengajukan rebate</h3>
+
+<figure class="fig" id="fig-rebates-request">
+  <img src="../screens/141-rebates-request.png" alt="Modal ajukan rebate">
+  <figcaption>Modal Ajukan Rebate. Pilih invoice dan aturan rebate yang berlaku.</figcaption>
+</figure>
+
+<ol class="langkah">
+  <li>Klik <strong>Ajukan Rebate</strong>.</li>
+  <li>Pilih <strong>Invoice</strong> yang menjadi dasar rebate.</li>
+  <li>Pilih <strong>Aturan Rebate</strong> yang berlaku. Bila dikosongkan, nilai rebate diisi manual.</li>
+  <li>Tambahkan <strong>Catatan</strong> bila perlu.</li>
+  <li>Klik <strong>Simpan</strong>. Rebate tersimpan berstatus <em>Diajukan</em>.</li>
+</ol>
+
+<p>Syarat pengajuan yang diperiksa aplikasi:</p>
+
+<ul>
+  <li><strong>Invoice sudah lunas.</strong> Bila aturan mewajibkan lunas, pengajuan untuk invoice yang belum lunas ditolak. Pada data contoh, konfigurasi <code>finance.rebate_requires_full_payment</code> bernilai <em>ya</em>, sehingga syarat ini berlaku umum.</li>
+  <li><strong>Nilai invoice memenuhi minimum</strong> bila aturan mencantumkan minimum.</li>
+  <li><strong>Tidak ada pengajuan ganda.</strong> Satu invoice tidak boleh mengajukan rebate dua kali untuk aturan yang sama, kecuali pengajuan sebelumnya sudah ditolak.</li>
+</ul>
+
+<h3>Menyetujui dan membayarkan</h3>
+
+<figure class="fig" id="fig-rebates-actions">
+  <img src="../screens/142-rebates-actions.png" alt="Kolom aksi pada daftar rebate">
+  <figcaption>
+    Kolom Aksi pada daftar rebate. Tombol yang muncul bergantung pada status
+    baris dan izin Anda.
+  </figcaption>
+</figure>
+
+<ol class="langkah">
+  <li>Pada baris berstatus <em>Diajukan</em>, klik <strong>Setujui</strong> (atau <strong>Tolak</strong> disertai alasan).</li>
+  <li>Untuk rebate yang sudah disetujui, klik <strong>Bayar</strong>.</li>
+  <li>Isi <strong>Referensi</strong> pembayaran — kolom ini wajib.</li>
+  <li>Lampirkan <strong>Bukti foto</strong> pembayaran — berkas ini juga wajib.</li>
+  <li>Klik <strong>Simpan</strong>.</li>
+</ol>
+
+<div class="kotak peringatan">
+  <span class="judul-kotak">Aturan status yang kaku</span>
+  <ul>
+    <li>Hanya rebate berstatus <em>Disetujui</em> yang dapat dibayarkan.</li>
+    <li>Rebate yang sudah <em>Dibayarkan</em> tidak dapat ditolak lagi.</li>
+    <li>Persetujuan hanya berlaku untuk rebate berstatus <em>Diajukan</em>, <em>Menunggu Persetujuan</em>, atau <em>Draft</em>.</li>
+  </ul>
+</div>
+
+<h2 id="sec-modul-pengaturan">5.10 Pengaturan</h2>
+
+<h3>Profil Perusahaan</h3>
+
+<div class="ringkas-modul">
+  <dl>
+    <dt>Cara membuka</dt><dd><strong>Pengaturan &rsaquo; Profil Perusahaan</strong></dd>
+    <dt>Izin</dt><dd><code>settings.manage</code> (hanya Admin)</dd>
+  </dl>
+</div>
+
+<figure class="fig" id="fig-settings-company">
+  <img src="../screens/160-settings-company.png" alt="Profil perusahaan">
+  <figcaption>
+    Formulir Profil Perusahaan: identitas perusahaan, pengaturan kepala dokumen
+    cetak, dan kartu <em>Keuangan</em> berisi tarif pajak.
+  </figcaption>
+</figure>
+
+<table class="tabel-field">
+  <thead><tr><th>Kolom</th><th>Keterangan</th></tr></thead>
+  <tbody>
+    <tr><td>Nama perusahaan</td><td>Nama yang tercetak pada invoice dan surat jalan.</td></tr>
+    <tr><td>Logo perusahaan</td><td>Berkas gambar untuk kepala dokumen.</td></tr>
+    <tr><td>Alamat</td><td>Alamat perusahaan.</td></tr>
+    <tr><td>Telepon, Email</td><td>Kontak perusahaan.</td></tr>
+    <tr><td>Profil perusahaan (penerbit)</td><td>Penerbit yang namanya dipakai pada kepala dokumen.</td></tr>
+    <tr><td>Nama kepala dokumen</td><td>Teks yang muncul di bagian atas dokumen cetak.</td></tr>
+  </tbody>
+</table>
+
+<h4>Kartu Keuangan — tarif pajak</h4>
+
+<p>
+  Kartu <em>Keuangan</em> pada formulir ini menentukan tarif pajak yang dipakai
+  saat menghitung invoice. Tersedia empat kolom.
+</p>
+
+<table class="tabel-field">
+  <thead><tr><th style="width:36%">Kolom</th><th>Keterangan</th></tr></thead>
+  <tbody>
+    <tr><td>Tarif Pajak (%)</td><td>Kolom lama. Perhitungan pajak invoice saat ini memakai tiga kolom di bawahnya, bukan kolom ini.</td></tr>
+    <tr><td><strong>Pajak Buku (%)</strong></td><td>Pajak untuk baris <em>buku</em>. Buku tidak dikenai PPN. Nilai awal <strong>0,5</strong>.</td></tr>
+    <tr><td><strong>Pajak Barang Lainnya (%)</strong></td><td>Pajak untuk baris <em>barang lainnya</em>, dihitung dari DPP. Nilai awal <strong>2</strong>.</td></tr>
+    <tr><td><strong>PPN (%)</strong></td><td>PPN untuk <em>barang lainnya</em>, dihitung dari DPP. Nilai awal <strong>12</strong>.</td></tr>
+  </tbody>
+</table>
+
+<div class="kotak catatan">
+  <span class="judul-kotak">Buku tanpa PPN, barang lainnya memakai PPN</span>
+  <p>
+    Baris <em>buku</em> hanya dikenai <strong>Pajak Buku</strong> — PPN tidak
+    berlaku untuk buku. Baris <em>barang lainnya</em> dikenai <strong>PPN</strong>
+    sekaligus <strong>Pajak Barang Lainnya</strong>. Rumus lengkapnya ada di
+    <a href="#sec-invoice-pajak">Bagian 5.6</a>.
+  </p>
+</div>
+
+<div class="kotak peringatan">
+  <span class="judul-kotak">Tarif baru hanya berlaku untuk dokumen baru</span>
+  <p>
+    Invoice dan pesanan yang sudah tersimpan tetap memakai nilai pajak yang
+    dihitung pada saat dokumen itu dibuat. Mengubah tarif di sini memengaruhi
+    perhitungan berikutnya, bukan dokumen yang sudah ada.
+  </p>
+</div>
+
+<h3>Pengguna</h3>
+
+<div class="ringkas-modul">
+  <dl>
+    <dt>Cara membuka</dt><dd><strong>Pengaturan &rsaquo; Pengguna</strong></dd>
+    <dt>Izin</dt><dd>Lihat: <code>users.view</code> &middot; Kelola: <code>users.manage</code></dd>
+  </dl>
+</div>
+
+<figure class="fig" id="fig-settings-users">
+  <img src="../screens/161-settings-users.png" alt="Daftar pengguna">
+  <figcaption>
+    Daftar pengguna. Kolom Peran menunjukkan peran yang dipegang masing-masing
+    akun.
+  </figcaption>
+</figure>
+
+<figure class="fig" id="fig-settings-user-create">
+  <img src="../screens/162-settings-user-create.png" alt="Modal tambah pengguna">
+  <figcaption>
+    Modal Tambah Pengguna. Kata sandi diisi oleh Admin dan diserahkan kepada
+    pemilik akun melalui saluran yang aman.
+  </figcaption>
+</figure>
+
+<table class="tabel-field">
+  <thead><tr><th>Kolom</th><th>Keterangan</th></tr></thead>
+  <tbody>
+    <tr><td>Nama</td><td>Nama lengkap pengguna.</td></tr>
+    <tr><td>Email</td><td>Dipakai untuk masuk. Harus unik.</td></tr>
+    <tr><td>Kata sandi</td><td>Diisi saat membuat akun. Pada mode ubah, biarkan kosong bila tidak ingin menggantinya.</td></tr>
+    <tr><td>Peran</td><td>Dapat lebih dari satu, tetapi sebaiknya satu saja agar kewenangan mudah dilacak.</td></tr>
+  </tbody>
+</table>
+
+<div class="kotak peringatan">
+  <span class="judul-kotak">Admin tidak dapat menghapus akunnya sendiri</span>
+  <p>
+    Bila Anda mencoba menghapus akun yang sedang Anda pakai, aplikasi akan
+    menolak dengan pesan bahwa akun sendiri tidak dapat dihapus. Ini pengaman
+    agar sistem tidak pernah kehilangan administrator terakhirnya.
+  </p>
+</div>
+
+<h3>Audit Log</h3>
+
+<div class="ringkas-modul">
+  <dl>
+    <dt>Cara membuka</dt><dd><strong>Pengaturan &rsaquo; Audit Log</strong></dd>
+    <dt>Izin</dt><dd><code>audit.view</code> (Admin dan Pimpinan)</dd>
+  </dl>
+</div>
+
+<figure class="fig" id="fig-settings-audit">
+  <img src="../screens/165-settings-audit.png" alt="Audit log">
+  <figcaption>
+    Audit Log. Setiap baris mencatat waktu, pengguna, aksi, deskripsi, dan
+    alamat IP.
+  </figcaption>
+</figure>
+
+<table class="tabel-field">
+  <thead><tr><th>Kolom</th><th>Arti</th></tr></thead>
+  <tbody>
+    <tr><td>Waktu</td><td>Kapan tindakan dilakukan.</td></tr>
+    <tr><td>Pengguna</td><td>Siapa yang melakukannya.</td></tr>
+    <tr><td>Aksi</td><td>Kode tindakan, misalnya <code>order.confirmed</code> atau <code>payment.verified</code>.</td></tr>
+    <tr><td>Deskripsi</td><td>Penjelasan dalam bahasa manusia.</td></tr>
+    <tr><td>IP</td><td>Alamat jaringan asal tindakan.</td></tr>
+    <tr><td>Perubahan</td><td>Nilai yang berubah, bila dicatat.</td></tr>
+  </tbody>
+</table>
+
+<p>
+  Audit Log adalah tempat pertama yang sebaiknya dibuka ketika ada angka yang
+  dipertanyakan: &ldquo;siapa yang mengubah ini, dan kapan?&rdquo;
+</p>
+
+<h2 id="sec-modul-integrasi">5.11 Integrasi dan Import</h2>
+
+<div class="ringkas-modul">
+  <dl>
+    <dt>Gambaran</dt><dd>Status penghubung ke sumber pesanan eksternal (misalnya SIPLah dan e-Katalog), beserta riwayat sinkronisasinya.</dd>
+    <dt>Cara membuka</dt><dd><strong>Pengaturan &rsaquo; Integrasi &amp; Import</strong></dd>
+    <dt>Izin</dt><dd>Lihat: <code>integrations.view</code> &middot; Sinkronkan: <code>integrations.manage</code></dd>
+  </dl>
+</div>
+
+<figure class="fig" id="fig-integrations">
+  <img src="../screens/166-integrations.png" alt="Halaman integrasi dan import">
+  <figcaption>
+    Integrasi &amp; Import. Bagian atas menampilkan status setiap sumber pesanan;
+    bagian bawah menampilkan riwayat sinkronisasi.
+  </figcaption>
+</figure>
+
+<table class="tabel-field">
+  <thead><tr><th>Kolom</th><th>Arti</th></tr></thead>
+  <tbody>
+    <tr><td>Nama / Kode / Tipe</td><td>Identitas sumber pesanan.</td></tr>
+    <tr><td>Aktif</td><td>Apakah sumber ini sedang dipakai.</td></tr>
+    <tr><td>Integrasi</td><td>Status sambungan ke sumber tersebut.</td></tr>
+    <tr><td>Waktu / Sumber / Arah / Referensi</td><td>Rincian setiap percobaan sinkronisasi pada tabel log.</td></tr>
+    <tr><td>Status / Pesan</td><td>Hasil sinkronisasi dan keterangannya.</td></tr>
+  </tbody>
+</table>
+
+<div class="kotak penting">
+  <span class="judul-kotak">Integrasi tanpa kredensial tidak akan mengimpor data</span>
+  <p>
+    Halaman ini menyatakan dengan jelas: <em>integrasi tanpa kredensial tidak
+    akan mengimpor data</em>. Jadi bila status integrasi menunjukkan belum
+    tersambung, menekan tombol sinkronisasi tidak akan menghasilkan pesanan
+    baru. Hubungi administrator untuk melengkapi kredensialnya lebih dulu.
+  </p>
+</div>
+
+<h2 id="sec-modul-laporan-penunjuk">5.12 Laporan</h2>
+
+<p>
+  Modul laporan dibahas tersendiri di <a href="#bagian-6">Bagian VI</a>, karena
+  cakupannya cukup luas: sembilan jenis laporan, penyaring tanggal, dan ekspor
+  CSV.
+</p>

@@ -1,0 +1,409 @@
+<section class="bagian-pembuka" id="bagian-7">
+  <p class="label-bagian">Bagian VII</p>
+  <h1 class="judul-bagian" style="border:none;padding:0">Pemecahan Masalah</h1>
+  <div class="aturan"></div>
+  <p class="deskripsi">
+    Kumpulan pesan yang benar-benar muncul dari aplikasi, apa artinya, dan apa
+    yang harus Anda lakukan. Disusun berdasarkan sebab, bukan berdasarkan dugaan.
+  </p>
+</section>
+
+<h1 id="bab-masalah">Bab 8. Bila Ada yang Tidak Berjalan</h1>
+
+<h2 id="sec-masalah-login">8.1 Tidak Bisa Masuk</h2>
+
+<figure class="fig" id="fig-trouble-login">
+  <img src="../screens/02-login-error.png" alt="Pesan kesalahan saat masuk">
+  <figcaption>Pesan kesalahan pada halaman masuk.</figcaption>
+</figure>
+
+<table>
+  <thead><tr><th style="width:38%">Pesan yang muncul</th><th>Sebab &amp; tindakan</th></tr></thead>
+  <tbody>
+    <tr>
+      <td><em>These credentials do not match our records.</em></td>
+      <td>Email atau kata sandi tidak cocok. Periksa ejaan email dan huruf besar/kecil pada kata sandi. Bila tetap gagal, minta administrator mengatur ulang kata sandi.</td>
+    </tr>
+    <tr>
+      <td><em>Too many login attempts. Please try again in … seconds.</em></td>
+      <td>Terlalu banyak percobaan gagal. Aplikasi membatasi <strong>lima percobaan</strong>; setelah itu tunggu sebentar sebelum mencoba lagi. Jangan terus menebak — tunggu, lalu pastikan kredensialnya benar.</td>
+    </tr>
+    <tr>
+      <td><em>The email field is required.</em> (atau pesan serupa)</td>
+      <td>Ada kolom yang belum diisi. Pesan validasi bawaan aplikasi tampil dalam bahasa Inggris.</td>
+    </tr>
+  </tbody>
+</table>
+
+<div class="kotak catatan">
+  <span class="judul-kotak">Mengapa sebagian pesan berbahasa Inggris?</span>
+  <p>
+    Pesan yang berasal dari kerangka kerja dasar (validasi kolom, kegagalan
+    login) memakai bahasa bawaan kerangka kerja, yaitu Inggris. Pesan yang
+    dibuat khusus untuk aplikasi ini — misalnya soal stok atau rebate —
+    berbahasa Indonesia. Keduanya sama-sama sah dan sama-sama berarti.
+  </p>
+</div>
+
+<h2 id="sec-masalah-tampilan">8.2 Halaman Tampak Polos Tanpa Warna</h2>
+
+<p>
+  Bila halaman terbuka tetapi tampak seperti dokumen tanpa gaya — tanpa warna
+  biru, tanpa sidebar yang rapi — biasanya berkas tampilan gagal dimuat. Ini
+  bukan kesalahan Anda, dan biasanya bukan kesalahan data.
+</p>
+
+<ol class="langkah">
+  <li>Muat ulang halaman dengan <kbd>Ctrl</kbd>+<kbd>F5</kbd> (muat ulang paksa, mengabaikan simpanan sementara).</li>
+  <li>Bila tetap sama, coba peramban lain atau mode penjelajahan privat.</li>
+  <li>Bila masih sama, laporkan ke administrator: kemungkinan berkas tampilan aplikasi belum dibangun ulang.</li>
+</ol>
+
+<div class="kotak penting">
+  <span class="judul-kotak">Catatan teknis untuk administrator</span>
+  <p>
+    Keadaan ini biasanya muncul ketika penunjuk peladen pengembangan
+    (<code>public/hot</code>) tertinggal sementara peladen pengembangan tidak
+    berjalan. Menghapus berkas tersebut membuat aplikasi kembali memakai berkas
+    tampilan hasil bangun di <code>public/build</code>.
+  </p>
+</div>
+
+<h2 id="sec-masalah-daftar-kosong">8.3 Daftar Kosong Padahal Seharusnya Ada Data</h2>
+
+<p>Sebelum melaporkan sebagai kesalahan, periksa tiga hal ini secara berurutan:</p>
+
+<ol class="langkah">
+  <li><strong>Penyaring.</strong> Buka daftar tanpa penyaring. Menu pintasan seperti <em>Perlu Validasi</em> memang menampilkan daftar kosong bila tidak ada pesanan pada status itu.</li>
+  <li><strong>Kata kunci pencarian.</strong> Kosongkan kolom pencarian. Sisa ketikan pada kolom itu dapat menyembunyikan seluruh data.</li>
+  <li><strong>Peran Anda.</strong> Akun Sales hanya melihat sekolah yang ditugaskan kepadanya. Daftar yang &ldquo;kosong&rdquo; bisa jadi memang bukan wilayah Anda.</li>
+</ol>
+
+<div class="kotak catatan">
+  <span class="judul-kotak">Pesan kosong yang normal</span>
+  <p>
+    Aplikasi menampilkan keterangan yang berbeda-beda untuk daftar kosong,
+    misalnya &ldquo;Belum ada stok tercatat.&rdquo;, &ldquo;Belum ada aktivitas
+    tercatat.&rdquo;, atau &ldquo;Tidak ada data untuk filter ini.&rdquo; Yang
+    terakhir menandakan penyaring Anda memang tidak menemukan apa pun — bukan
+    bahwa datanya hilang.
+  </p>
+</div>
+
+<h2 id="sec-masalah-pesanan">8.4 Pesanan Tidak Bisa Diubah atau Dikonfirmasi</h2>
+
+<table>
+  <thead><tr><th style="width:46%">Pesan yang muncul</th><th>Arti &amp; tindakan</th></tr></thead>
+  <tbody>
+    <tr>
+      <td><em>Pesanan yang sudah diproses tidak dapat diubah.</em></td>
+      <td>Pesanan sudah melewati tahap draft. Batalkan pesanan tersebut lalu buat pesanan baru yang benar.</td>
+    </tr>
+    <tr>
+      <td><em>Pesanan ini tidak dapat dikonfirmasi pada status saat ini.</em></td>
+      <td>Pesanan sudah berjalan (misalnya sudah dikirim sebagian). Konfirmasi hanya berlaku untuk pesanan Draft atau Pesanan Diterima.</td>
+    </tr>
+    <tr>
+      <td><em>Pesanan tidak memiliki item.</em></td>
+      <td>Pesanan dibuat tanpa barang. Ubah pesanan dan tambahkan minimal satu barang.</td>
+    </tr>
+    <tr>
+      <td><em>Pesanan harus memiliki minimal satu item.</em></td>
+      <td>Sama seperti di atas — formulir dikirim tanpa baris barang.</td>
+    </tr>
+    <tr>
+      <td><em>Pesanan yang sudah dikirim sebagian tidak dapat dibatalkan.</em></td>
+      <td>Sudah ada barang yang keluar gudang. Pembatalan tidak dimungkinkan; selesaikan sisanya atau buat pengiriman penyesuaian.</td>
+    </tr>
+    <tr>
+      <td><em>Referensi pesanan eksternal ini sudah pernah diimpor untuk sekolah tersebut.</em></td>
+      <td>Nomor referensi dari sistem luar sudah dipakai. Periksa daftar pesanan sekolah itu, atau kosongkan kolom referensinya bila memang bukan impor.</td>
+    </tr>
+  </tbody>
+</table>
+
+<h3>Formulir menolak disimpan</h3>
+
+<figure class="fig" id="fig-trouble-validation">
+  <img src="../screens/64-orders-validation.png" alt="Pesan validasi pada formulir pesanan">
+  <figcaption>
+    Kolom yang bermasalah ditandai merah dan pesannya muncul tepat di bawah
+    kolom tersebut.
+  </figcaption>
+</figure>
+
+<p>
+  Bila formulir menolak disimpan, jangan menekan tombol berulang kali. Baca
+  pesan yang muncul dan perbaiki kolom yang ditandai — biasanya hanya satu atau
+  dua kolom. Isian lain tetap tersimpan, jadi Anda tidak perlu mengulang.
+</p>
+
+<h2 id="sec-masalah-stok">8.5 Masalah Stok</h2>
+
+<figure class="fig" id="fig-trouble-stock">
+  <img src="../screens/82-stock-adjust-error.png" alt="Penolakan penyesuaian stok">
+  <figcaption>Penyesuaian stok ditolak karena akan membuat stok menjadi negatif.</figcaption>
+</figure>
+
+<table>
+  <thead><tr><th style="width:46%">Pesan yang muncul</th><th>Arti &amp; tindakan</th></tr></thead>
+  <tbody>
+    <tr>
+      <td><em>Penyesuaian akan membuat stok fisik menjadi negatif.</em></td>
+      <td>Angka pengurangan melebihi stok yang ada. Periksa jumlahnya; mungkin ada kelebihan angka nol, atau barang yang dipilih berbeda.</td>
+    </tr>
+    <tr>
+      <td><em>Jumlah penyesuaian tidak boleh nol.</em></td>
+      <td>Isi angka selain nol, positif maupun negatif.</td>
+    </tr>
+    <tr>
+      <td><em>Penerimaan barang ini sudah dikonfirmasi sebelumnya.</em></td>
+      <td>Stok sudah pernah ditambah dari dokumen ini. Ini pengaman ganda; jangan diulang.</td>
+    </tr>
+    <tr>
+      <td><em>Penerimaan barang tidak memiliki item.</em></td>
+      <td>Dokumen penerimaan kosong. Tambahkan barang lebih dulu, baru konfirmasi.</td>
+    </tr>
+  </tbody>
+</table>
+
+<div class="kotak penting">
+  <span class="judul-kotak">&ldquo;Tersedia&rdquo; nol, tetapi &ldquo;Fisik&rdquo; ada</span>
+  <p>
+    Ini bukan kerusakan. Semua barang fisik sudah dijanjikan ke pesanan lain,
+    sehingga tidak ada yang tersisa untuk dijual. Lihat kolom <em>Reservasi</em>
+    untuk memastikan. Solusinya: tambah stok lewat penerimaan barang, atau
+    selesaikan pengiriman pesanan yang menahan stok tersebut.
+  </p>
+</div>
+
+<h2 id="sec-masalah-picking">8.6 Masalah Picking dan Packing</h2>
+
+<table>
+  <thead><tr><th style="width:46%">Pesan yang muncul</th><th>Arti &amp; tindakan</th></tr></thead>
+  <tbody>
+    <tr>
+      <td><em>Belum ada item yang siap dipicking untuk pesanan ini.</em></td>
+      <td>Belum ada stok yang bisa dipesan untuk pesanan tersebut. Konfirmasi pesanannya lebih dulu, dan pastikan stok sudah masuk.</td>
+    </tr>
+    <tr>
+      <td><em>Picking ini tidak dapat diubah pada status saat ini.</em></td>
+      <td>Picking sudah selesai atau sudah dikemas. Buat picking baru dari pesanan bila memang perlu menambah.</td>
+    </tr>
+    <tr>
+      <td><em>Picking harus selesai dipicking sebelum packing.</em></td>
+      <td>Simpan hasil picking lebih dulu. Baru setelah itu packing dapat diselesaikan.</td>
+    </tr>
+  </tbody>
+</table>
+
+<h2 id="sec-masalah-pengiriman">8.7 Masalah Pengiriman</h2>
+
+<table>
+  <thead><tr><th style="width:46%">Pesan yang muncul</th><th>Arti &amp; tindakan</th></tr></thead>
+  <tbody>
+    <tr>
+      <td><em>Pesanan belum dikonfirmasi sehingga belum dapat dikirim.</em></td>
+      <td>Konfirmasi pesanan lebih dulu di halaman detailnya.</td>
+    </tr>
+    <tr>
+      <td><em>Tidak ada kuantitas yang siap dikirim.</em></td>
+      <td>Belum ada barang yang dipicking dan dikemas, atau semuanya sudah dikirim. Periksa daftar picking.</td>
+    </tr>
+    <tr>
+      <td><em>Jumlah kirim untuk barang #N melebihi sisa yang siap dikirim (x).</em></td>
+      <td>Jumlah pada kolom kirim lebih besar daripada yang tersedia. Kecilkan angkanya menjadi paling banyak <em>x</em>.</td>
+    </tr>
+    <tr>
+      <td><em>Jumlah kirim melebihi stok yang direservasi untuk barang #N.</em></td>
+      <td>Terjadi ketidaksesuaian antara reservasi dan jumlah kirim. Jangan dipaksa; periksa kondisi stok dan pesanan terkait, lalu laporkan bila menetap.</td>
+    </tr>
+    <tr>
+      <td><em>Pesanan ini sudah dikonfirmasi.</em></td>
+      <td>Pengiriman sudah dikonfirmasi sebelumnya. Stok sudah berkurang; jangan diulang.</td>
+    </tr>
+    <tr>
+      <td><em>Hanya pengiriman yang sudah dikirim yang dapat ditandai diterima.</em></td>
+      <td>Konfirmasi kirim lebih dulu, baru tandai diterima.</td>
+    </tr>
+    <tr>
+      <td><em>Bukti foto pengiriman wajib dilampirkan.</em></td>
+      <td>Pilih berkas gambar lebih dulu. Syaratnya JPEG, PNG, atau WebP, maksimal 5&nbsp;MB.</td>
+    </tr>
+    <tr>
+      <td><em>Bukti pengiriman maksimal 5 MB.</em></td>
+      <td>Perkecil ukuran foto, lalu unggah ulang.</td>
+    </tr>
+  </tbody>
+</table>
+
+<div class="kotak tips">
+  <span class="judul-kotak">Foto terlalu besar</span>
+  <p>
+    Foto dari telepon sering berukuran lebih dari 5&nbsp;MB. Cara paling cepat:
+    kirim foto itu ke diri sendiri lewat perpesanan (yang otomatis memperkecil
+    ukurannya), lalu unggah hasil kirimannya.
+  </p>
+</div>
+
+<h2 id="sec-masalah-invoice">8.8 Masalah Invoice</h2>
+
+<table>
+  <thead><tr><th style="width:46%">Pesan yang muncul</th><th>Arti &amp; tindakan</th></tr></thead>
+  <tbody>
+    <tr>
+      <td><em>Pengiriman belum dikonfirmasi sehingga belum dapat diinvoice.</em></td>
+      <td>Konfirmasi pengiriman lebih dulu, baru terbitkan invoice.</td>
+    </tr>
+    <tr>
+      <td><em>Belum ada pengiriman terkonfirmasi untuk diinvoice.</em></td>
+      <td>Pesanan belum punya pengiriman yang terkonfirmasi.</td>
+    </tr>
+    <tr>
+      <td><em>Tidak ada kuantitas yang dapat diinvoice (semua sudah pernah diinvoice).</em></td>
+      <td>Barang pada pengiriman itu seluruhnya sudah ditagih. Periksa daftar invoice sekolah tersebut.</td>
+    </tr>
+    <tr>
+      <td><em>Invoice membutuhkan data sekolah.</em></td>
+      <td>Data sekolah pada pesanan tidak lengkap. Lengkapi dulu di Master Data.</td>
+    </tr>
+    <tr>
+      <td><em>Invoice yang sudah memiliki pembayaran tidak dapat dibatalkan.</em></td>
+      <td>Balik dulu pembayarannya di halaman Riwayat Pembayaran, baru batalkan invoice.</td>
+    </tr>
+  </tbody>
+</table>
+
+<h2 id="sec-masalah-pembayaran">8.9 Masalah Pembayaran</h2>
+
+<table>
+  <thead><tr><th style="width:46%">Pesan yang muncul</th><th>Arti &amp; tindakan</th></tr></thead>
+  <tbody>
+    <tr>
+      <td><em>Invoice bukan milik sekolah pada pembayaran ini.</em></td>
+      <td>Alokasi diarahkan ke invoice sekolah lain. Pilih invoice milik sekolah yang sama.</td>
+    </tr>
+    <tr>
+      <td><em>Jumlah alokasi harus lebih dari nol.</em></td>
+      <td>Isi angka lebih dari nol pada kolom alokasi.</td>
+    </tr>
+    <tr>
+      <td><em>Total alokasi melebihi jumlah pembayaran.</em></td>
+      <td>Jumlah alokasi lebih besar daripada uang yang diterima. Kurangi alokasinya.</td>
+    </tr>
+    <tr>
+      <td><em>Alokasi melebihi sisa tagihan invoice.</em></td>
+      <td>Sisa tagihan invoice lebih kecil daripada alokasi. Periksa sisa terkini.</td>
+    </tr>
+  </tbody>
+</table>
+
+<div class="kotak penting">
+  <span class="judul-kotak">Piutang belum berkurang setelah mencatat pembayaran</span>
+  <p>
+    Ini bukan kesalahan. Pembayaran yang baru <strong>dicatat</strong> berstatus
+    <em>Draft</em> dan belum mengurangi piutang. Piutang baru berkurang setelah
+    pembayaran <strong>diverifikasi</strong>. Periksa kolom <em>Status</em> pada
+    baris pembayaran tersebut.
+  </p>
+</div>
+
+<h2 id="sec-masalah-rebate">8.10 Masalah Rebate</h2>
+
+<table>
+  <thead><tr><th style="width:46%">Pesan yang muncul</th><th>Arti &amp; tindakan</th></tr></thead>
+  <tbody>
+    <tr>
+      <td><em>Invoice harus lunas sebelum rebate dapat diajukan.</em></td>
+      <td>Selesaikan pembayaran invoice tersebut sampai lunas, baru ajukan rebate.</td>
+    </tr>
+    <tr>
+      <td><em>Nilai invoice di bawah minimum aturan rebate.</em></td>
+      <td>Nilai tagihan belum memenuhi minimum yang disyaratkan aturan. Pilih aturan lain, atau ajukan setelah ada tagihan berikutnya.</td>
+    </tr>
+    <tr>
+      <td><em>Rebate untuk invoice dan aturan ini sudah pernah diajukan.</em></td>
+      <td>Pengajuan ganda ditolak. Periksa daftar rebate untuk invoice tersebut.</td>
+    </tr>
+    <tr>
+      <td><em>Rebate ini tidak dapat disetujui pada status saat ini.</em></td>
+      <td>Rebate sudah disetujui, ditolak, atau dibayarkan. Lihat kolom Status.</td>
+    </tr>
+    <tr>
+      <td><em>Hanya rebate yang disetujui yang dapat dibayarkan.</em></td>
+      <td>Setujui rebate lebih dulu, baru bayarkan.</td>
+    </tr>
+    <tr>
+      <td><em>Rebate yang sudah dibayarkan tidak dapat ditolak.</em></td>
+      <td>Sudah selesai. Tidak ada langkah lanjutan.</td>
+    </tr>
+  </tbody>
+</table>
+
+<h2 id="sec-masalah-hapus">8.11 Data Tidak Bisa Dihapus</h2>
+
+<table>
+  <thead><tr><th style="width:46%">Pesan yang muncul</th><th>Arti &amp; tindakan</th></tr></thead>
+  <tbody>
+    <tr>
+      <td><em>&lt;Nama data&gt; tidak dapat dihapus karena masih dipakai pada transaksi lain.</em></td>
+      <td>Data ini terpakai pada pesanan, penerimaan, atau dokumen lain. Pindahkan atau hapus dulu data yang menggunakannya.</td>
+    </tr>
+    <tr>
+      <td><em>Tidak dapat menghapus akun sendiri.</em></td>
+      <td>Ini pengaman agar sistem tidak kehilangan administrator terakhirnya. Minta administrator lain untuk menghapusnya.</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>
+  Ketika penghapusan ditolak karena data masih terpakai, aplikasi menampilkan
+  pesan merah di bagian atas halaman dan data <strong>tidak</strong> terhapus.
+</p>
+
+<figure class="fig" id="fig-trouble-delete">
+  <img src="../screens/57-master-delete-error.png" alt="Pesan penolakan penghapusan data">
+  <figcaption>
+    Contoh penolakan penghapusan: penerbit yang masih memiliki buku tidak dapat
+    dihapus, disertai penjelasan sebabnya.
+  </figcaption>
+</figure>
+
+<h2 id="sec-masalah-jaringan">8.12 Halaman Lambat atau Tidak Merespons</h2>
+
+<ol class="langkah">
+  <li>Periksa koneksi jaringan Anda terlebih dahulu — buka situs lain di tab baru.</li>
+  <li>Muat ulang halaman sekali dengan <kbd>Ctrl</kbd>+<kbd>F5</kbd>.</li>
+  <li>Bila yang macet adalah proses penyimpanan, <strong>jangan menekan tombol berulang kali</strong>. Tunggu, lalu periksa daftar terkait untuk melihat apakah data sudah tersimpan.</li>
+  <li>Bila aplikasi benar-benar tidak dapat diakses, hubungi administrator.</li>
+</ol>
+
+<div class="kotak peringatan">
+  <span class="judul-kotak">Menekan tombol berulang kali bisa menggandakan data</span>
+  <p>
+    Beberapa proses memang dilindungi dari pengulangan (misalnya konfirmasi
+    penerimaan dan konfirmasi pengiriman akan menolak yang kedua). Namun
+    pembuatan data baru <em>tidak</em> selalu terlindungi. Lebih baik menunggu
+    dan memeriksa daripada mengklik berkali-kali.
+  </p>
+</div>
+
+<h2 id="sec-kapan-hubungi-admin">8.13 Kapan Menghubungi Administrator</h2>
+
+<p>Hubungi administrator bila salah satu hal berikut terjadi:</p>
+
+<ul class="tugas">
+  <li>Anda lupa kata sandi, atau kata sandi perlu diganti.</li>
+  <li>Akun Anda perlu dibuatkan, atau perannya perlu diubah.</li>
+  <li>Sebuah menu yang seharusnya ada tidak muncul.</li>
+  <li>Halaman tampak polos tanpa warna setelah dimuat ulang paksa.</li>
+  <li>Sebuah angka tidak dapat dijelaskan meski sudah diperiksa di Audit Log.</li>
+  <li>Muncul pesan yang tidak ada dalam daftar di bab ini.</li>
+</ul>
+
+<p>
+  Saat melapor, sebutkan: <strong>halaman apa</strong> yang Anda buka,
+  <strong>apa yang Anda lakukan</strong>, <strong>pesan apa</strong> yang muncul,
+  dan <strong>kapan</strong> kejadiannya. Empat informasi itu memangkas waktu
+  penelusuran secara drastis.
+</p>

@@ -1,0 +1,187 @@
+<section class="bagian-pembuka" id="bagian-1">
+  <p class="label-bagian">Bagian I</p>
+  <h1 class="judul-bagian" style="border:none;padding:0">Kenal Aplikasi</h1>
+  <div class="aturan"></div>
+  <p class="deskripsi">
+    Sebelum menyentuh tombol apa pun, mari kita pahami dulu apa itu ARKARA PM,
+    masalah apa yang dijawabnya, siapa saja yang memakainya, dan bagaimana
+    bagian-bagiannya saling terhubung.
+  </p>
+</section>
+
+<h1 id="bab-kenal">Bab 1. Apa Itu ARKARA PM?</h1>
+
+<p>
+  <strong>ARKARA PM</strong> adalah singkatan dari <em>Aplikasi Rekapitulasi,
+  Kendali, dan Analisis Rekening dan Administrasi — Prana Media</em>. Secara
+  sederhana: ini adalah satu tempat untuk mengurus seluruh pekerjaan penjualan
+  buku sekolah, mulai dari data sekolah dan buku, penerimaan barang di gudang,
+  pesanan dari sekolah, pengiriman, penagihan, sampai laporan keuangan.
+</p>
+
+<p>
+  Slogan aplikasi ini, <strong>&ldquo;Kelola Lebih Mudah, Pantau Lebih
+  Akurat&rdquo;</strong>, merangkum dua hal yang ingin dicapai:
+  pekerjaan administrasi menjadi lebih ringkas, dan angka yang dilaporkan
+  dapat dipertanggungjawabkan karena setiap perubahan tercatat.
+</p>
+
+<h2 id="sec-masalah">1.1 Masalah yang Dijawab Aplikasi Ini</h2>
+
+<p>
+  Penjualan buku sekolah punya ciri khas: jumlah sekolahnya banyak, judul
+  bukunya ribuan, harga bisa berbeda per wilayah, dan pembayarannya sering
+  mengangsur. Bila dikerjakan dengan buku besar kertas dan lembar kerja
+  terpisah, muncul beberapa kesulitan yang berulang:
+</p>
+
+<ul class="tugas">
+  <li><strong>Stok tidak sinkron.</strong> Barang yang sudah dijanjikan ke satu sekolah bisa ikut terjanji ke sekolah lain, karena catatan stok terpisah dari catatan pesanan.</li>
+  <li><strong>Pesanan tertinggal.</strong> Tidak ada cara cepat melihat pesanan mana yang belum diproses, belum dikirim, atau belum ditagih.</li>
+  <li><strong>Piutang tidak terpantau.</strong> Sulit mengetahui sekolah mana yang tagihannya sudah lewat jatuh tempo.</li>
+  <li><strong>Perhitungan pajak keliru.</strong> Setiap invoice harus menghitung dasar pengenaan pajak dan potongan secara konsisten.</li>
+  <li><strong>Riwayat hilang.</strong> Ketika sebuah angka berubah, tidak ada catatan siapa yang mengubah dan kapan.</li>
+</ul>
+
+<p>ARKARA PM menjawab kelima hal itu dengan cara berikut:</p>
+
+<table>
+  <thead>
+    <tr><th style="width:38%">Masalah</th><th>Cara aplikasi menjawab</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>Stok tidak sinkron</td><td>Stok punya dua angka: <strong>fisik</strong> (barang nyata di gudang) dan <strong>reservasi</strong> (sudah dijanjikan ke pesanan). Yang tersedia untuk dijual adalah selisihnya.</td></tr>
+    <tr><td>Pesanan tertinggal</td><td>Setiap pesanan punya status yang bergerak otomatis, dan menu Pesanan dapat disaring per status maupun per sumber.</td></tr>
+    <tr><td>Piutang tidak terpantau</td><td>Menu <strong>Piutang</strong> mengelompokkan tagihan yang belum dibayar, sebagian dibayar, dan yang sudah jatuh tempo.</td></tr>
+    <tr><td>Perhitungan pajak</td><td>Pajak dihitung otomatis oleh satu komponen terpusat, dengan tarif yang dapat diatur pada Profil Perusahaan. Buku tidak dikenai PPN; barang lainnya dikenai PPN dan pajak barang lainnya.</td></tr>
+    <tr><td>Riwayat hilang</td><td>Setiap tindakan penting dicatat pada <strong>Audit Log</strong> lengkap dengan pengguna, waktu, dan alamat IP.</td></tr>
+  </tbody>
+</table>
+
+<h2 id="sec-pengguna">1.2 Siapa Saja yang Memakai Aplikasi Ini</h2>
+
+<p>
+  Aplikasi mengenal enam peran (<em>role</em>). Setiap orang yang masuk ke
+  aplikasi memegang tepat satu peran, dan peran itulah yang menentukan menu apa
+  yang terlihat serta tombol apa yang boleh ditekan.
+</p>
+
+<table>
+  <thead>
+    <tr><th style="width:22%">Peran</th><th style="width:26%">Tugas utama</th><th>Ringkasan kewenangan</th></tr>
+  </thead>
+  <tbody>
+    <tr><td><strong>Admin</strong></td><td>Mengurus sistem secara keseluruhan</td><td>Akses penuh ke seluruh modul, termasuk pengguna, peran, dan konfigurasi.</td></tr>
+    <tr><td><strong>Operator Pesanan</strong></td><td>Menginput dan memvalidasi pesanan</td><td>Membuat, mengubah, dan mengonfirmasi pesanan; melihat stok dan laporan.</td></tr>
+    <tr><td><strong>Gudang</strong></td><td>Mengurus barang fisik</td><td>Penerimaan barang, penyesuaian stok, picking, packing, dan pengiriman.</td></tr>
+    <tr><td><strong>Keuangan</strong></td><td>Mengurus tagihan dan uang masuk</td><td>Invoice, pembayaran, piutang, dan persetujuan/pembayaran rebate.</td></tr>
+    <tr><td><strong>Sales / PIC</strong></td><td>Menangani sekolah yang ditugaskan</td><td>Melihat sekolah dan transaksinya, membuat pesanan, mengajukan rebate.</td></tr>
+    <tr><td><strong>Pimpinan</strong></td><td>Memantau dan menyetujui</td><td>Dashboard manajemen, laporan, audit log, serta menyetujui rebate.</td></tr>
+  </tbody>
+</table>
+
+<p>
+  Pembahasan rinci setiap peran — termasuk daftar izinnya satu per satu — ada di
+  <a href="#bagian-3">Bagian III</a>.
+</p>
+
+<h2 id="sec-hubungan-modul">1.3 Bagaimana Modul Saling Terhubung</h2>
+
+<p>
+  Modul-modul ARKARA PM bukan kumpulan layar yang berdiri sendiri. Mereka
+  membentuk satu rantai kerja yang mengalir dari kiri ke kanan seperti berikut.
+</p>
+
+<div class="kotak catatan">
+  <span class="judul-kotak">Rantai kerja utama</span>
+  <p style="text-align:left" class="mono">
+    Data sekolah &amp; buku → Penerimaan barang → Stok siap →
+    <strong>Pesanan</strong> (dikonfirmasi) → <strong>Picking</strong> →
+    <strong>Packing</strong> → <strong>Pengiriman</strong> →
+    <strong>Invoice</strong> → <strong>Pembayaran</strong> →
+    <strong>Rebate</strong> → Laporan &amp; Audit Log
+  </p>
+</div>
+
+<p>Setiap mata rantai menyerahkan sesuatu kepada mata rantai berikutnya:</p>
+
+<ol>
+  <li><strong>Data sekolah dan buku</strong> menyediakan pilihan pada saat pesanan dibuat. Harga jual dapat berbeda menurut <em>zona</em> sekolah.</li>
+  <li><strong>Penerimaan barang</strong> menambah stok fisik. Setelah dikonfirmasi, stok ini siap dipakai memenuhi pesanan.</li>
+  <li><strong>Konfirmasi pesanan</strong> memesan (mereservasi) stok yang tersedia. Bila stok kurang, kekurangannya dicatat sebagai <em>back order</em> — pesanan tetap berjalan dan sisanya menyusul.</li>
+  <li><strong>Picking dan packing</strong> mengambil barang yang sudah direservasi dan menyiapkannya untuk dikirim.</li>
+  <li><strong>Pengiriman</strong> mengurangi stok fisik dan menandai pesanan sebagai terkirim. Wajib disertai foto bukti.</li>
+  <li><strong>Invoice</strong> menagih jumlah yang benar-benar dikirim, dengan pajak yang dihitung otomatis.</li>
+  <li><strong>Pembayaran</strong> menutup invoice. Pembayaran harus diverifikasi lebih dulu sebelum dianggap sah.</li>
+  <li><strong>Rebate</strong> mengembalikan sebagian nilai kepada sekolah sesuai aturan yang berlaku.</li>
+</ol>
+
+<figure class="fig" id="fig-dashboard-admin">
+  <img src="../screens/20-dashboard-admin.png" alt="Dashboard admin ARKARA PM">
+  <figcaption>
+    Dashboard admin. Satu layar ini merangkum pesanan terbaru, barang yang perlu
+    ditangani, dan piutang yang mendekati jatuh tempo — cermin dari rantai kerja
+    di atas.
+  </figcaption>
+</figure>
+
+<h2 id="sec-istilah">1.4 Istilah Dasar</h2>
+
+<p>
+  Aplikasi ini memakai beberapa istilah yang akan sering muncul. Pahami dulu
+  di sini, karena bab-bab selanjutnya akan menganggap Anda sudah mengenalnya.
+</p>
+
+<table>
+  <thead>
+    <tr><th style="width:26%">Istilah</th><th>Arti sederhana</th></tr>
+  </thead>
+  <tbody>
+    <tr><td><strong>SKU / Kode barang</strong></td><td>Kode unik sebuah barang, misalnya <code>1545170220</code>. Dipakai agar barang tidak tertukar.</td></tr>
+    <tr><td><strong>Zona harga</strong></td><td>Pengelompokan wilayah yang menentukan harga jual sebuah buku untuk sekolah di wilayah itu.</td></tr>
+    <tr><td><strong>Reservasi</strong></td><td>Jumlah barang yang sudah &ldquo;dipesan&rdquo; untuk sebuah pesanan, tetapi belum keluar dari gudang.</td></tr>
+    <tr><td><strong>Back order</strong></td><td>Sisa pesanan yang belum bisa dipenuhi karena stok kurang. Dicatat agar tidak terlupakan.</td></tr>
+    <tr><td><strong>Picking</strong></td><td>Kegiatan mengambil barang dari rak sesuai daftar.</td></tr>
+    <tr><td><strong>Packing</strong></td><td>Kegiatan mengemas barang yang sudah diambil agar siap kirim.</td></tr>
+    <tr><td><strong>Surat jalan</strong></td><td>Dokumen yang menemani barang saat dikirim.</td></tr>
+    <tr><td><strong>Invoice</strong></td><td>Tagihan resmi kepada sekolah atas barang yang dikirim.</td></tr>
+    <tr><td><strong>Piutang</strong></td><td>Uang yang masih harus dibayar sekolah kepada kita.</td></tr>
+    <tr><td><strong>Hutang</strong></td><td>Pada aplikasi ini diartikan sebagai invoice yang <em>sudah dibayar</em> tetapi barangnya belum dikirim.</td></tr>
+    <tr><td><strong>Rebate / cashback</strong></td><td>Pengembalian sebagian nilai transaksi kepada sekolah.</td></tr>
+    <tr><td><strong>Jatuh tempo</strong></td><td>Tanggal terakhir invoice seharusnya dibayar.</td></tr>
+    <tr><td><strong>DPP</strong></td><td>Dasar Pengenaan Pajak — nilai yang menjadi dasar perhitungan pajak.</td></tr>
+    <tr><td><strong>PPN / PPh</strong></td><td>Pajak Pertambahan Nilai (ditambahkan) dan Pajak Penghasilan (dipotong).</td></tr>
+  </tbody>
+</table>
+
+<div class="kotak penting">
+  <span class="judul-kotak">Penting: dua arti kata &ldquo;hutang&rdquo;</span>
+  <p>
+    Di dunia akuntansi umum, <em>hutang</em> berarti kewajiban kita membayar
+    pihak lain. Di aplikasi ini, menu
+    <strong>Barang Belum Dikirim</strong> (<code>/finance/hutang</code>)
+    memakai kata <em>hutang</em> untuk hal yang berbeda: invoice yang
+    <strong>sudah dibayar sekolah</strong> tetapi <strong>barangnya belum
+    dikirim</strong> — jadi ini kewajiban kita, bukan kewajiban sekolah. Jangan
+    tertukar dengan menu <strong>Piutang</strong>.
+  </p>
+</div>
+
+<h2 id="sec-fitur">1.5 Peta Fitur dalam Satu Tabel</h2>
+
+<table>
+  <thead>
+    <tr><th style="width:30%">Kelompok</th><th>Isi</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>Dashboard</td><td>Enam tampilan berbeda, satu untuk tiap peran.</td></tr>
+    <tr><td>Master Data (13 layar)</td><td>Sekolah, Penerbit, Buku, Barang Lainnya, Kategori Buku, Gudang, Sumber Pesanan, Kurir, Metode Kirim, Metode Bayar, Aturan Rebate, Pinjaman Tunai, Konfigurasi.</td></tr>
+    <tr><td>Pesanan</td><td>Nota pesanan, pembuatan pesanan, konfirmasi, pembatalan, nota cetak.</td></tr>
+    <tr><td>Stok &amp; Gudang</td><td>Stok barang, penerimaan barang, mutasi stok.</td></tr>
+    <tr><td>Picking &amp; Packing</td><td>Daftar picking, pencatatan hasil picking, penyelesaian packing.</td></tr>
+    <tr><td>Pengiriman</td><td>Pembuatan pengiriman, konfirmasi dengan bukti foto, surat jalan.</td></tr>
+    <tr><td>Keuangan</td><td>Invoice, piutang, barang belum dikirim, pembayaran, rebate.</td></tr>
+    <tr><td>Laporan</td><td>Sembilan jenis laporan dengan ekspor CSV.</td></tr>
+    <tr><td>Pengaturan</td><td>Profil perusahaan, pengguna, peran &amp; izin, integrasi &amp; impor, audit log.</td></tr>
+  </tbody>
+</table>

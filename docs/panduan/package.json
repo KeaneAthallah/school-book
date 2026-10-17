@@ -1,0 +1,17 @@
+{
+  "name": "arkara-pm-panduan",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Buku Panduan ARKARA PM — sumber HTML kanonik, skrip render PDF, dan perkakas QA.",
+  "scripts": {
+    "capture": "node scripts/capture.mjs",
+    "render": "node build/render.mjs",
+    "qa:images": "python scripts/qa_images.py",
+    "qa:pdf": "python scripts/qa_pdf.py"
+  },
+  "dependencies": {
+    "pagedjs": "0.4.3"
+  },
+  "comment": "playwright-core dipakai dari node_modules aplikasi utama (versi 1.64.1) agar tidak ada unduhan peramban tambahan."
+}

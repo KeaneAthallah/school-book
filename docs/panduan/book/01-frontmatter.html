@@ -1,0 +1,293 @@
+<section class="bagian-awal" style="break-before:page">
+  <h1 id="kata-pengantar">Kata Pengantar</h1>
+
+  <p>
+    Penjualan buku sekolah adalah pekerjaan yang tampak sederhana di permukaan,
+    tetapi menyimpan banyak urusan di belakangnya: ribuan judul buku, ratusan
+    sekolah, harga yang berbeda per wilayah, barang yang harus dihitung di gudang,
+    tagihan yang harus dihitung pajaknya, dan pembayaran yang sering mengangsur.
+  </p>
+
+  <p>
+    <strong>ARKARA PM</strong> dibangun untuk merapikan semua itu dalam satu
+    tempat. Aplikasi ini mengikuti satu rantai kerja yang jelas: penerimaan
+    barang menambah stok, pesanan memesan stok itu, picking dan packing
+    menyiapkannya, pengiriman mengeluarkannya, invoice menagihnya, dan
+    pembayaran menutupnya. Setiap langkah tercatat, sehingga angka yang
+    dilaporkan dapat dipertanggungjawabkan.
+  </p>
+
+  <p>
+    Buku ini disusun untuk Anda yang akan memakai aplikasi ini sehari-hari —
+    bukan untuk programmer. Karena itu, penjelasannya memakai bahasa sehari-hari,
+    dan setiap istilah teknis dijelaskan pada saat pertama kali muncul.
+  </p>
+
+  <p>
+    Satu hal yang perlu ditegaskan sejak awal: <strong>seluruh gambar dalam buku
+    ini diambil dari aplikasi yang benar-benar berjalan</strong>, memakai data
+    contoh yang sengaja dimuat untuk latihan. Tidak ada satu pun tangkapan layar
+    yang merupakan gambar ilustrasi buatan. Bila Anda melihat sesuatu di dalam
+    buku dan hal yang sama muncul di layar Anda, itu memang sama.
+  </p>
+
+  <p style="margin-top:8mm">
+    Selamat bekerja. Semoga aplikasi ini membuat pekerjaan Anda lebih ringan,
+    dan angka yang Anda laporkan lebih dapat dipercaya.
+  </p>
+</section>
+
+<section class="bagian-awal">
+  <h1 id="tentang-buku">Tentang Buku Ini</h1>
+
+  <h2>Untuk siapa buku ini ditulis</h2>
+
+  <p>Buku ini ditujukan untuk empat kelompok pembaca:</p>
+
+  <ul class="tugas">
+    <li><strong>Pengguna baru</strong> yang baru pertama kali membuka ARKARA PM dan perlu tahu harus mulai dari mana.</li>
+    <li><strong>Pengguna harian</strong> yang perlu mencari cara melakukan satu pekerjaan tertentu dengan cepat.</li>
+    <li><strong>Pelatih internal</strong> yang akan mengajari orang lain memakai aplikasi ini.</li>
+    <li><strong>Administrator</strong> yang perlu memahami hak akses, konfigurasi, dan jejak audit.</li>
+  </ul>
+
+  <h2>Bagaimana buku ini disusun</h2>
+
+  <p>
+    Buku ini bergerak dari yang umum ke yang khusus. Bagian awal menjelaskan
+    konsep dan cara masuk; bagian tengah adalah referensi layar demi layar;
+    bagian akhir berisi alur kerja lengkap, laporan, dan pemecahan masalah.
+  </p>
+
+  <table>
+    <thead><tr><th style="width:26%">Bagian</th><th>Isi</th></tr></thead>
+    <tbody>
+      <tr><td>Bagian I</td><td>Mengenal aplikasi, masalah yang dijawabnya, dan istilah dasarnya.</td></tr>
+      <tr><td>Bagian II</td><td>Langkah pertama: masuk, mengenali tata letak layar, dan keluar.</td></tr>
+      <tr><td>Bagian III</td><td>Enam peran pengguna dan apa yang boleh dilakukan masing-masing.</td></tr>
+      <tr><td>Bagian IV</td><td>Panduan setiap modul, layar demi layar.</td></tr>
+      <tr><td>Bagian V</td><td>Satu contoh dikerjakan dari awal sampai akhir.</td></tr>
+      <tr><td>Bagian VI</td><td>Sembilan laporan yang tersedia.</td></tr>
+      <tr><td>Bagian VII</td><td>Pemecahan masalah berdasarkan pesan yang benar-benar muncul.</td></tr>
+      <tr><td>Bagian VIII</td><td>Keamanan dan kebiasaan kerja yang baik.</td></tr>
+      <tr><td>Lampiran</td><td>Glosarium, referensi cepat, daftar izin, dan keterbatasan dokumen.</td></tr>
+    </tbody>
+  </table>
+
+  <h2>Cara membaca buku ini</h2>
+
+  <p>Anda tidak perlu membacanya dari depan ke belakang. Pilih cara yang sesuai kebutuhan Anda:</p>
+
+  <ul>
+    <li><strong>Baru pertama kali?</strong> Baca Bagian I dan II secara berurutan, lalu kerjakan contoh di Bagian V.</li>
+    <li><strong>Ingin melakukan sesuatu sekarang?</strong> Cari langsung di Daftar Isi, lalu buka modul yang dituju di Bagian IV.</li>
+    <li><strong>Sedang menghadapi masalah?</strong> Buka Bagian VII dan cari pesan kesalahan yang muncul.</li>
+  </ul>
+
+  <h2>Konvensi yang dipakai</h2>
+
+  <table>
+    <thead><tr><th style="width:32%">Penanda</th><th>Arti</th></tr></thead>
+    <tbody>
+      <tr><td><span class="mono">Teks seperti ini</span></td><td>Nama menu, tombol, atau kolom yang harus Anda cari di layar.</td></tr>
+      <tr><td><kbd>Teks seperti ini</kbd></td><td>Tombol pada papan ketik yang harus ditekan.</td></tr>
+      <tr><td><code>/dashboard</code></td><td>Alamat halaman di dalam aplikasi.</td></tr>
+      <tr><td>Kotak biru <em>(Catatan)</em></td><td>Penjelasan tambahan yang membantu pemahaman.</td></tr>
+      <tr><td>Kotak hijau <em>(Tips)</em></td><td>Saran praktis untuk bekerja lebih cepat.</td></tr>
+      <tr><td>Kotak kuning <em>(Penting)</em></td><td>Hal yang mudah disalahpahami dan perlu diperhatikan.</td></tr>
+      <tr><td>Kotak merah <em>(Peringatan)</em></td><td>Hal yang dapat menimbulkan masalah bila diabaikan.</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<section class="bagian-awal">
+  <h1 id="cara-menggunakan">Cara Menggunakan Buku Ini</h1>
+
+  <h2>Mengenal unsur-unsur layar</h2>
+
+  <p>
+    Sepanjang buku ini, beberapa istilah dipakai berulang untuk menunjuk bagian
+    layar tertentu. Agar tidak membingungkan, berikut artinya.
+  </p>
+
+  <table>
+    <thead><tr><th style="width:28%">Istilah</th><th>Yang dimaksud</th></tr></thead>
+    <tbody>
+      <tr><td><strong>Sidebar</strong></td><td>Kolom menu di sisi kiri layar.</td></tr>
+      <tr><td><strong>Bilah atas</strong></td><td>Baris di bagian paling atas berisi judul halaman dan alat bantu.</td></tr>
+      <tr><td><strong>Bilah judul halaman</strong></td><td>Bagian atas isi halaman, memuat nama halaman dan tombol aksi utama.</td></tr>
+      <tr><td><strong>Kartu</strong></td><td>Kotak putih berisi satu kelompok informasi.</td></tr>
+      <tr><td><strong>Tabel</strong></td><td>Daftar data dalam bentuk baris dan kolom.</td></tr>
+      <tr><td><strong>Modal</strong></td><td>Jendela kecil yang muncul di tengah layar untuk mengisi data atau meminta penegasan.</td></tr>
+      <tr><td><strong>Penyaring</strong></td><td>Kolom di atas tabel untuk mempersempit data yang ditampilkan.</td></tr>
+      <tr><td><strong>Lencana status</strong></td><td>Label berwarna yang menunjukkan keadaan sebuah data.</td></tr>
+      <tr><td><strong>Pesan kilat</strong></td><td>Pesan hijau (berhasil) atau merah (gagal) yang muncul di atas isi halaman setelah suatu tindakan.</td></tr>
+    </tbody>
+  </table>
+
+  <h2>Dasar papan ketik dan tetikus</h2>
+
+  <table>
+    <thead><tr><th style="width:34%">Tindakan</th><th>Cara</th></tr></thead>
+    <tbody>
+      <tr><td>Menekan tombol</td><td>Arahkan penunjuk ke tombol, lalu klik satu kali dengan tombol kiri tetikus.</td></tr>
+      <tr><td>Mengisi kolom teks</td><td>Klik kolomnya, lalu ketik.</td></tr>
+      <tr><td>Memilih dari daftar</td><td>Klik daftarnya, lalu pilih salah satu baris.</td></tr>
+      <tr><td>Mencentang kotak</td><td>Klik kotak kecilnya hingga muncul tanda centang.</td></tr>
+      <tr><td>Menggulir halaman</td><td>Putar roda di tengah tetikus, atau gunakan tombol <kbd>PgUp</kbd>/<kbd>PgDn</kbd>.</td></tr>
+      <tr><td>Mencari di dalam halaman</td><td>Tekan <kbd>Ctrl</kbd>+<kbd>F</kbd>.</td></tr>
+    </tbody>
+  </table>
+
+  <h2>Membaca tangkapan layar</h2>
+
+  <p>
+    Setiap gambar diberi nomor dan keterangan di bawahnya. Karena data yang
+    dipakai adalah data contoh, angka pada gambar tidak akan sama dengan angka
+    pada sistem Anda — itu wajar. Yang perlu Anda perhatikan adalah
+    <strong>tata letak dan nama tombolnya</strong>, karena itulah yang sama.
+  </p>
+
+  <p class="catatan-kecil">
+    Bila sebuah gambar tampak lebih kecil daripada tulisan di sekitarnya,
+    perbesar tampilan dengan menekan <kbd>Ctrl</kbd> dan <kbd>+</kbd> pada
+    pembaca PDF Anda.
+  </p>
+</section>
+
+<section class="bagian-awal">
+  <h1 id="daftar-isi">Daftar Isi</h1>
+
+  <nav class="toc">
+    <ul>
+      <li class="lvl1"><a href="#kata-pengantar">Kata Pengantar</a></li>
+      <li class="lvl1"><a href="#tentang-buku">Tentang Buku Ini</a></li>
+      <li class="lvl1"><a href="#cara-menggunakan">Cara Menggunakan Buku Ini</a></li>
+
+      <li class="lvl1"><a href="#bagian-1">Bagian I — Kenal Aplikasi</a></li>
+      <li class="lvl2"><a href="#bab-kenal">Bab 1. Apa Itu ARKARA PM?</a></li>
+      <li class="lvl3"><a href="#sec-masalah">1.1 Masalah yang Dijawab Aplikasi Ini</a></li>
+      <li class="lvl3"><a href="#sec-pengguna">1.2 Siapa Saja yang Memakai Aplikasi Ini</a></li>
+      <li class="lvl3"><a href="#sec-hubungan-modul">1.3 Bagaimana Modul Saling Terhubung</a></li>
+      <li class="lvl3"><a href="#sec-istilah">1.4 Istilah Dasar</a></li>
+      <li class="lvl3"><a href="#sec-fitur">1.5 Peta Fitur dalam Satu Tabel</a></li>
+
+      <li class="lvl1"><a href="#bagian-2">Bagian II — Memulai</a></li>
+      <li class="lvl2"><a href="#bab-memulai">Bab 2. Langkah Pertama Anda</a></li>
+      <li class="lvl3"><a href="#sec-buka-aplikasi">2.1 Membuka Aplikasi di Peramban</a></li>
+      <li class="lvl3"><a href="#sec-anatomi-login">2.2 Anatomi Halaman Masuk</a></li>
+      <li class="lvl3"><a href="#sec-langkah-masuk">2.3 Masuk ke Aplikasi</a></li>
+      <li class="lvl3"><a href="#sec-gagal-masuk">2.4 Bila Gagal Masuk</a></li>
+      <li class="lvl3"><a href="#sec-dashboard">2.5 Mengenal Dashboard</a></li>
+      <li class="lvl3"><a href="#sec-navigasi">2.6 Menelusuri Menu di Sidebar</a></li>
+      <li class="lvl3"><a href="#sec-bilah-atas">2.7 Bilah Atas dan Alat Bantunya</a></li>
+      <li class="lvl3"><a href="#sec-keluar">2.8 Keluar dengan Aman</a></li>
+      <li class="lvl3"><a href="#sec-ganti-sandi">2.9 Mengganti Kata Sandi</a></li>
+
+      <li class="lvl1"><a href="#bagian-3">Bagian III — Peran &amp; Izin</a></li>
+      <li class="lvl2"><a href="#bab-peran">Bab 3. Enam Peran Pengguna</a></li>
+      <li class="lvl3"><a href="#sec-cara-kerja-izin">3.1 Bagaimana Izin Bekerja</a></li>
+      <li class="lvl3"><a href="#sec-peran-admin">3.2 Admin</a></li>
+      <li class="lvl3"><a href="#sec-peran-operator">3.3 Operator Pesanan</a></li>
+      <li class="lvl3"><a href="#sec-peran-gudang">3.4 Gudang</a></li>
+      <li class="lvl3"><a href="#sec-peran-keuangan">3.5 Keuangan</a></li>
+      <li class="lvl3"><a href="#sec-peran-sales">3.6 Sales / PIC</a></li>
+      <li class="lvl3"><a href="#sec-peran-pimpinan">3.7 Pimpinan</a></li>
+      <li class="lvl3"><a href="#sec-matriks-izin">3.8 Matriks Izin Ringkas</a></li>
+
+      <li class="lvl1"><a href="#bagian-4">Bagian IV — Panduan Modul</a></li>
+      <li class="lvl2"><a href="#bab-modul-master">Bab 4. Dashboard dan Data Induk</a></li>
+      <li class="lvl3"><a href="#sec-modul-dashboard">4.1 Dashboard</a></li>
+      <li class="lvl3"><a href="#sec-modul-sekolah">4.2 Sekolah</a></li>
+      <li class="lvl3"><a href="#sec-modul-penerbit">4.3 Penerbit</a></li>
+      <li class="lvl3"><a href="#sec-modul-kategori">4.4 Kategori Buku</a></li>
+      <li class="lvl3"><a href="#sec-modul-buku">4.5 Buku</a></li>
+      <li class="lvl3"><a href="#sec-modul-barang">4.6 Barang Lainnya</a></li>
+      <li class="lvl3"><a href="#sec-modul-gudang">4.7 Gudang</a></li>
+      <li class="lvl3"><a href="#sec-modul-sumber">4.8 Sumber Pesanan</a></li>
+      <li class="lvl3"><a href="#sec-modul-kurir">4.9 Kurir dan Metode Kirim</a></li>
+      <li class="lvl3"><a href="#sec-modul-bayar">4.10 Metode Pembayaran</a></li>
+      <li class="lvl3"><a href="#sec-modul-rebate-rule">4.11 Aturan Rebate</a></li>
+      <li class="lvl3"><a href="#sec-modul-pinjaman">4.12 Pinjaman Tunai</a></li>
+      <li class="lvl3"><a href="#sec-modul-konfigurasi">4.13 Konfigurasi</a></li>
+
+      <li class="lvl2"><a href="#bab-modul-operasional">Bab 5. Transaksi dan Keuangan</a></li>
+      <li class="lvl3"><a href="#sec-modul-pesanan">5.1 Pesanan</a></li>
+      <li class="lvl3"><a href="#sec-modul-penerimaan">5.2 Penerimaan Barang</a></li>
+      <li class="lvl3"><a href="#sec-modul-stok">5.3 Stok dan Mutasi Stok</a></li>
+      <li class="lvl3"><a href="#sec-modul-picking">5.4 Picking dan Packing</a></li>
+      <li class="lvl3"><a href="#sec-modul-pengiriman">5.5 Pengiriman</a></li>
+      <li class="lvl3"><a href="#sec-modul-invoice">5.6 Invoice</a></li>
+      <li class="lvl3"><a href="#sec-modul-piutang">5.7 Piutang dan Barang Belum Dikirim</a></li>
+      <li class="lvl3"><a href="#sec-modul-pembayaran">5.8 Pembayaran</a></li>
+      <li class="lvl3"><a href="#sec-modul-rebate">5.9 Rebate / Cashback</a></li>
+      <li class="lvl3"><a href="#sec-modul-pengaturan">5.10 Pengaturan</a></li>
+      <li class="lvl3"><a href="#sec-modul-integrasi">5.11 Integrasi dan Import</a></li>
+      <li class="lvl3"><a href="#sec-modul-laporan-penunjuk">5.12 Laporan</a></li>
+
+      <li class="lvl1"><a href="#bagian-5">Bagian V — Alur Kerja Lengkap</a></li>
+      <li class="lvl2"><a href="#bab-alur">Bab 6. Dari Barang Datang sampai Uang Masuk</a></li>
+      <li class="lvl3"><a href="#sec-alur-koreksi">6.1 Prosedur Perbaikan Data</a></li>
+
+      <li class="lvl1"><a href="#bagian-6">Bagian VI — Laporan</a></li>
+      <li class="lvl2"><a href="#bab-laporan">Bab 7. Sembilan Laporan</a></li>
+      <li class="lvl3"><a href="#sec-laporan-umum">7.1 Cara Memakai Modul Laporan</a></li>
+      <li class="lvl3"><a href="#sec-laporan-penjualan-sekolah">7.2 Penjualan per Sekolah</a></li>
+      <li class="lvl3"><a href="#sec-laporan-penjualan-penerbit">7.3 Penjualan per Penerbit</a></li>
+      <li class="lvl3"><a href="#sec-laporan-penjualan-barang">7.4 Penjualan per Barang</a></li>
+      <li class="lvl3"><a href="#sec-laporan-ringkasan-pesanan">7.5 Ringkasan Pesanan</a></li>
+      <li class="lvl3"><a href="#sec-laporan-piutang">7.6 Piutang per Sekolah</a></li>
+      <li class="lvl3"><a href="#sec-laporan-jatuh-tempo">7.7 Invoice Jatuh Tempo</a></li>
+      <li class="lvl3"><a href="#sec-laporan-stok">7.8 Stok per Barang</a></li>
+      <li class="lvl3"><a href="#sec-laporan-stok-menipis">7.9 Stok Menipis</a></li>
+      <li class="lvl3"><a href="#sec-laporan-backorder">7.10 Back Order</a></li>
+      <li class="lvl3"><a href="#sec-laporan-ringkas">7.11 Ringkasan Sembilan Laporan</a></li>
+
+      <li class="lvl1"><a href="#bagian-7">Bagian VII — Pemecahan Masalah</a></li>
+      <li class="lvl2"><a href="#bab-masalah">Bab 8. Bila Ada yang Tidak Berjalan</a></li>
+      <li class="lvl3"><a href="#sec-masalah-login">8.1 Tidak Bisa Masuk</a></li>
+      <li class="lvl3"><a href="#sec-masalah-tampilan">8.2 Halaman Tampak Polos Tanpa Warna</a></li>
+      <li class="lvl3"><a href="#sec-masalah-daftar-kosong">8.3 Daftar Kosong Padahal Seharusnya Ada Data</a></li>
+      <li class="lvl3"><a href="#sec-masalah-pesanan">8.4 Pesanan Tidak Bisa Diubah atau Dikonfirmasi</a></li>
+      <li class="lvl3"><a href="#sec-masalah-stok">8.5 Masalah Stok</a></li>
+      <li class="lvl3"><a href="#sec-masalah-picking">8.6 Masalah Picking dan Packing</a></li>
+      <li class="lvl3"><a href="#sec-masalah-pengiriman">8.7 Masalah Pengiriman</a></li>
+      <li class="lvl3"><a href="#sec-masalah-invoice">8.8 Masalah Invoice</a></li>
+      <li class="lvl3"><a href="#sec-masalah-pembayaran">8.9 Masalah Pembayaran</a></li>
+      <li class="lvl3"><a href="#sec-masalah-rebate">8.10 Masalah Rebate</a></li>
+      <li class="lvl3"><a href="#sec-masalah-hapus">8.11 Data Tidak Bisa Dihapus</a></li>
+      <li class="lvl3"><a href="#sec-masalah-jaringan">8.12 Halaman Lambat atau Tidak Merespons</a></li>
+      <li class="lvl3"><a href="#sec-kapan-hubungi-admin">8.13 Kapan Menghubungi Administrator</a></li>
+
+      <li class="lvl1"><a href="#bagian-8">Bagian VIII — Keamanan &amp; Praktik Baik</a></li>
+      <li class="lvl2"><a href="#bab-keamanan">Bab 9. Menjaga Data Tetap Terpercaya</a></li>
+      <li class="lvl3"><a href="#sec-aman-akun">9.1 Akun dan Kata Sandi</a></li>
+      <li class="lvl3"><a href="#sec-aman-peran">9.2 Prinsip Hak Sekecil Mungkin</a></li>
+      <li class="lvl3"><a href="#sec-aman-sesi">9.3 Keluar dan Sesi</a></li>
+      <li class="lvl3"><a href="#sec-aman-audit">9.4 Memanfaatkan Jejak Audit</a></li>
+      <li class="lvl3"><a href="#sec-aman-praktik">9.5 Sepuluh Kebiasaan Baik</a></li>
+      <li class="lvl3"><a href="#sec-aman-larangan">9.6 Yang Tidak Boleh Dilakukan</a></li>
+      <li class="lvl3"><a href="#sec-aman-cadangan">9.7 Cadangan Data</a></li>
+      <li class="lvl3"><a href="#sec-aman-batas">9.8 Batas Tanggung Jawab Buku Ini</a></li>
+
+      <li class="lvl1"><a href="#lampiran">Lampiran</a></li>
+      <li class="lvl2"><a href="#lampiran-a">Lampiran A. Glosarium</a></li>
+      <li class="lvl2"><a href="#lampiran-b">Lampiran B. Referensi Cepat</a></li>
+      <li class="lvl2"><a href="#lampiran-c">Lampiran C. Daftar Izin Lengkap</a></li>
+      <li class="lvl2"><a href="#lampiran-d">Lampiran D. Daftar Modul dan Alamat Halaman</a></li>
+      <li class="lvl2"><a href="#lampiran-e">Lampiran E. Tips Papan Ketik dan Peramban</a></li>
+      <li class="lvl2"><a href="#lampiran-f">Lampiran F. Pemecahan Masalah Ringkas</a></li>
+      <li class="lvl2"><a href="#lampiran-g">Lampiran G. Cakupan dan Keterbatasan Dokumen</a></li>
+      <li class="lvl2"><a href="#lampiran-h">Lampiran H. Riwayat Versi Dokumen</a></li>
+    </ul>
+  </nav>
+</section>
+
+<section class="bagian-awal">
+  <h1 id="daftar-gambar">Daftar Gambar</h1>
+  <p class="catatan-kecil">
+    Nomor gambar mengikuti urutan kemunculannya di dalam buku. Nomor halaman
+    ditampilkan di sebelah kanan.
+  </p>
+  <!--DAFTAR-GAMBAR-->
+</section>
