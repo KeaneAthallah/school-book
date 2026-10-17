@@ -393,7 +393,7 @@
 <li><a href="#fig-publishers-form"><span class="nomor">Gambar 22</span> — Formulir tambah penerbit. Kolom Logo menerima berkas gambar maksimal 5&nbsp;MB.</a></li>
 <li><a href="#fig-categories"><span class="nomor">Gambar 23</span> — Daftar kategori buku. Kategori bersifat opsional pada data buku.</a></li>
 <li><a href="#fig-books"><span class="nomor">Gambar 24</span> — Daftar buku. Pencarian mencakup kode, judul, dan ISBN. Kolom Harga menampilkan harga jual standar.</a></li>
-<li><a href="#fig-books-form"><span class="nomor">Gambar 25</span> — Formulir tambah buku. Kolom Harga Jual di sini adalah harga standar; harga khusus per zona diatur terpisah.</a></li>
+<li><a href="#fig-books-form"><span class="nomor">Gambar 25</span> — Formulir tambah buku. Harga jual diisi per zona — Zona 3, Zona 4, dan Zona 5 — bukan sebagai satu harga tunggal.</a></li>
 <li><a href="#fig-goods"><span class="nomor">Gambar 26</span> — Daftar barang lainnya. Barang di sini mengikuti alur yang sama dengan buku: ikut dipesan, dipicking, dikirim, dan diinvoice.</a></li>
 <li><a href="#fig-goods-form"><span class="nomor">Gambar 27</span> — Formulir tambah barang lainnya.</a></li>
 <li><a href="#fig-warehouses"><span class="nomor">Gambar 28</span> — Daftar gudang. Pada data contoh hanya ada satu gudang, yaitu Gudang Utama .</a></li>
@@ -578,7 +578,7 @@
 <p>Setiap mata rantai menyerahkan sesuatu kepada mata rantai berikutnya:</p>
 
 <ol>
-  <li><strong>Data sekolah dan buku</strong> menyediakan pilihan pada saat pesanan dibuat. Harga jual dapat berbeda menurut <em>zona</em> sekolah.</li>
+  <li><strong>Data sekolah dan buku</strong> menyediakan pilihan pada saat pesanan dibuat. Harga jual buku diisi per <em>zona harga</em> (Zona 3, 4, dan 5) dan zona itu dipilih saat pesanan dibuat.</li>
   <li><strong>Penerimaan barang</strong> menambah stok fisik. Setelah dikonfirmasi, stok ini siap dipakai memenuhi pesanan.</li>
   <li><strong>Konfirmasi pesanan</strong> memesan (mereservasi) stok yang tersedia. Bila stok kurang, kekurangannya dicatat sebagai <em>back order</em> — pesanan tetap berjalan dan sisanya menyusul.</li>
   <li><strong>Picking dan packing</strong> mengambil barang yang sudah direservasi dan menyiapkannya untuk dikirim.</li>
@@ -610,7 +610,7 @@
   </thead>
   <tbody>
     <tr><td><strong>SKU / Kode barang</strong></td><td>Kode unik sebuah barang, misalnya <code>1545170220</code>. Dipakai agar barang tidak tertukar.</td></tr>
-    <tr><td><strong>Zona harga</strong></td><td>Pengelompokan wilayah yang menentukan harga jual sebuah buku untuk sekolah di wilayah itu.</td></tr>
+    <tr><td><strong>Zona harga</strong></td><td>Pengelompokan wilayah dengan harga jual tersendiri. Harga tiap zona diisi pada data buku dan dipilih saat pesanan dibuat.</td></tr>
     <tr><td><strong>Reservasi</strong></td><td>Jumlah barang yang sudah &ldquo;dipesan&rdquo; untuk sebuah pesanan, tetapi belum keluar dari gudang.</td></tr>
     <tr><td><strong>Back order</strong></td><td>Sisa pesanan yang belum bisa dipenuhi karena stok kurang. Dicatat agar tidak terlupakan.</td></tr>
     <tr><td><strong>Picking</strong></td><td>Kegiatan mengambil barang dari rak sesuai daftar.</td></tr>
@@ -1343,7 +1343,7 @@
 <ol class="langkah">
   <li>Klik tombol <strong>Tambah Sekolah</strong>.</li>
   <li>Isi kolom wajib: <strong>Nama Sekolah</strong> dan <strong>Status</strong>.</li>
-  <li>Isi kolom lain bila datanya tersedia. Lengkapi <strong>Zona</strong> bila sekolah ini memiliki harga khusus wilayah.</li>
+  <li>Isi kolom lain bila datanya tersedia — misalnya alamat, kontak, dan Sales/PIC.</li>
   <li>Klik <strong>Simpan</strong>. Bila berhasil, Anda kembali ke daftar dan muncul pesan keberhasilan.</li>
 </ol>
 
@@ -1361,7 +1361,6 @@
     <tr><td>Kontak, Telepon, Email</td><td>Data narahubung sekolah.</td></tr>
     <tr><td>Kepala Sekolah</td><td>Nama kepala sekolah, untuk keperluan dokumen.</td></tr>
     <tr><td>Sales/PIC</td><td>Pilih pengguna yang bertanggung jawab atas sekolah ini.</td></tr>
-    <tr><td>Zona</td><td>Menentukan harga jual buku untuk sekolah ini.</td></tr>
     <tr><td>Status <em>(wajib)</em></td><td>Aktif atau Nonaktif. Sekolah nonaktif tetap tersimpan untuk riwayat.</td></tr>
   </tbody>
 </table>
@@ -1463,7 +1462,8 @@
 <h3>Menambah buku</h3>
 <ol class="langkah">
   <li>Klik <strong>Tambah Buku</strong>.</li>
-  <li>Isi <strong>Kode Buku</strong>, <strong>Judul</strong>, <strong>Penerbit</strong>, <strong>Harga Jual</strong>, dan <strong>Status</strong> — kelimanya wajib.</li>
+  <li>Isi <strong>Kode Buku</strong>, <strong>Judul</strong>, <strong>Penerbit</strong>, dan <strong>Status</strong> — keempatnya wajib.</li>
+  <li>Isi <strong>Harga Jual Zona 3</strong>, <strong>Zona 4</strong>, dan <strong>Zona 5</strong> sesuai wilayah yang dilayani. <strong>Minimal satu</strong> harus diisi.</li>
   <li>Lengkapi ISBN, kategori, kelas, mata pelajaran, klasifikasi, harga pokok, stok minimum, dan lokasi rak bila tersedia.</li>
   <li>Klik <strong>Simpan</strong>.</li>
 </ol>
@@ -1471,8 +1471,8 @@
 <figure class="fig" id="fig-books-form">
   <img src="screens/37-master-books-form.png" alt="Formulir tambah buku">
   <figcaption><span class="fig-num">Gambar 25.</span> 
-    Formulir tambah buku. Kolom <strong>Harga Jual</strong> di sini adalah harga
-    standar; harga khusus per zona diatur terpisah.
+    Formulir tambah buku. Harga jual diisi per zona — Zona 3, Zona 4, dan
+    Zona 5 — bukan sebagai satu harga tunggal.
   </figcaption>
 </figure>
 
@@ -1486,7 +1486,9 @@
     <tr><td>Kategori</td><td>Opsional.</td></tr>
     <tr><td>Kelas, Mata Pelajaran</td><td>Opsional, memudahkan penyaringan.</td></tr>
     <tr><td>Klasifikasi</td><td>Het, Reguler, Depag, Banpem, atau Alcom.</td></tr>
-    <tr><td>Harga Jual <em>(wajib)</em></td><td>Harga standar bila sekolah tidak punya zona khusus.</td></tr>
+    <tr><td>Harga Jual Zona 3</td><td>Harga jual untuk Zona 3. <strong>Minimal satu dari tiga harga zona harus diisi.</strong></td></tr>
+    <tr><td>Harga Jual Zona 4</td><td>Harga jual untuk Zona 4.</td></tr>
+    <tr><td>Harga Jual Zona 5</td><td>Harga jual untuk Zona 5.</td></tr>
     <tr><td>Harga Pokok</td><td>Modal. Tidak muncul pada dokumen pelanggan, tetapi berguna untuk analisis.</td></tr>
     <tr><td>Stok Minimum</td><td>Ambang peringatan stok menipis.</td></tr>
     <tr><td>Lokasi Rak</td><td>Mempermudah petugas gudang menemukan barang.</td></tr>
@@ -1497,39 +1499,39 @@
 <h3 id="sec-harga-zona">Memahami harga per zona</h3>
 
 <p>
-  Satu judul buku bisa memiliki harga berbeda untuk wilayah yang berbeda. Itulah
-  yang disebut <strong>harga zona</strong>. Cara kerjanya sebagai berikut:
+  Harga jual buku berbeda menurut wilayah penjualan. Perbedaan itu diatur
+  sebagai <strong>harga zona</strong>, dan seluruhnya diisi dari formulir Buku.
 </p>
 
 <ol>
-  <li>Setiap sekolah dapat ditautkan ke satu <strong>zona</strong> (kolom <em>Zona</em> pada data sekolah).</li>
-  <li>Sebuah buku dapat memiliki beberapa harga khusus, satu untuk tiap zona.</li>
-  <li>Saat pesanan dibuat untuk sekolah tertentu, aplikasi mengambil harga sebagai berikut:
-    <ul>
-      <li>bila ada harga khusus untuk zona sekolah tersebut, pakai harga itu;</li>
-      <li>bila tidak ada, pakai <strong>harga jual standar</strong> buku.</li>
-    </ul>
-  </li>
+  <li>Setiap buku memiliki hingga tiga harga jual: <strong>Zona 3</strong>, <strong>Zona 4</strong>, dan <strong>Zona 5</strong>.</li>
+  <li>Saat membuat pesanan, pilih <strong>Zona Harga</strong> pada kartu Item Pesanan.</li>
+  <li>Memilih zona mengisi kolom <em>Harga</em> setiap barang dengan harga zona tersebut.</li>
+  <li>Bila harga untuk zona itu belum diisi pada buku, aplikasi memakai harga dasar buku.</li>
 </ol>
 
 <div class="kotak catatan">
   <span class="judul-kotak">Kenapa harga di keranjang bisa berbeda dari katalog</span>
   <p>
-    Bila Anda melihat harga yang tidak sama dengan kolom Harga di daftar Buku,
-    kemungkinan besar itu karena sekolah yang dipilih memiliki zona berharga
-    khusus. Ini bukan kesalahan. Untuk memeriksanya, lihat kolom Zona pada data
-    sekolah tersebut.
+    Kolom <em>Harga</em> pada daftar Buku menampilkan harga dasar, yang mengikuti
+    harga zona pertama yang terisi (umumnya Zona 3). Bila harga di keranjang
+    berbeda, itu karena Anda memilih <strong>Zona Harga</strong> lain pada
+    pesanan. Ini bukan kesalahan.
   </p>
 </div>
 
 <div class="kotak penting">
-  <span class="judul-kotak">Zona tidak punya layar tersendiri</span>
+  <span class="judul-kotak">Zona tidak diatur per sekolah</span>
   <p>
-    Saat buku ini disusun, daftar zona hanya muncul sebagai <em>pilihan</em> pada
-    formulir sekolah dan pemilih <em>Zona Harga</em> pada formulir pesanan.
-    Tidak ada layar untuk menambah atau menyunting nama zona dari dalam
-    aplikasi. Bila Anda perlu menambah zona baru, mintalah bantuan
-    administrator sistem.
+    Zona <strong>tidak</strong> dipilih pada data sekolah. Zona ditentukan per
+    pesanan melalui pemilih <em>Zona Harga</em>, sehingga satu sekolah dapat
+    dilayani dengan harga zona yang berbeda pada pesanan yang berbeda.
+  </p>
+  <p>
+    Daftar zona (Zona 3, 4, dan 5) disediakan oleh administrator sistem; belum
+    ada layar untuk menambah atau mengganti nama zona dari dalam aplikasi. Yang
+    Anda atur dari aplikasi adalah <strong>harga</strong> tiap zona pada
+    masing-masing buku.
   </p>
 </div>
 
@@ -1915,7 +1917,7 @@
   <li>Pilih <strong>Sumber Pesanan</strong>. Kolom ini wajib.</li>
   <li>Isi <strong>Referensi Eksternal</strong> bila pesanan berasal dari sistem luar seperti SIPLah. Referensi yang sama tidak boleh dipakai dua kali untuk sekolah yang sama.</li>
   <li>Bila perlu, isi <strong>Diskon Pesanan</strong> dan <strong>Catatan</strong>.</li>
-  <li>Pada kartu <strong>Item Pesanan</strong>, pilih <strong>Zona Harga</strong> bila sekolah memiliki zona khusus.</li>
+  <li>Pada kartu <strong>Item Pesanan</strong>, pilih <strong>Zona Harga</strong> (Zona 3, 4, atau 5) untuk memakai harga zona tersebut.</li>
   <li>Klik kolom <strong>Cari/pilih barang…</strong> lalu ketik sebagian judul atau kode. Pilih barang dari daftar yang muncul.</li>
   <li>Isi <strong>Qty</strong> dan periksa <strong>Harga</strong>. Harga terisi otomatis dari data barang; sesuaikan hanya bila memang perlu.</li>
   <li>Klik <strong>Tambah Item</strong> untuk menambah baris barang lain.</li>
@@ -1934,7 +1936,7 @@
   <thead><tr><th>Kolom</th><th>Wajib?</th><th>Keterangan</th></tr></thead>
   <tbody>
     <tr><td>Tanggal</td><td>Ya</td><td>Tanggal pesanan. Ikut menentukan nomor dokumen.</td></tr>
-    <tr><td>Sekolah</td><td>Ya</td><td>Menentukan zona harga dan alamat kirim.</td></tr>
+    <tr><td>Sekolah</td><td>Ya</td><td>Menentukan data pelanggan dan alamat kirim.</td></tr>
     <tr><td>Sumber Pesanan</td><td>Ya</td><td>Asal pesanan.</td></tr>
     <tr><td>Referensi Eksternal</td><td>Tidak</td><td>Nomor pesanan dari sistem asal. Harus unik per sekolah.</td></tr>
     <tr><td>Diskon Pesanan</td><td>Tidak</td><td>Potongan atas keseluruhan pesanan.</td></tr>
@@ -3181,7 +3183,7 @@
   <li>Masuk sebagai <strong>Operator Pesanan</strong>.</li>
   <li>Buka <strong>Pesanan &rsaquo; Buat Pesanan</strong>.</li>
   <li>Pilih sekolah <em>TK Pembina Nur Ikhlas</em>, pilih sumber pesanan, dan isi referensi eksternal bila pesanan datang dari SIPLah.</li>
-  <li>Pilih <strong>Zona Harga</strong> bila sekolah itu punya harga khusus, lalu tambahkan barang beserta jumlahnya.</li>
+  <li>Pilih <strong>Zona Harga</strong> (Zona 3, 4, atau 5), lalu tambahkan barang beserta jumlahnya.</li>
   <li>Periksa harga dan subtotal pada ringkasan, lalu klik <strong>Simpan Pesanan</strong>.</li>
   <li>Pada halaman detail yang terbuka, klik <strong>Konfirmasi</strong> dan setujui penegasan.</li>
 </ol>
@@ -4332,7 +4334,7 @@ tercatat pada laporan keuangan.</p>
     <tr><td>SKU / kode barang</td><td>Kode unik sebuah barang.</td></tr>
     <tr><td>Surat jalan</td><td>Dokumen pengantar barang saat pengiriman.</td></tr>
     <tr><td>Tersedia (stok)</td><td>Fisik dikurangi reservasi; jumlah yang masih boleh dijual.</td></tr>
-    <tr><td>Zona harga</td><td>Pengelompokan wilayah yang menentukan harga jual buku bagi sekolah di wilayah itu.</td></tr>
+    <tr><td>Zona harga</td><td>Pengelompokan wilayah dengan harga jual tersendiri. Harga tiap zona diisi pada data Buku dan dipilih pada pesanan.</td></tr>
   </tbody>
 </table>
 
@@ -4479,10 +4481,11 @@ tercatat pada laporan keuangan.</p>
 <div class="kotak penting">
   <span class="judul-kotak">Izin tanpa layar</span>
   <p>
-    Izin <code>zonas.manage</code> terdaftar di sistem, tetapi pada versi yang
-    didokumentasikan buku ini belum ada layar untuk mengelola zona dari dalam
-    aplikasi. Zona hanya muncul sebagai pilihan pada formulir Sekolah dan pada
-    pemilih Zona Harga di formulir pesanan.
+    Izin <code>zonas.manage</code> terdaftar di sistem, tetapi belum ada layar
+    untuk menambah atau mengganti nama zona dari dalam aplikasi. Zona 3, 4, dan 5
+    disediakan oleh administrator sistem; yang diatur dari aplikasi adalah
+    <strong>harga</strong> tiap zona, pada formulir Buku. Pemilih
+    <em>Zona Harga</em> pada pesanan memakai daftar zona tersebut.
   </p>
 </div>
 
@@ -4540,7 +4543,7 @@ tercatat pada laporan keuangan.</p>
     <tr><td>Daftar kosong</td><td>Hapus kata kunci pencarian dan penyaring.</td></tr>
     <tr><td>Tombol konfirmasi tidak ada</td><td>Periksa status data — tombolnya hanya muncul pada status tertentu.</td></tr>
     <tr><td>Piutang tidak berkurang</td><td>Pastikan pembayaran sudah <em>diverifikasi</em>, bukan sekadar dicatat.</td></tr>
-    <tr><td>Harga tidak sesuai katalog</td><td>Periksa zona sekolah; zona khusus memang mengubah harga.</td></tr>
+    <tr><td>Harga tidak sesuai katalog</td><td>Periksa <em>Zona Harga</em> yang dipilih pada pesanan; harga tiap zona memang berbeda.</td></tr>
     <tr><td>Tidak bisa menghapus data</td><td>Data itu masih dipakai transaksi lain. Hapus atau pindahkan yang menggunakannya lebih dulu.</td></tr>
     <tr><td>Foto bukti ditolak</td><td>Pastikan formatnya JPEG/PNG/WebP dan ukurannya di bawah 5&nbsp;MB.</td></tr>
     <tr><td>Angka diragukan</td><td>Buka <strong>Audit Log</strong> dan telusuri riwayatnya.</td></tr>
@@ -4583,7 +4586,7 @@ tercatat pada laporan keuangan.</p>
     </tr>
     <tr>
       <td>Zona tidak dapat dikelola dari dalam aplikasi</td>
-      <td>Belum ada layar CRUD zona; lihat Lampiran C.</td>
+      <td>Belum ada layar untuk menambah atau mengganti nama zona. Daftar zona disediakan administrator; harga per zona diisi pada formulir Buku. Lihat Lampiran C.</td>
     </tr>
     <tr>
       <td>Laporan hanya berekspor CSV</td>

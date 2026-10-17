@@ -34,6 +34,18 @@ use Illuminate\Validation\Rule;
 class MasterDataRegistry
 {
     /**
+     * Zone-specific selling prices edited from the Buku form, keyed by form
+     * field name and mapped to the zona code the value is stored against.
+     *
+     * @var array<string, string>
+     */
+    private const BOOK_PRICE_ZONES = [
+        'price_zona_3' => 'Z3',
+        'price_zona_4' => 'Z4',
+        'price_zona_5' => 'Z5',
+    ];
+
+    /**
      * @return array<string, array<string, mixed>>
      */
     public static function all(): array
@@ -136,7 +148,6 @@ class MasterDataRegistry
                 ['name' => 'email', 'label' => 'Email', 'type' => 'email'],
                 ['name' => 'principal_name', 'label' => 'Kepala Sekolah', 'type' => 'text'],
                 ['name' => 'sales_user_id', 'label' => 'Sales/PIC', 'type' => 'select', 'options' => fn (): array => self::activeOptions(User::class)],
-                ['name' => 'zona_id', 'label' => 'Zona', 'type' => 'select', 'options' => fn (): array => self::activeOptions(Zona::class)],
                 ['name' => 'status', 'label' => 'Status', 'type' => 'select', 'options' => [['value' => 'active', 'label' => 'Aktif'], ['value' => 'inactive', 'label' => 'Nonaktif']]],
             ],
             'rules' => fn (?Model $model): array => [
@@ -152,7 +163,6 @@ class MasterDataRegistry
                 'email' => ['nullable', 'email', 'max:255'],
                 'principal_name' => ['nullable', 'string', 'max:255'],
                 'sales_user_id' => ['nullable', 'integer', 'exists:users,id'],
-                'zona_id' => ['nullable', 'integer', 'exists:zonas,id'],
                 'status' => ['required', Rule::in(['active', 'inactive'])],
             ],
         ];
@@ -273,7 +283,9 @@ class MasterDataRegistry
                     ['value' => 'Banpem', 'label' => 'Banpem'],
                     ['value' => 'Alcom', 'label' => 'Alcom'],
                 ]],
-                ['name' => 'price', 'label' => 'Harga Jual', 'type' => 'number', 'required' => true],
+                ['name' => 'price_zona_3', 'label' => 'Harga Jual Zona 3', 'type' => 'number'],
+                ['name' => 'price_zona_4', 'label' => 'Harga Jual Zona 4', 'type' => 'number'],
+                ['name' => 'price_zona_5', 'label' => 'Harga Jual Zona 5', 'type' => 'number'],
                 ['name' => 'cost_price', 'label' => 'Harga Pokok', 'type' => 'number'],
                 ['name' => 'min_stock', 'label' => 'Stok Minimum', 'type' => 'number'],
                 ['name' => 'rack_location', 'label' => 'Lokasi Rak', 'type' => 'text'],
@@ -288,7 +300,9 @@ class MasterDataRegistry
                 'grade' => ['nullable', 'string', 'max:255'],
                 'subject' => ['nullable', 'string', 'max:255'],
                 'classification' => ['nullable', 'string', Rule::in(['Het', 'Reguler', 'Depag', 'Banpem', 'Alcom'])],
-                'price' => ['required', 'numeric', 'min:0'],
+                'price_zona_3' => ['nullable', 'numeric', 'min:0', 'required_without_all:price_zona_4,price_zona_5'],
+                'price_zona_4' => ['nullable', 'numeric', 'min:0', 'required_without_all:price_zona_3,price_zona_5'],
+                'price_zona_5' => ['nullable', 'numeric', 'min:0', 'required_without_all:price_zona_3,price_zona_4'],
                 'cost_price' => ['nullable', 'numeric', 'min:0'],
                 'min_stock' => ['nullable', 'integer', 'min:0'],
                 'rack_location' => ['nullable', 'string', 'max:255'],
@@ -296,6 +310,11 @@ class MasterDataRegistry
             ],
             'values' => function (Book $book): array {
                 $product = $book->product;
+
+                $zonePrices = $product === null
+                    ? collect()
+                    : $product->prices()->with('zona:id,code')->get()
+                        ->mapWithKeys(fn ($price): array => [(string) $price->zona?->code => (string) $price->price]);
 
                 return [
                     'code' => $product?->code,
@@ -306,7 +325,11 @@ class MasterDataRegistry
                     'grade' => $book->grade,
                     'subject' => $book->subject,
                     'classification' => $book->classification,
-                    'price' => $product?->price,
+                    // Older books carry a single price; show it under Zona 3 so
+                    // editing one never silently loses its price.
+                    'price_zona_3' => $zonePrices['Z3'] ?? $product?->price,
+                    'price_zona_4' => $zonePrices['Z4'] ?? null,
+                    'price_zona_5' => $zonePrices['Z5'] ?? null,
                     'cost_price' => $product?->cost_price,
                     'min_stock' => $product?->min_stock,
                     'rack_location' => $product?->rack_location,
@@ -319,12 +342,14 @@ class MasterDataRegistry
                     'type' => 'book',
                     'code' => $attributes['code'],
                     'title' => $attributes['title'],
-                    'price' => $attributes['price'],
+                    'price' => $attributes['price_zona_3'] ?? '0',
                     'cost_price' => $attributes['cost_price'] ?? 0,
                     'min_stock' => $attributes['min_stock'] ?? 0,
                     'rack_location' => $attributes['rack_location'] ?? null,
                     'status' => $attributes['status'],
                 ])->save();
+
+                self::syncBookZonePrices($product, $attributes);
 
                 $book ??= new Book;
                 $book->fill([
@@ -340,6 +365,51 @@ class MasterDataRegistry
                 return $book;
             },
         ];
+    }
+
+    /**
+     * Persist the per-zone selling prices edited on the Buku form.
+     *
+     * Clearing a field removes that zone's price. The product's own price
+     * mirrors the first filled zone so the catalog listing and the
+     * server-side order fallback keep working.
+     *
+     * @param  array<string, mixed>  $attributes
+     */
+    private static function syncBookZonePrices(Product $product, array $attributes): void
+    {
+        $zonaIds = Zona::query()
+            ->whereIn('code', array_values(self::BOOK_PRICE_ZONES))
+            ->pluck('id', 'code');
+
+        $basePrice = null;
+
+        foreach (self::BOOK_PRICE_ZONES as $field => $code) {
+            $zonaId = $zonaIds[$code] ?? null;
+
+            if ($zonaId === null) {
+                continue;
+            }
+
+            $value = $attributes[$field] ?? null;
+
+            if ($value === null || $value === '') {
+                $product->prices()->where('zona_id', $zonaId)->delete();
+
+                continue;
+            }
+
+            $product->prices()->updateOrCreate(
+                ['zona_id' => $zonaId],
+                ['price' => (string) $value],
+            );
+
+            $basePrice ??= (string) $value;
+        }
+
+        if ($basePrice !== null) {
+            $product->forceFill(['price' => $basePrice])->save();
+        }
     }
 
     /**

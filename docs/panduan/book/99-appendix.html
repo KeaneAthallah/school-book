@@ -36,7 +36,7 @@
     <tr><td>SKU / kode barang</td><td>Kode unik sebuah barang.</td></tr>
     <tr><td>Surat jalan</td><td>Dokumen pengantar barang saat pengiriman.</td></tr>
     <tr><td>Tersedia (stok)</td><td>Fisik dikurangi reservasi; jumlah yang masih boleh dijual.</td></tr>
-    <tr><td>Zona harga</td><td>Pengelompokan wilayah yang menentukan harga jual buku bagi sekolah di wilayah itu.</td></tr>
+    <tr><td>Zona harga</td><td>Pengelompokan wilayah dengan harga jual tersendiri. Harga tiap zona diisi pada data Buku dan dipilih pada pesanan.</td></tr>
   </tbody>
 </table>
 
@@ -183,10 +183,11 @@
 <div class="kotak penting">
   <span class="judul-kotak">Izin tanpa layar</span>
   <p>
-    Izin <code>zonas.manage</code> terdaftar di sistem, tetapi pada versi yang
-    didokumentasikan buku ini belum ada layar untuk mengelola zona dari dalam
-    aplikasi. Zona hanya muncul sebagai pilihan pada formulir Sekolah dan pada
-    pemilih Zona Harga di formulir pesanan.
+    Izin <code>zonas.manage</code> terdaftar di sistem, tetapi belum ada layar
+    untuk menambah atau mengganti nama zona dari dalam aplikasi. Zona 3, 4, dan 5
+    disediakan oleh administrator sistem; yang diatur dari aplikasi adalah
+    <strong>harga</strong> tiap zona, pada formulir Buku. Pemilih
+    <em>Zona Harga</em> pada pesanan memakai daftar zona tersebut.
   </p>
 </div>
 
@@ -244,7 +245,7 @@
     <tr><td>Daftar kosong</td><td>Hapus kata kunci pencarian dan penyaring.</td></tr>
     <tr><td>Tombol konfirmasi tidak ada</td><td>Periksa status data — tombolnya hanya muncul pada status tertentu.</td></tr>
     <tr><td>Piutang tidak berkurang</td><td>Pastikan pembayaran sudah <em>diverifikasi</em>, bukan sekadar dicatat.</td></tr>
-    <tr><td>Harga tidak sesuai katalog</td><td>Periksa zona sekolah; zona khusus memang mengubah harga.</td></tr>
+    <tr><td>Harga tidak sesuai katalog</td><td>Periksa <em>Zona Harga</em> yang dipilih pada pesanan; harga tiap zona memang berbeda.</td></tr>
     <tr><td>Tidak bisa menghapus data</td><td>Data itu masih dipakai transaksi lain. Hapus atau pindahkan yang menggunakannya lebih dulu.</td></tr>
     <tr><td>Foto bukti ditolak</td><td>Pastikan formatnya JPEG/PNG/WebP dan ukurannya di bawah 5&nbsp;MB.</td></tr>
     <tr><td>Angka diragukan</td><td>Buka <strong>Audit Log</strong> dan telusuri riwayatnya.</td></tr>
@@ -287,7 +288,7 @@
     </tr>
     <tr>
       <td>Zona tidak dapat dikelola dari dalam aplikasi</td>
-      <td>Belum ada layar CRUD zona; lihat Lampiran C.</td>
+      <td>Belum ada layar untuk menambah atau mengganti nama zona. Daftar zona disediakan administrator; harga per zona diisi pada formulir Buku. Lihat Lampiran C.</td>
     </tr>
     <tr>
       <td>Laporan hanya berekspor CSV</td>

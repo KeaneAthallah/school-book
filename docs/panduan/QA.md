@@ -285,7 +285,55 @@ Ketiga hal ini dijaga oleh `tests/Feature/InvoiceTaxDisplayTest.php`.
 
 ---
 
-## 9. Cara Mengulang Seluruh Pemeriksaan
+## 9. Harga Jual Buku per Zona
+
+### 9.1 Yang berubah
+
+- Formulir **Buku** mengganti satu kolom "Harga Jual" dengan tiga: **Harga Jual
+  Zona 3**, **Zona 4**, dan **Zona 5**. Minimal satu wajib diisi.
+- Kolom **Zona** dihapus dari formulir **Sekolah**.
+- Zona 3, 4, dan 5 disemai oleh `MasterDataSeeder`; tabel `zonas` sebelumnya kosong.
+- Formulir pesanan kini mengirim `zona_prices` untuk setiap barang, sehingga
+  pemilih **Zona Harga** benar-benar mengubah harga. Sebelumnya data itu tidak
+  pernah dikirim, sehingga pemilih zona tidak berpengaruh.
+
+### 9.2 Cara penyimpanan
+
+| Isian | Disimpan ke |
+|---|---|
+| Harga Jual Zona 3 | `product_prices`, zona berkode `Z3` |
+| Harga Jual Zona 4 | `product_prices`, zona berkode `Z4` |
+| Harga Jual Zona 5 | `product_prices`, zona berkode `Z5` |
+
+`products.price` mengikuti harga zona pertama yang terisi (Zona 3 → 4 → 5).
+Kolom itu tetap diperlukan karena daftar Buku dan cadangan harga di sisi peladen
+membacanya.
+
+Mengosongkan sebuah kolom menghapus harga zona tersebut. Saat menyunting buku
+lama yang belum punya harga zona, harga lamanya ditampilkan pada kolom Zona 3
+agar tidak hilang tanpa sengaja.
+
+### 9.3 Verifikasi
+
+- 5 pengujian baru di `tests/Feature/BookZonePriceTest.php`.
+- Diperiksa langsung pada aplikasi: formulir Buku memuat tepat tiga input
+  `price_zona_3/4/5` tanpa input `price`; formulir Sekolah tidak memuat
+  `zona_id`; pemilih Zona Harga berisi Zona 3, 4, 5 dan data `zona_prices`
+  terkirim ke halaman pesanan.
+
+### 9.4 Catatan
+
+- Karena zona tidak lagi melekat pada sekolah, `OrderService` tidak dapat lagi
+  menyimpulkan zona dari sekolah. Harga zona dipilih per pesanan lewat pemilih
+  Zona Harga; bila tidak dipilih, dipakai `products.price`.
+- Kolom `schools.zona_id` tetap ada di basis data tetapi tidak lagi diisi dari
+  formulir. Tidak ada sekolah pada data contoh yang memilikinya.
+- Karena data transaksi contoh sudah direset (lihat §4), tidak ada pesanan nyata
+  untuk menguji pemilihan zona secara visual. Perilaku ini dijaga oleh pengujian.
+
+---
+
+## 10. Cara Mengulang Seluruh Pemeriksaan
 
 ```bash
 # 1. jalankan aplikasi

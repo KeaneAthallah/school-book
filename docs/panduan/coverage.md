@@ -75,9 +75,10 @@ Registry: `app/Support/MasterDataRegistry.php`. Route: `master.index/create/stor
 | Dialog konfirmasi hapus | `master/partials/row-actions.blade.php` | Bagian IV | — (dialog `confirm()` bawaan peramban) | tidak diambil |
 | Hapus ditolak (data terpakai) | `MasterDataController@destroy` | Bagian IV, VII | `57-master-delete-error.png` (pesan galat) | rencana |
 
-> Catatan: **Zona** hanya tersedia sebagai pilihan pada form (kolom `zona_id`), tidak memiliki
-> layar CRUD sendiri. Izin `zonas.manage` ada di `config/rbac.php` tetapi tidak diekspos di
-> menu. Didokumentasikan di Bagian IV sebagai keterbatasan.
+> Catatan: **Zona** tidak memiliki layar CRUD sendiri. Daftar zona (Zona 3, 4, 5) disediakan
+> oleh seeder; harga per zona diisi pada formulir **Buku**, dan zona dipilih per pesanan
+> lewat pemilih *Zona Harga*. Izin `zonas.manage` ada di `config/rbac.php` tetapi belum
+> diekspos di menu. Didokumentasikan di Bagian 4.5 dan Lampiran C.
 
 ## E. Pesanan (Orders)
 
@@ -217,7 +218,7 @@ Registry: `app/Support/MasterDataRegistry.php`. Route: `master.index/create/stor
 | `GET /storage/{path}` | Penyajian berkas statis. |
 | `GET /up` | Endpoint health-check. |
 | `_boost/browser-logs` | Endpoint diagnostik pengembangan. |
-| CRUD Zona | Tidak ada layar CRUD; hanya pilihan pada form Sekolah. |
+| CRUD Zona | Tidak ada layar CRUD; zona disediakan seeder dan harganya diisi pada formulir Buku. |
 | Dialog `confirm()` bawaan peramban | Aksi konfirmasi (konfirmasi pesanan, penerimaan, packing, pengiriman, verifikasi/pembalikan pembayaran, hapus data) memakai `window.confirm()` native. Dialog ini digambar oleh peramban, bukan oleh halaman, sehingga tidak dapat dipotret Playwright. Yang dipotret adalah tombol/baris aksinya. |
 
 ---

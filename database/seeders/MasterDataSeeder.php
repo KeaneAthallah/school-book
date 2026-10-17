@@ -14,6 +14,7 @@ use App\Models\RebateRule;
 use App\Models\Setting;
 use App\Models\ShippingMethod;
 use App\Models\Warehouse;
+use App\Models\Zona;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Str;
 
@@ -25,6 +26,7 @@ class MasterDataSeeder extends Seeder
     public function run(): void
     {
         $this->seedSettings();
+        $this->seedZonas();
 
         $warehouse = Warehouse::query()->updateOrCreate(
             ['code' => 'GDG-01'],
@@ -130,6 +132,25 @@ class MasterDataSeeder extends Seeder
             Goods::query()->updateOrCreate(
                 ['product_id' => $product->getKey()],
                 ['unit' => $data['unit']],
+            );
+        }
+    }
+
+    /**
+     * Zones used by the per-zone selling prices on the Buku form.
+     */
+    private function seedZonas(): void
+    {
+        $zonas = [
+            ['code' => 'Z3', 'name' => 'Zona 3'],
+            ['code' => 'Z4', 'name' => 'Zona 4'],
+            ['code' => 'Z5', 'name' => 'Zona 5'],
+        ];
+
+        foreach ($zonas as $zona) {
+            Zona::query()->updateOrCreate(
+                ['code' => $zona['code']],
+                [...$zona, 'status' => 'active'],
             );
         }
     }

@@ -106,7 +106,7 @@
 <ol class="langkah">
   <li>Klik tombol <strong>Tambah Sekolah</strong>.</li>
   <li>Isi kolom wajib: <strong>Nama Sekolah</strong> dan <strong>Status</strong>.</li>
-  <li>Isi kolom lain bila datanya tersedia. Lengkapi <strong>Zona</strong> bila sekolah ini memiliki harga khusus wilayah.</li>
+  <li>Isi kolom lain bila datanya tersedia — misalnya alamat, kontak, dan Sales/PIC.</li>
   <li>Klik <strong>Simpan</strong>. Bila berhasil, Anda kembali ke daftar dan muncul pesan keberhasilan.</li>
 </ol>
 
@@ -124,7 +124,6 @@
     <tr><td>Kontak, Telepon, Email</td><td>Data narahubung sekolah.</td></tr>
     <tr><td>Kepala Sekolah</td><td>Nama kepala sekolah, untuk keperluan dokumen.</td></tr>
     <tr><td>Sales/PIC</td><td>Pilih pengguna yang bertanggung jawab atas sekolah ini.</td></tr>
-    <tr><td>Zona</td><td>Menentukan harga jual buku untuk sekolah ini.</td></tr>
     <tr><td>Status <em>(wajib)</em></td><td>Aktif atau Nonaktif. Sekolah nonaktif tetap tersimpan untuk riwayat.</td></tr>
   </tbody>
 </table>
@@ -226,7 +225,8 @@
 <h3>Menambah buku</h3>
 <ol class="langkah">
   <li>Klik <strong>Tambah Buku</strong>.</li>
-  <li>Isi <strong>Kode Buku</strong>, <strong>Judul</strong>, <strong>Penerbit</strong>, <strong>Harga Jual</strong>, dan <strong>Status</strong> — kelimanya wajib.</li>
+  <li>Isi <strong>Kode Buku</strong>, <strong>Judul</strong>, <strong>Penerbit</strong>, dan <strong>Status</strong> — keempatnya wajib.</li>
+  <li>Isi <strong>Harga Jual Zona 3</strong>, <strong>Zona 4</strong>, dan <strong>Zona 5</strong> sesuai wilayah yang dilayani. <strong>Minimal satu</strong> harus diisi.</li>
   <li>Lengkapi ISBN, kategori, kelas, mata pelajaran, klasifikasi, harga pokok, stok minimum, dan lokasi rak bila tersedia.</li>
   <li>Klik <strong>Simpan</strong>.</li>
 </ol>
@@ -234,8 +234,8 @@
 <figure class="fig" id="fig-books-form">
   <img src="../screens/37-master-books-form.png" alt="Formulir tambah buku">
   <figcaption>
-    Formulir tambah buku. Kolom <strong>Harga Jual</strong> di sini adalah harga
-    standar; harga khusus per zona diatur terpisah.
+    Formulir tambah buku. Harga jual diisi per zona — Zona 3, Zona 4, dan
+    Zona 5 — bukan sebagai satu harga tunggal.
   </figcaption>
 </figure>
 
@@ -249,7 +249,9 @@
     <tr><td>Kategori</td><td>Opsional.</td></tr>
     <tr><td>Kelas, Mata Pelajaran</td><td>Opsional, memudahkan penyaringan.</td></tr>
     <tr><td>Klasifikasi</td><td>Het, Reguler, Depag, Banpem, atau Alcom.</td></tr>
-    <tr><td>Harga Jual <em>(wajib)</em></td><td>Harga standar bila sekolah tidak punya zona khusus.</td></tr>
+    <tr><td>Harga Jual Zona 3</td><td>Harga jual untuk Zona 3. <strong>Minimal satu dari tiga harga zona harus diisi.</strong></td></tr>
+    <tr><td>Harga Jual Zona 4</td><td>Harga jual untuk Zona 4.</td></tr>
+    <tr><td>Harga Jual Zona 5</td><td>Harga jual untuk Zona 5.</td></tr>
     <tr><td>Harga Pokok</td><td>Modal. Tidak muncul pada dokumen pelanggan, tetapi berguna untuk analisis.</td></tr>
     <tr><td>Stok Minimum</td><td>Ambang peringatan stok menipis.</td></tr>
     <tr><td>Lokasi Rak</td><td>Mempermudah petugas gudang menemukan barang.</td></tr>
@@ -260,39 +262,39 @@
 <h3 id="sec-harga-zona">Memahami harga per zona</h3>
 
 <p>
-  Satu judul buku bisa memiliki harga berbeda untuk wilayah yang berbeda. Itulah
-  yang disebut <strong>harga zona</strong>. Cara kerjanya sebagai berikut:
+  Harga jual buku berbeda menurut wilayah penjualan. Perbedaan itu diatur
+  sebagai <strong>harga zona</strong>, dan seluruhnya diisi dari formulir Buku.
 </p>
 
 <ol>
-  <li>Setiap sekolah dapat ditautkan ke satu <strong>zona</strong> (kolom <em>Zona</em> pada data sekolah).</li>
-  <li>Sebuah buku dapat memiliki beberapa harga khusus, satu untuk tiap zona.</li>
-  <li>Saat pesanan dibuat untuk sekolah tertentu, aplikasi mengambil harga sebagai berikut:
-    <ul>
-      <li>bila ada harga khusus untuk zona sekolah tersebut, pakai harga itu;</li>
-      <li>bila tidak ada, pakai <strong>harga jual standar</strong> buku.</li>
-    </ul>
-  </li>
+  <li>Setiap buku memiliki hingga tiga harga jual: <strong>Zona 3</strong>, <strong>Zona 4</strong>, dan <strong>Zona 5</strong>.</li>
+  <li>Saat membuat pesanan, pilih <strong>Zona Harga</strong> pada kartu Item Pesanan.</li>
+  <li>Memilih zona mengisi kolom <em>Harga</em> setiap barang dengan harga zona tersebut.</li>
+  <li>Bila harga untuk zona itu belum diisi pada buku, aplikasi memakai harga dasar buku.</li>
 </ol>
 
 <div class="kotak catatan">
   <span class="judul-kotak">Kenapa harga di keranjang bisa berbeda dari katalog</span>
   <p>
-    Bila Anda melihat harga yang tidak sama dengan kolom Harga di daftar Buku,
-    kemungkinan besar itu karena sekolah yang dipilih memiliki zona berharga
-    khusus. Ini bukan kesalahan. Untuk memeriksanya, lihat kolom Zona pada data
-    sekolah tersebut.
+    Kolom <em>Harga</em> pada daftar Buku menampilkan harga dasar, yang mengikuti
+    harga zona pertama yang terisi (umumnya Zona 3). Bila harga di keranjang
+    berbeda, itu karena Anda memilih <strong>Zona Harga</strong> lain pada
+    pesanan. Ini bukan kesalahan.
   </p>
 </div>
 
 <div class="kotak penting">
-  <span class="judul-kotak">Zona tidak punya layar tersendiri</span>
+  <span class="judul-kotak">Zona tidak diatur per sekolah</span>
   <p>
-    Saat buku ini disusun, daftar zona hanya muncul sebagai <em>pilihan</em> pada
-    formulir sekolah dan pemilih <em>Zona Harga</em> pada formulir pesanan.
-    Tidak ada layar untuk menambah atau menyunting nama zona dari dalam
-    aplikasi. Bila Anda perlu menambah zona baru, mintalah bantuan
-    administrator sistem.
+    Zona <strong>tidak</strong> dipilih pada data sekolah. Zona ditentukan per
+    pesanan melalui pemilih <em>Zona Harga</em>, sehingga satu sekolah dapat
+    dilayani dengan harga zona yang berbeda pada pesanan yang berbeda.
+  </p>
+  <p>
+    Daftar zona (Zona 3, 4, dan 5) disediakan oleh administrator sistem; belum
+    ada layar untuk menambah atau mengganti nama zona dari dalam aplikasi. Yang
+    Anda atur dari aplikasi adalah <strong>harga</strong> tiap zona pada
+    masing-masing buku.
   </p>
 </div>
 

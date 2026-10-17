@@ -272,6 +272,9 @@ class OrderController extends Controller
                     'value' => $product->getKey(),
                     'label' => $product->code.' - '.$product->title,
                     'price' => $product->price,
+                    'zona_prices' => $product->prices
+                        ->mapWithKeys(fn ($price): array => [(string) $price->zona_id => (string) $price->price])
+                        ->all(),
                     'available' => (int) ($availability[$product->getKey()] ?? 0),
                 ])
                 ->all(),

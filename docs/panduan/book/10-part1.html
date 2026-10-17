@@ -106,7 +106,7 @@
 <p>Setiap mata rantai menyerahkan sesuatu kepada mata rantai berikutnya:</p>
 
 <ol>
-  <li><strong>Data sekolah dan buku</strong> menyediakan pilihan pada saat pesanan dibuat. Harga jual dapat berbeda menurut <em>zona</em> sekolah.</li>
+  <li><strong>Data sekolah dan buku</strong> menyediakan pilihan pada saat pesanan dibuat. Harga jual buku diisi per <em>zona harga</em> (Zona 3, 4, dan 5) dan zona itu dipilih saat pesanan dibuat.</li>
   <li><strong>Penerimaan barang</strong> menambah stok fisik. Setelah dikonfirmasi, stok ini siap dipakai memenuhi pesanan.</li>
   <li><strong>Konfirmasi pesanan</strong> memesan (mereservasi) stok yang tersedia. Bila stok kurang, kekurangannya dicatat sebagai <em>back order</em> — pesanan tetap berjalan dan sisanya menyusul.</li>
   <li><strong>Picking dan packing</strong> mengambil barang yang sudah direservasi dan menyiapkannya untuk dikirim.</li>
@@ -138,7 +138,7 @@
   </thead>
   <tbody>
     <tr><td><strong>SKU / Kode barang</strong></td><td>Kode unik sebuah barang, misalnya <code>1545170220</code>. Dipakai agar barang tidak tertukar.</td></tr>
-    <tr><td><strong>Zona harga</strong></td><td>Pengelompokan wilayah yang menentukan harga jual sebuah buku untuk sekolah di wilayah itu.</td></tr>
+    <tr><td><strong>Zona harga</strong></td><td>Pengelompokan wilayah dengan harga jual tersendiri. Harga tiap zona diisi pada data buku dan dipilih saat pesanan dibuat.</td></tr>
     <tr><td><strong>Reservasi</strong></td><td>Jumlah barang yang sudah &ldquo;dipesan&rdquo; untuk sebuah pesanan, tetapi belum keluar dari gudang.</td></tr>
     <tr><td><strong>Back order</strong></td><td>Sisa pesanan yang belum bisa dipenuhi karena stok kurang. Dicatat agar tidak terlupakan.</td></tr>
     <tr><td><strong>Picking</strong></td><td>Kegiatan mengambil barang dari rak sesuai daftar.</td></tr>
