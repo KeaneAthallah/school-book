@@ -66,23 +66,30 @@
                 <template x-for="(item, index) in items" :key="index">
                     <div class="grid gap-2 rounded-control border border-line p-3 sm:grid-cols-[2fr_1fr_1fr_auto]">
                         <x-field label="Barang">
-                            <input
-                                type="search"
-                                x-model="productQuery"
-                                placeholder="Cari barang..."
-                                class="mb-1 w-full rounded-control border border-line-strong bg-panel px-3 py-1.5 text-xs text-ink outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-100 dark:focus:ring-brand-500/25"
-                            />
-                            <select
-                                x-bind:name="`items[${index}][product_id]`"
-                                x-model="item.product_id"
-                                x-on:change="pick(index)"
-                                class="w-full rounded-control border border-line-strong bg-panel px-3 py-2 text-sm text-ink outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-100 dark:focus:ring-brand-500/25"
-                            >
-                                <option value="">— Pilih Barang —</option>
-                                <template x-for="product in filteredProducts()" :key="product.value">
-                                    <option :value="product.value" x-text="product.label"></option>
-                                </template>
-                            </select>
+                            <div class="relative" x-data>
+                                <input
+                                    type="text"
+                                    x-model="item.product_search"
+                                    @focus="item.showDropdown = true"
+                                    @input="item.showDropdown = true; item.product_id = ''"
+                                    placeholder="Cari/pilih barang..."
+                                    class="w-full rounded-control border border-line-strong bg-panel px-3 py-2 text-sm text-ink outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-100 dark:focus:ring-brand-500/25"
+                                />
+                                <input type="hidden" x-bind:name="`items[${index}][product_id]`" x-model="item.product_id" />
+                                <div
+                                    x-show="item.showDropdown"
+                                    @click.outside="item.showDropdown = false"
+                                    class="absolute z-20 mt-1 max-h-48 w-full overflow-y-auto rounded-control border border-line-strong bg-panel shadow-lg"
+                                >
+                                    <template x-for="product in products.filter(p => String(p.label).toLowerCase().includes(String(item.product_search || '').toLowerCase()))" :key="product.value">
+                                        <div
+                                            class="cursor-pointer px-3 py-2 text-sm text-ink hover:bg-panel-soft"
+                                            @click="item.product_id = product.value; item.product_search = product.label; item.showDropdown = false; pick(index)"
+                                            x-text="product.label"
+                                        ></div>
+                                    </template>
+                                </div>
+                            </div>
                         </x-field>
 
                         <x-field label="Qty">

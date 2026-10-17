@@ -289,13 +289,22 @@ Alpine.data('lineItems', (config = {}) => ({
     products: config.products ?? [],
     productQuery: '',
     zone: config.zone ?? '',
-    blank: config.blank ?? { product_id: '', quantity: 1, unit_price: '' },
+    blank: config.blank ?? { product_id: '', quantity: 1, unit_price: '', product_search: '', showDropdown: false },
     items: [],
 
     init() {
         this.items =
             Array.isArray(config.items) && config.items.length > 0
-                ? config.items.map((item) => ({ ...this.blank, ...item }))
+                ? config.items.map((item) => {
+                      const merged = { ...this.blank, ...item, showDropdown: false };
+                      if (merged.product_id && !merged.product_search) {
+                          const product = this.products.find(
+                              (candidate) => String(candidate.value) === String(merged.product_id),
+                          );
+                          merged.product_search = product?.label ?? '';
+                      }
+                      return merged;
+                  })
                 : [{ ...this.blank }];
     },
 
