@@ -13,6 +13,9 @@
 /storage/backups
 *.sql
 *.zip
+/scratchpad/
+/sulawesi-*-schools.json
+/storage/app/data/dapodik/
 /storage/pail
 /vendor
 .env
