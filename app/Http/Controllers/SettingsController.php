@@ -26,6 +26,9 @@ class SettingsController extends Controller
                 'header_publisher_id' => (string) Setting::value('print.header_publisher_id', ''),
                 'header_name' => (string) Setting::value('print.header_name', ''),
                 'tax_rate' => (string) Setting::value('finance.tax_rate', '0'),
+                'book_tax_rate' => (string) Setting::value('finance.book_tax_rate', '0.5'),
+                'goods_tax_rate' => (string) Setting::value('finance.goods_tax_rate', '2'),
+                'ppn_rate' => (string) Setting::value('finance.ppn_rate', '12'),
             ],
             'publishers' => Publisher::query()->orderBy('name')->pluck('name', 'id'),
         ]);
@@ -40,6 +43,27 @@ class SettingsController extends Controller
             $request->all(),
         ));
 
+        // Accept common alias field names for tax rates.
+        $aliases = [
+            'tax_book_rate' => 'book_tax_rate',
+            'book_tax' => 'book_tax_rate',
+            'tax_book' => 'book_tax_rate',
+            'pajak_buku' => 'book_tax_rate',
+            'tax_goods_rate' => 'goods_tax_rate',
+            'goods_tax' => 'goods_tax_rate',
+            'tax_goods' => 'goods_tax_rate',
+            'pajak_barang' => 'goods_tax_rate',
+            'pajak_barang_lainnya' => 'goods_tax_rate',
+            'ppn' => 'ppn_rate',
+            'tax_ppn' => 'ppn_rate',
+            'tax_ppn_rate' => 'ppn_rate',
+        ];
+        foreach ($aliases as $alias => $canonical) {
+            if ($request->has($alias) && ! $request->has($canonical)) {
+                $request->merge([$canonical => $request->input($alias)]);
+            }
+        }
+
         $validated = $request->validate([
             'company_name' => ['required', 'string', 'max:255'],
             'company_address' => ['nullable', 'string', 'max:1000'],
@@ -49,6 +73,9 @@ class SettingsController extends Controller
             'header_publisher_id' => ['nullable', 'integer', 'exists:publishers,id'],
             'header_name' => ['nullable', 'string', 'max:255'],
             'tax_rate' => ['nullable', 'numeric', 'min:0', 'max:100'],
+            'book_tax_rate' => ['nullable', 'numeric', 'min:0', 'max:100'],
+            'goods_tax_rate' => ['nullable', 'numeric', 'min:0', 'max:100'],
+            'ppn_rate' => ['nullable', 'numeric', 'min:0', 'max:100'],
         ], [
             'company_name.required' => 'Nama perusahaan wajib diisi.',
         ]);
@@ -77,6 +104,18 @@ class SettingsController extends Controller
         $this->put('print.header_publisher_id', ($validated['header_publisher_id'] ?? null) === null ? '' : (string) $validated['header_publisher_id'], 'print');
         $this->put('print.header_name', $validated['header_name'] ?? '', 'print');
         $this->put('finance.tax_rate', ($validated['tax_rate'] ?? null) === null ? '0' : (string) $validated['tax_rate'], 'finance');
+        $bookRate = ($validated['book_tax_rate'] ?? null) === null ? '0.5' : (string) $validated['book_tax_rate'];
+        $goodsRate = ($validated['goods_tax_rate'] ?? null) === null ? '2' : (string) $validated['goods_tax_rate'];
+        $ppnRate = ($validated['ppn_rate'] ?? null) === null ? '12' : (string) $validated['ppn_rate'];
+        foreach (['finance.book_tax_rate','finance.tax_book_rate','finance.book_tax','finance.tax_book','finance.pajak_buku'] as $k) {
+            $this->put($k, $bookRate, 'finance');
+        }
+        foreach (['finance.goods_tax_rate','finance.tax_goods_rate','finance.goods_tax','finance.tax_goods','finance.pajak_barang_lainnya','finance.pajak_barang'] as $k) {
+            $this->put($k, $goodsRate, 'finance');
+        }
+        foreach (['finance.ppn_rate','finance.tax_ppn_rate','finance.ppn','finance.tax_ppn'] as $k) {
+            $this->put($k, $ppnRate, 'finance');
+        }
 
         return back()->with('success', 'Profil perusahaan diperbarui.');
     }

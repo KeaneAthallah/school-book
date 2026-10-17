@@ -2,18 +2,16 @@
 
 namespace App\Services;
 
+use App\Models\Setting;
 use App\Support\Money;
 
 /**
  * Hitung PPN / PPh berdasarkan jenis produk.
  *
  * Aturan:
- *  - Barang lainnya / jasa (type != "book"): DPP = harga × 100/111,
- *    PVN = 12% × DPP, PPh = 2% × DPP.
- *  - Buku (type = "book"): dibebaskan PPN, PPh = 0,5% × harga.
- *
- * Semua nilai dikelompokkan per order/item dan dikembalikan sebagai
- * string desimal siap simpan ke kolom DECIMAL(15,2).
+ *  - Buku (type = "book"): pajak buku (book_tax_rate) × harga, tanpa PPN.
+ *  - Barang lainnya (type != "book"): DPP = harga × 100/111,
+ *    PPN = ppn_rate × DPP, pajak barang lainnya = goods_tax_rate × DPP.
  */
 class TaxCalculator
 {
@@ -23,6 +21,10 @@ class TaxCalculator
      */
     public function calculate(iterable $lines): array
     {
+        $bookRate = (string) Setting::value('finance.book_tax_rate', '0.5');
+        $goodsRate = (string) Setting::value('finance.goods_tax_rate', '2');
+        $ppnRate = (string) Setting::value('finance.ppn_rate', '12');
+
         $dpp = '0.00';
         $ppn = '0.00';
         $pph = '0.00';
@@ -34,7 +36,7 @@ class TaxCalculator
             $lineTotal = Money::mul($price, $qty);
 
             if ($type === 'book') {
-                $linePph = Money::percentage($lineTotal, '0.5');
+                $linePph = Money::percentage($lineTotal, $bookRate);
                 $pph = Money::add($pph, $linePph);
 
                 continue;
@@ -42,8 +44,8 @@ class TaxCalculator
 
             $lineDpp = Money::mul($lineTotal, '100');
             $lineDpp = Money::div($lineDpp, '111');
-            $linePpn = Money::percentage($lineDpp, '12');
-            $linePph = Money::percentage($lineDpp, '2');
+            $linePpn = Money::percentage($lineDpp, $ppnRate);
+            $linePph = Money::percentage($lineDpp, $goodsRate);
 
             $dpp = Money::add($dpp, $lineDpp);
             $ppn = Money::add($ppn, $linePpn);

@@ -81,6 +81,15 @@
                 <x-field label="Tarif Pajak (%)" name="tax_rate" hint="Diterapkan saat menerbitkan invoice">
                     <x-input type="number" name="tax_rate" step="any" :value="$value('tax_rate')" :invalid="$errors->has('tax_rate')" />
                 </x-field>
+                <x-field label="Pajak Buku (%)" name="book_tax_rate" hint="Pajak untuk buku">
+                    <x-input type="number" name="book_tax_rate" step="any" :value="$value('book_tax_rate')" :invalid="$errors->has('book_tax_rate')" />
+                </x-field>
+                <x-field label="Pajak Barang Lainnya (%)" name="goods_tax_rate" hint="Pajak untuk barang lainnya">
+                    <x-input type="number" name="goods_tax_rate" step="any" :value="$value('goods_tax_rate')" :invalid="$errors->has('goods_tax_rate')" />
+                </x-field>
+                <x-field label="PPN (%)" name="ppn_rate" hint="PPN untuk barang lainnya">
+                    <x-input type="number" name="ppn_rate" step="any" :value="$value('ppn_rate')" :invalid="$errors->has('ppn_rate')" />
+                </x-field>
             </div>
         </x-card>
 
