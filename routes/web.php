@@ -76,6 +76,7 @@ Route::middleware('auth')->group(function (): void {
     Route::post('pickings', [PickingController::class, 'store'])->name('pickings.store');
     Route::get('pickings/{picking}', [PickingController::class, 'show'])->name('pickings.show');
     Route::post('pickings/{picking}/record', [PickingController::class, 'record'])->name('pickings.record');
+    Route::post('pickings/{picking}/record-and-pack', [PickingController::class, 'recordAndPack'])->name('pickings.recordAndPack');
     Route::post('pickings/{picking}/pack', [PickingController::class, 'pack'])->name('pickings.pack');
 
     // Shipments.

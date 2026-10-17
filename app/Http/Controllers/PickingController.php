@@ -110,6 +110,44 @@ class PickingController extends Controller
 
         $service->pack($picking, $request->user());
 
-        return back()->with('success', 'Picking '.$picking->number.' selesai dipacking dan siap kirim.');
+        $next = Picking::query()
+            ->where('id', '>', $picking->getKey())
+            ->whereIn('status', [PickingStatus::Draft->value, PickingStatus::Picking->value])
+            ->orderBy('id')
+            ->first();
+
+        if ($next instanceof Picking) {
+            return redirect()->route('pickings.show', $next)->with('success', 'Picking '.$picking->number.' selesai dipacking. Lanjut ke picking berikutnya.');
+        }
+
+        return redirect()->route('pickings.index', ['status' => 'draft'])->with('success', 'Picking '.$picking->number.' selesai dipacking dan siap kirim.');
+    }
+
+    public function recordAndPack(Request $request, Picking $picking, FulfillmentService $service): RedirectResponse
+    {
+        abort_unless($this->userCan($request, 'fulfillment.pick'), 403);
+        abort_unless($this->userCan($request, 'fulfillment.pack'), 403);
+
+        $validated = $request->validate([
+            'items' => ['required', 'array'],
+            'items.*.id' => ['required', 'integer'],
+            'items.*.picked_quantity' => ['required', 'integer', 'min:0'],
+        ]);
+
+        $service->recordPicked($picking, $validated['items'], $request->user());
+        $picking->refresh();
+        $service->pack($picking, $request->user());
+
+        $next = Picking::query()
+            ->where('id', '>', $picking->getKey())
+            ->whereIn('status', [PickingStatus::Draft->value, PickingStatus::Picking->value])
+            ->orderBy('id')
+            ->first();
+
+        if ($next instanceof Picking) {
+            return redirect()->route('pickings.show', $next)->with('success', 'Picking '.$picking->number.' selesai. Lanjut ke picking berikutnya.');
+        }
+
+        return redirect()->route('pickings.index', ['status' => 'draft'])->with('success', 'Picking '.$picking->number.' selesai dipacking dan siap kirim.');
     }
 }

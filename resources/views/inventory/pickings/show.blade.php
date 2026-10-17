@@ -61,8 +61,9 @@
                     </table>
                 </div>
 
-                <div class="flex justify-end border-t border-line px-4 py-3">
+                <div class="flex justify-end gap-2 border-t border-line px-4 py-3">
                     <x-button type="submit">Simpan Hasil Picking</x-button>
+                    <x-button type="submit" formaction="{{ route('pickings.recordAndPack', $picking['id']) }}" variant="primary">Simpan &amp; Selesai Packing</x-button>
                 </div>
             </form>
         @else
