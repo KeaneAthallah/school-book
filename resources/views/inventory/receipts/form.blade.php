@@ -66,6 +66,12 @@
                 <template x-for="(item, index) in items" :key="index">
                     <div class="grid gap-2 rounded-control border border-line p-3 sm:grid-cols-[2fr_1fr_1fr_auto]">
                         <x-field label="Barang">
+                            <input
+                                type="search"
+                                x-model="productQuery"
+                                placeholder="Cari barang..."
+                                class="mb-1 w-full rounded-control border border-line-strong bg-panel px-3 py-1.5 text-xs text-ink outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-100 dark:focus:ring-brand-500/25"
+                            />
                             <select
                                 x-bind:name="`items[${index}][product_id]`"
                                 x-model="item.product_id"
@@ -73,7 +79,7 @@
                                 class="w-full rounded-control border border-line-strong bg-panel px-3 py-2 text-sm text-ink outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-100 dark:focus:ring-brand-500/25"
                             >
                                 <option value="">— Pilih Barang —</option>
-                                <template x-for="product in products" :key="product.value">
+                                <template x-for="product in filteredProducts()" :key="product.value">
                                     <option :value="product.value" x-text="product.label"></option>
                                 </template>
                             </select>

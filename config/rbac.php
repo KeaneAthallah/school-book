@@ -26,6 +26,9 @@ return [
         'payment-methods.manage' => ['name' => 'Kelola Metode Pembayaran', 'group' => 'Master Data'],
         'rebate-rules.manage' => ['name' => 'Kelola Aturan Rebate', 'group' => 'Master Data'],
         'settings.manage' => ['name' => 'Kelola Konfigurasi', 'group' => 'Master Data'],
+        'zonas.manage' => ['name' => 'Kelola Zona', 'group' => 'Master Data'],
+        'loans.view' => ['name' => 'Lihat Pinjaman Tunai', 'group' => 'Pinjaman'],
+        'loans.manage' => ['name' => 'Kelola Pinjaman Tunai', 'group' => 'Pinjaman'],
 
         'users.view' => ['name' => 'Lihat Pengguna', 'group' => 'Pengguna'],
         'users.manage' => ['name' => 'Kelola Pengguna', 'group' => 'Pengguna'],

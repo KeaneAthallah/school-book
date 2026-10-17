@@ -127,4 +127,26 @@ class Product extends Model
     {
         return $this->hasMany(StockMovement::class);
     }
+
+    /**
+     * @return HasMany<ProductPrice, $this>
+     */
+    public function prices(): HasMany
+    {
+        return $this->hasMany(ProductPrice::class);
+    }
+
+    /**
+     * Harga khusus untuk zona, atau null bila belum pernah diatur.
+     */
+    public function priceForZona(?int $zonaId): ?string
+    {
+        if ($zonaId === null) {
+            return null;
+        }
+
+        $price = $this->prices()->where('zona_id', $zonaId)->value('price');
+
+        return $price === null ? null : (string) $price;
+    }
 }

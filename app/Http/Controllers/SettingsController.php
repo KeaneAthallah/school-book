@@ -59,6 +59,10 @@ class SettingsController extends Controller
             $old = (string) Setting::value('company.logo', '');
             $path = $logo->store('company', 'public');
 
+            if ($path === false) {
+                return back()->with('error', 'Logo perusahaan gagal diunggah. Silakan coba lagi.');
+            }
+
             if ($old !== '') {
                 Storage::disk('public')->delete($old);
             }

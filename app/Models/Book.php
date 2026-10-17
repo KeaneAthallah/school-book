@@ -18,8 +18,9 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property int|null $category_id
  * @property string|null $grade
  * @property string|null $subject
+ * @property string|null $classification
  */
-#[Fillable(['product_id', 'isbn', 'publisher_id', 'category_id', 'grade', 'subject'])]
+#[Fillable(['product_id', 'isbn', 'publisher_id', 'category_id', 'grade', 'subject', 'classification'])]
 class Book extends Model
 {
     /** @use HasFactory<BookFactory> */

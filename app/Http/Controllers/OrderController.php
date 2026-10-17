@@ -12,7 +12,9 @@ use App\Models\Product;
 use App\Models\School;
 use App\Models\Stock;
 use App\Models\User;
+use App\Models\Zona;
 use App\Services\OrderService;
+use App\Services\PrintHeaderService;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -229,6 +231,25 @@ class OrderController extends Controller
         return back()->with('success', 'Pesanan '.$order->number.' dibatalkan.');
     }
 
+    public function print(Request $request, Order $order, PrintHeaderService $headers): View
+    {
+        abort_unless($this->userCan($request, 'orders.view'), 403);
+        $this->authorizeSchoolAccess($request->user(), $order);
+
+        $order->load([
+            'school',
+            'orderSource:id,name',
+            'items' => fn ($query) => $query->with('product:id,code,title')->orderBy('id'),
+            'items.warehouse:id,name',
+            'invoices',
+        ]);
+
+        return view('print.order-note', [
+            'order' => $order,
+            'company' => $headers->resolve(),
+        ]);
+    }
+
     /**
      * @return array<string, mixed>
      */
@@ -240,19 +261,22 @@ class OrderController extends Controller
             ->pluck('available', 'product_id');
 
         return [
-            'schools' => School::query()->active()->orderBy('name')->get(['id', 'name', 'npsn'])
+            'schools' => School::query()->active()->orderBy('name')->get(['id', 'name', 'npsn', 'zona_id'])
                 ->map(fn (School $school): array => ['value' => $school->getKey(), 'label' => $school->name.' ('.$school->npsn.')'])
                 ->all(),
             'sources' => OrderSource::query()->active()->orderBy('name')->get(['id', 'name'])
                 ->map(fn (OrderSource $source): array => ['value' => $source->getKey(), 'label' => $source->name])
                 ->all(),
-            'products' => Product::query()->active()->orderBy('title')->get(['id', 'code', 'title', 'price'])
+            'products' => Product::query()->active()->with('prices')->orderBy('title')->get(['id', 'code', 'title', 'price'])
                 ->map(fn (Product $product): array => [
                     'value' => $product->getKey(),
                     'label' => $product->code.' - '.$product->title,
                     'price' => $product->price,
                     'available' => (int) ($availability[$product->getKey()] ?? 0),
                 ])
+                ->all(),
+            'zonas' => Zona::query()->active()->orderBy('code')->get(['id', 'code', 'name'])
+                ->map(fn (Zona $zona): array => ['value' => $zona->getKey(), 'label' => $zona->name])
                 ->all(),
             'defaultDate' => now()->toDateString(),
         ];

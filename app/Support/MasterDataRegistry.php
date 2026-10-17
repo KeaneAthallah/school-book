@@ -5,6 +5,7 @@ namespace App\Support;
 use App\Enums\OrderSourceType;
 use App\Models\Book;
 use App\Models\BookCategory;
+use App\Models\CashLoan;
 use App\Models\Courier as CourierModel;
 use App\Models\Goods;
 use App\Models\OrderSource;
@@ -17,6 +18,8 @@ use App\Models\Setting;
 use App\Models\ShippingMethod;
 use App\Models\User;
 use App\Models\Warehouse;
+use App\Models\Zona;
+use App\Services\DocumentNumberService;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
@@ -50,6 +53,7 @@ class MasterDataRegistry
             'payment-methods' => self::paymentMethods(),
             'rebate-rules' => self::rebateRules(),
             'settings' => self::settings(),
+            'cash-loans' => self::cashLoans(),
         ];
     }
 
@@ -132,13 +136,23 @@ class MasterDataRegistry
                 ['name' => 'email', 'label' => 'Email', 'type' => 'email'],
                 ['name' => 'principal_name', 'label' => 'Kepala Sekolah', 'type' => 'text'],
                 ['name' => 'sales_user_id', 'label' => 'Sales/PIC', 'type' => 'select', 'options' => fn (): array => self::activeOptions(User::class)],
+                ['name' => 'zona_id', 'label' => 'Zona', 'type' => 'select', 'options' => fn (): array => self::activeOptions(Zona::class)],
                 ['name' => 'status', 'label' => 'Status', 'type' => 'select', 'options' => [['value' => 'active', 'label' => 'Aktif'], ['value' => 'inactive', 'label' => 'Nonaktif']]],
             ],
             'rules' => fn (?Model $model): array => [
                 'npsn' => ['nullable', 'string', 'max:20', Rule::unique('schools', 'npsn')->ignore($model?->getKey())],
                 'name' => ['required', 'string', 'max:255'],
+                'address' => ['nullable', 'string', 'max:255'],
+                'district' => ['nullable', 'string', 'max:255'],
+                'regency' => ['nullable', 'string', 'max:255'],
+                'province' => ['nullable', 'string', 'max:255'],
+                'postal_code' => ['nullable', 'string', 'max:20'],
+                'contact_person' => ['nullable', 'string', 'max:255'],
+                'phone' => ['nullable', 'string', 'max:50'],
                 'email' => ['nullable', 'email', 'max:255'],
+                'principal_name' => ['nullable', 'string', 'max:255'],
                 'sales_user_id' => ['nullable', 'integer', 'exists:users,id'],
+                'zona_id' => ['nullable', 'integer', 'exists:zonas,id'],
                 'status' => ['required', Rule::in(['active', 'inactive'])],
             ],
         ];
@@ -240,6 +254,7 @@ class MasterDataRegistry
                 ['key' => 'category.name', 'label' => 'Kategori'],
                 ['key' => 'grade', 'label' => 'Kelas'],
                 ['key' => 'subject', 'label' => 'Mapel'],
+                ['key' => 'classification', 'label' => 'Klasifikasi'],
                 ['key' => 'product.price', 'label' => 'Harga', 'type' => 'currency'],
                 ['key' => 'product.status', 'label' => 'Status', 'type' => 'status'],
             ],
@@ -251,6 +266,13 @@ class MasterDataRegistry
                 ['name' => 'category_id', 'label' => 'Kategori', 'type' => 'select', 'options' => fn (): array => self::activeOptions(BookCategory::class)],
                 ['name' => 'grade', 'label' => 'Kelas', 'type' => 'text'],
                 ['name' => 'subject', 'label' => 'Mata Pelajaran', 'type' => 'text'],
+                ['name' => 'classification', 'label' => 'Klasifikasi', 'type' => 'select', 'options' => [
+                    ['value' => 'Het', 'label' => 'Het'],
+                    ['value' => 'Reguler', 'label' => 'Reguler'],
+                    ['value' => 'Depag', 'label' => 'Depag'],
+                    ['value' => 'Banpem', 'label' => 'Banpem'],
+                    ['value' => 'Alcom', 'label' => 'Alcom'],
+                ]],
                 ['name' => 'price', 'label' => 'Harga Jual', 'type' => 'number', 'required' => true],
                 ['name' => 'cost_price', 'label' => 'Harga Pokok', 'type' => 'number'],
                 ['name' => 'min_stock', 'label' => 'Stok Minimum', 'type' => 'number'],
@@ -265,9 +287,11 @@ class MasterDataRegistry
                 'category_id' => ['nullable', 'integer', 'exists:book_categories,id'],
                 'grade' => ['nullable', 'string', 'max:255'],
                 'subject' => ['nullable', 'string', 'max:255'],
+                'classification' => ['nullable', 'string', Rule::in(['Het', 'Reguler', 'Depag', 'Banpem', 'Alcom'])],
                 'price' => ['required', 'numeric', 'min:0'],
                 'cost_price' => ['nullable', 'numeric', 'min:0'],
                 'min_stock' => ['nullable', 'integer', 'min:0'],
+                'rack_location' => ['nullable', 'string', 'max:255'],
                 'status' => ['required', Rule::in(['active', 'inactive'])],
             ],
             'values' => function (Book $book): array {
@@ -281,6 +305,7 @@ class MasterDataRegistry
                     'category_id' => $book->category_id,
                     'grade' => $book->grade,
                     'subject' => $book->subject,
+                    'classification' => $book->classification,
                     'price' => $product?->price,
                     'cost_price' => $product?->cost_price,
                     'min_stock' => $product?->min_stock,
@@ -309,6 +334,7 @@ class MasterDataRegistry
                     'category_id' => $attributes['category_id'] ?? null,
                     'grade' => $attributes['grade'] ?? null,
                     'subject' => $attributes['subject'] ?? null,
+                    'classification' => $attributes['classification'] ?? null,
                 ])->save();
 
                 return $book;
@@ -347,6 +373,7 @@ class MasterDataRegistry
                 ['name' => 'cost_price', 'label' => 'Harga Pokok', 'type' => 'number'],
                 ['name' => 'min_stock', 'label' => 'Stok Minimum', 'type' => 'number'],
                 ['name' => 'rack_location', 'label' => 'Lokasi Rak', 'type' => 'text'],
+                ['name' => 'store_name', 'label' => 'Nama Toko', 'type' => 'text'],
                 ['name' => 'unit', 'label' => 'Satuan', 'type' => 'text'],
                 ['name' => 'status', 'label' => 'Status', 'type' => 'select', 'options' => [['value' => 'active', 'label' => 'Aktif'], ['value' => 'inactive', 'label' => 'Nonaktif']]],
             ],
@@ -357,6 +384,7 @@ class MasterDataRegistry
                 'cost_price' => ['nullable', 'numeric', 'min:0'],
                 'min_stock' => ['nullable', 'integer', 'min:0'],
                 'rack_location' => ['nullable', 'string', 'max:255'],
+                'store_name' => ['nullable', 'string', 'max:255'],
                 'unit' => ['nullable', 'string', 'max:255'],
                 'status' => ['required', Rule::in(['active', 'inactive'])],
             ],
@@ -370,6 +398,7 @@ class MasterDataRegistry
                     'cost_price' => $product?->cost_price,
                     'min_stock' => $product?->min_stock,
                     'rack_location' => $product?->rack_location,
+                    'store_name' => $goods->store_name,
                     'unit' => $goods->unit,
                     'status' => $product?->status,
                 ];
@@ -391,6 +420,7 @@ class MasterDataRegistry
                 $goods->fill([
                     'product_id' => $product->getKey(),
                     'unit' => $attributes['unit'] ?? null,
+                    'store_name' => $attributes['store_name'] ?? null,
                 ])->save();
 
                 return $goods;
@@ -607,6 +637,59 @@ class MasterDataRegistry
                 'value' => ['nullable', 'string'],
                 'group' => ['required', 'string', 'max:255'],
             ],
+        ];
+    }
+
+    /**
+    /**
+     * @return array<string, mixed>
+     */
+    private static function cashLoans(): array
+    {
+        return [
+            ...self::base('Pinjaman Tunai', CashLoan::class, 'loans.view', 'loans.manage'),
+            'search' => ['number', 'person_name', 'school_name'],
+            'sort' => 'loan_date',
+            'columns' => [
+                ['key' => 'number', 'label' => 'No. Pinjaman'],
+                ['key' => 'person_name', 'label' => 'Nama'],
+                ['key' => 'school_name', 'label' => 'Sekolah'],
+                ['key' => 'loan_date', 'label' => 'Tgl Pinjaman'],
+                ['key' => 'due_date', 'label' => 'Jatuh Tempo'],
+                ['key' => 'amount', 'label' => 'Nilai', 'type' => 'currency'],
+            ],
+            'fields' => [
+                ['name' => 'person_name', 'label' => 'Nama', 'type' => 'text', 'required' => true],
+                ['name' => 'school_name', 'label' => 'Nama Sekolah', 'type' => 'text'],
+                ['name' => 'loan_date', 'label' => 'Tgl Pinjaman', 'type' => 'date', 'required' => true],
+                ['name' => 'due_date', 'label' => 'Tgl Janji Bayar', 'type' => 'date'],
+                ['name' => 'amount', 'label' => 'Nilai Pinjaman', 'type' => 'number', 'required' => true],
+                ['name' => 'notes', 'label' => 'Keterangan', 'type' => 'textarea'],
+            ],
+            'rules' => fn (?CashLoan $model): array => [
+                'person_name' => ['required', 'string', 'max:255'],
+                'school_name' => ['nullable', 'string', 'max:255'],
+                'loan_date' => ['required', 'date'],
+                'due_date' => ['nullable', 'date'],
+                'amount' => ['required', 'numeric', 'min:0'],
+                'notes' => ['nullable', 'string'],
+            ],
+            'save' => function (array $attributes, ?CashLoan $loan): CashLoan {
+                $loan ??= new CashLoan;
+                if (empty($loan->number)) {
+                    $loan->number = app(DocumentNumberService::class)->generate('PIN', 'cash_loans');
+                }
+                $loan->fill([
+                    'person_name' => $attributes['person_name'],
+                    'school_name' => $attributes['school_name'] ?? null,
+                    'loan_date' => $attributes['loan_date'],
+                    'due_date' => $attributes['due_date'] ?? null,
+                    'amount' => $attributes['amount'],
+                    'notes' => $attributes['notes'] ?? null,
+                ])->save();
+
+                return $loan;
+            },
         ];
     }
 }

@@ -42,6 +42,7 @@
             ['label' => 'Metode Kirim', 'route' => 'master.index', 'params' => ['resource' => 'shipping-methods'], 'match' => 'master.*', 'permission' => 'couriers.manage'],
             ['label' => 'Metode Bayar', 'route' => 'master.index', 'params' => ['resource' => 'payment-methods'], 'match' => 'master.*', 'permission' => 'payment-methods.manage'],
             ['label' => 'Aturan Rebate', 'route' => 'master.index', 'params' => ['resource' => 'rebate-rules'], 'match' => 'master.*', 'permission' => 'rebate-rules.manage'],
+            ['label' => 'Pinjaman Tunai', 'route' => 'master.index', 'params' => ['resource' => 'cash-loans'], 'match' => 'master.*', 'permission' => 'loans.view'],
             ['label' => 'Konfigurasi', 'route' => 'master.index', 'params' => ['resource' => 'settings'], 'match' => 'master.*', 'permission' => 'settings.manage'],
         ]],
 
@@ -69,6 +70,7 @@
 
         ['kind' => 'group', 'label' => 'Piutang', 'icon' => 'wallet', 'permission' => 'invoices.view', 'items' => [
             ['label' => 'Daftar Piutang', 'route' => 'receivables.index', 'match' => 'receivables.index', 'permission' => 'invoices.view'],
+            ['label' => 'Barang Belum Dikirim', 'route' => 'finance.hutang.list', 'match' => 'finance.hutang.*', 'permission' => 'invoices.view'],
             ['label' => 'Jatuh Tempo', 'route' => 'receivables.index', 'query' => ['bucket' => 'overdue'], 'match' => 'receivables.index', 'permission' => 'invoices.view'],
             ['label' => 'Riwayat Pembayaran', 'route' => 'payments.index', 'match' => 'payments.*', 'permission' => 'payments.view'],
         ]],

@@ -76,7 +76,7 @@
             </div>
         </x-card>
 
-        <x-card x-data="lineItems({{ json_encode(['products' => $products, 'items' => $items, 'blank' => $blank]) }})">
+        <x-card x-data="lineItems({{ json_encode(['products' => $products, 'items' => $items, 'blank' => $blank, 'zone' => $zonas[0]['value'] ?? '']) }})">
             <x-card-header title="Item Pesanan" icon="boxes">
                 <x-slot:action>
                     <x-button type="button" variant="secondary" size="sm" x-on:click="add()">Tambah Item</x-button>
@@ -84,6 +84,16 @@
             </x-card-header>
 
             <div class="space-y-3 p-4">
+                <div class="rounded-control border border-line p-3">
+                    <x-field label="Zona Harga">
+                        <select x-model="zone" x-on:change="applyZone()" class="w-full rounded-control border border-line-strong bg-panel px-3 py-2 text-sm text-ink outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-100 dark:focus:ring-brand-500/25">
+                            <option value="">— Pilih Zona —</option>
+                            @foreach ($zonas as $zona)
+                                <option value="{{ $zona['value'] }}">{{ $zona['label'] }}</option>
+                            @endforeach
+                        </select>
+                    </x-field>
+                </div>
                 @error('items')
                     <p class="text-xs text-rose-600 dark:text-rose-400">{{ $message }}</p>
                 @enderror
@@ -91,6 +101,12 @@
                 <template x-for="(item, index) in items" :key="index">
                     <div class="grid gap-2 rounded-control border border-line p-3 sm:grid-cols-[2fr_1fr_1fr_1fr_auto]">
                         <x-field label="Barang">
+                            <input
+                                type="search"
+                                x-model="productQuery"
+                                placeholder="Cari barang..."
+                                class="mb-1 w-full rounded-control border border-line-strong bg-panel px-3 py-1.5 text-xs text-ink outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-100 dark:focus:ring-brand-500/25"
+                            />
                             <select
                                 :name="`items[${index}][product_id]`"
                                 x-model="item.product_id"
@@ -98,7 +114,7 @@
                                 class="w-full rounded-control border border-line-strong bg-panel px-3 py-2 text-sm text-ink outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-100 dark:focus:ring-brand-500/25"
                             >
                                 <option value="">— Pilih Barang —</option>
-                                <template x-for="product in products" :key="product.value">
+                                <template x-for="product in filteredProducts()" :key="product.value">
                                     <option :value="product.value" x-text="product.label" :selected="String(item.product_id) === String(product.value)"></option>
                                 </template>
                             </select>

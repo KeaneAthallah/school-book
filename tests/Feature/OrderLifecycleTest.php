@@ -83,7 +83,7 @@ it('runs the full order lifecycle with partial stock, back orders, invoicing, pa
 
     // Invoice the shipped quantity only.
     $invoice = app(InvoiceService::class)->generateForShipment($shipment, $user);
-    expect($invoice->total_amount)->toBe('60000.00')
+    expect($invoice->total_amount)->toBe('60300.00')
         ->and($invoice->items()->sum('quantity'))->toBe(60);
 
     // Partial payment keeps the invoice partially paid.
@@ -124,21 +124,21 @@ it('runs the full order lifecycle with partial stock, back orders, invoicing, pa
 
     // Invoice the second shipment and settle both invoices.
     $secondInvoice = app(InvoiceService::class)->generateForShipment($secondShipment, $user);
-    expect($secondInvoice->total_amount)->toBe('40000.00');
+    expect($secondInvoice->total_amount)->toBe('40200.00');
 
     $settlementOne = app(PaymentService::class)->record([
         'school_id' => $school->id,
         'payment_date' => now()->toDateString(),
-        'amount' => '30000.00',
-        'allocations' => [['invoice_id' => $invoice->id, 'amount' => '30000.00']],
+        'amount' => '30300.00',
+        'allocations' => [['invoice_id' => $invoice->id, 'amount' => '30300.00']],
     ], $user);
     app(PaymentService::class)->verify($settlementOne, $user);
 
     $settlementTwo = app(PaymentService::class)->record([
         'school_id' => $school->id,
         'payment_date' => now()->toDateString(),
-        'amount' => '40000.00',
-        'allocations' => [['invoice_id' => $secondInvoice->id, 'amount' => '40000.00']],
+        'amount' => '40200.00',
+        'allocations' => [['invoice_id' => $secondInvoice->id, 'amount' => '40200.00']],
     ], $user);
     app(PaymentService::class)->verify($settlementTwo, $user);
 
@@ -152,7 +152,7 @@ it('runs the full order lifecycle with partial stock, back orders, invoicing, pa
         'rebate_rule_id' => $rule->id,
     ], $user);
 
-    expect($rebate->amount)->toBe('1200.00')
+    expect($rebate->amount)->toBe('1206.00')
         ->and($rebate->status)->toBe(RebateStatus::Submitted);
 
     app(RebateService::class)->approve($rebate, $user);
@@ -161,8 +161,8 @@ it('runs the full order lifecycle with partial stock, back orders, invoicing, pa
     expect($rebate->refresh()->status)->toBe(RebateStatus::Paid);
 
     // Final reconciliation.
-    expect((float) Invoice::query()->sum('total_amount'))->toBe(100000.0)
-        ->and((float) Invoice::query()->sum('paid_amount'))->toBe(100000.0)
+    expect((float) Invoice::query()->sum('total_amount'))->toBe(100500.0)
+        ->and((float) Invoice::query()->sum('paid_amount'))->toBe(100500.0)
         ->and(Shipment::query()->count())->toBe(2)
         ->and(OrderItem::query()->sum('shipped_quantity'))->toBe(100);
 });

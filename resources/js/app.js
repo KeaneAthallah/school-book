@@ -287,6 +287,8 @@ Alpine.data('chart', (config = {}) => ({
  */
 Alpine.data('lineItems', (config = {}) => ({
     products: config.products ?? [],
+    productQuery: '',
+    zone: config.zone ?? '',
     blank: config.blank ?? { product_id: '', quantity: 1, unit_price: '' },
     items: [],
 
@@ -320,10 +322,50 @@ Alpine.data('lineItems', (config = {}) => ({
         const targetKey = config.priceKey ?? 'unit_price';
         const sourceKey = config.bookPriceKey ?? 'price';
         const current = this.items[index][targetKey];
+        const zonaPrice = this.zonePriceFor(product);
 
         if (current === '' || current === null || current === undefined) {
-            this.items[index][targetKey] = product[sourceKey] ?? '';
+            this.items[index][targetKey] = zonaPrice || product[sourceKey] || '';
         }
+    },
+
+    zonePriceFor(product) {
+        if (!this.zone || !product?.zona_prices) {
+            return null;
+        }
+
+        return product.zona_prices[String(this.zone)] ?? null;
+    },
+
+    applyZone() {
+        this.items.forEach((item, index) => {
+            const product = this.products.find(
+                (candidate) => String(candidate.value) === String(item.product_id),
+            );
+
+            if (!product) {
+                return;
+            }
+
+            const targetKey = config.priceKey ?? 'unit_price';
+            const zonaPrice = this.zonePriceFor(product);
+
+            if (zonaPrice !== null && zonaPrice !== undefined && zonaPrice !== '') {
+                this.items[index][targetKey] = zonaPrice;
+            }
+        });
+    },
+
+filteredProducts() {
+        const q = this.productQuery.trim().toLowerCase();
+
+        if (q === '') {
+            return this.products;
+        }
+
+        return this.products.filter((product) =>
+            String(product.label ?? '').toLowerCase().includes(q),
+        );
     },
 
     subtotal() {

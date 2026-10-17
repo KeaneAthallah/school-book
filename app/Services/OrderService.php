@@ -8,7 +8,8 @@ use App\Enums\OrderStatus;
 use App\Models\Backorder;
 use App\Models\Order;
 use App\Models\OrderItem;
-use App\Models\Setting;
+use App\Models\Product;
+use App\Models\School;
 use App\Models\Stock;
 use App\Models\User;
 use App\Models\Warehouse;
@@ -23,6 +24,7 @@ class OrderService
         private readonly InventoryService $inventory,
         private readonly OrderStatusResolver $statusResolver,
         private readonly AuditLogger $audit,
+        private readonly TaxCalculator $taxes,
     ) {}
 
     /**
@@ -43,10 +45,11 @@ class OrderService
                 'notes' => $data['notes'] ?? null,
                 'external_reference' => $data['external_reference'] ?? null,
                 'external_source' => $data['external_source'] ?? null,
+                'discount_percent' => $data['discount_percent'] ?? '0',
                 'discount_amount' => $data['discount_amount'] ?? '0',
             ]);
 
-            $this->syncItems($order, $data['items']);
+            $this->syncItems($order, $data['items'], (int) $data['school_id']);
             $this->recalculate($order, $data['tax_amount'] ?? null);
 
             $this->audit->log('order.created', $order, 'Pembuatan pesanan '.$order->number, newValues: [
@@ -78,10 +81,11 @@ class OrderService
                 'notes' => $data['notes'] ?? null,
                 'external_reference' => $data['external_reference'] ?? null,
                 'external_source' => $data['external_source'] ?? null,
+                'discount_percent' => $data['discount_percent'] ?? '0',
                 'discount_amount' => $data['discount_amount'] ?? '0',
             ])->save();
 
-            $this->syncItems($order, $data['items']);
+            $this->syncItems($order, $data['items'], (int) $data['school_id']);
             $this->recalculate($order, $data['tax_amount'] ?? null);
 
             $this->audit->log('order.updated', $order, 'Perubahan pesanan '.$order->number, user: $user);
@@ -191,7 +195,7 @@ class OrderService
     /**
      * @param  array<int, array<string, mixed>>  $items
      */
-    private function syncItems(Order $order, array $items): void
+    private function syncItems(Order $order, array $items, int $schoolId = 0): void
     {
         if ($items === []) {
             throw ValidationException::withMessages([
@@ -201,14 +205,33 @@ class OrderService
 
         $order->items()->delete();
 
+        $zonaId = $schoolId > 0 ? School::query()->whereKey($schoolId)->value('zona_id') : null;
+
         foreach ($items as $line) {
             $quantity = (int) $line['quantity'];
-            $price = (string) ($line['unit_price'] ?? '0');
+            $productId = (int) $line['product_id'];
+
+            $price = $line['unit_price'] ?? null;
+            if ($price === null || $price === '') {
+                $product = Product::query()->find($productId);
+                if ($zonaId !== null && $product !== null) {
+                    $zonaPrice = $product->priceForZona((int) $zonaId);
+                    if ($zonaPrice !== null) {
+                        $price = $zonaPrice;
+                    } else {
+                        $price = $product->price;
+                    }
+                } else {
+                    $price = $product !== null ? $product->price : '0';
+                }
+            }
+            $price = (string) $price;
+
             $discount = (string) ($line['discount_amount'] ?? '0');
             $subtotal = Money::sub(Money::mul($price, (string) $quantity), $discount);
 
             $order->items()->create([
-                'product_id' => (int) $line['product_id'],
+                'product_id' => $productId,
                 'quantity' => $quantity,
                 'unit_price' => $price,
                 'discount_amount' => $discount,
@@ -220,26 +243,47 @@ class OrderService
 
     private function recalculate(Order $order, ?string $taxAmount): void
     {
-        $order->load('items');
+        $order->load('items.product:products.id,type');
 
         $subtotal = $order->items->reduce(
             fn (string $carry, OrderItem $item): string => Money::add($carry, $item->subtotal),
             '0.00',
         );
 
-        $discount = (string) $order->discount_amount;
-        $tax = $taxAmount;
+        $discountPercent = (string) $order->discount_percent;
 
-        if ($tax === null) {
-            $rate = (string) Setting::value('finance.tax_rate', '0');
-            $tax = Money::percentage($subtotal, $rate);
+        // Diskon pesanan kini persentase dari subtotal (bukan lagi nilai tetap).
+        if (Money::compare($discountPercent, '0') > 0) {
+            $discount = Money::percentage($subtotal, $discountPercent);
+        } else {
+            $discount = (string) $order->discount_amount;
         }
 
-        $total = Money::sub(Money::add($subtotal, $tax), $discount);
+        $tax = $taxAmount;
+        $dpp = '0.00';
+        $ppn = '0.00';
+        $pph = '0.00';
+
+        if ($tax === null) {
+            $calc = $this->taxes->calculate($order->items->map(fn (OrderItem $item): array => [
+                'type' => $item->product->type ?? 'book',
+                'unit_price' => $item->unit_price,
+                'quantity' => $item->quantity,
+            ]));
+
+            $tax = Money::add($calc['ppn'], $calc['pph']);
+            [$dpp, $ppn, $pph] = [$calc['dpp'], $calc['ppn'], $calc['pph']];
+        }
+
+        $total = Money::add(Money::sub(Money::add($subtotal, $ppn), $discount), $pph);
 
         $order->forceFill([
             'subtotal' => $subtotal,
+            'discount_amount' => $discount,
             'tax_amount' => $tax,
+            'dpp_amount' => $dpp,
+            'ppn_amount' => $ppn,
+            'pph_amount' => $pph,
             'total_amount' => $total,
         ])->save();
     }

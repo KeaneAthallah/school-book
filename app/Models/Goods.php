@@ -16,8 +16,9 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property int $product_id
  * @property string|null $unit
  * @property string|null $description
+ * @property string|null $store_name
  */
-#[Fillable(['product_id', 'unit', 'description'])]
+#[Fillable(['product_id', 'unit', 'description', 'store_name'])]
 class Goods extends Model
 {
     /** @use HasFactory<GoodsFactory> */

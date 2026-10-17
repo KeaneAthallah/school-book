@@ -6,6 +6,8 @@ use App\Models\Setting;
 use App\Models\Shipment;
 use App\Models\User;
 use Database\Seeders\RbacSeeder;
+use Illuminate\Contracts\Filesystem\Factory as FilesystemFactory;
+use Illuminate\Filesystem\FilesystemAdapter;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
 
@@ -92,6 +94,29 @@ it('replaces the company logo and removes the old file', function () {
 
     Storage::disk('public')->assertMissing($first);
     Storage::disk('public')->assertExists($second);
+});
+
+it('keeps the existing logo and reports an error when the upload fails', function () {
+    // Force the store() call to fail (it returns string|false) by making the
+    // filesystem disk fail the write.
+    $disk = Mockery::mock(FilesystemAdapter::class);
+    $disk->shouldReceive('putFileAs')->once()->andReturn(false);
+
+    $this->mock(FilesystemFactory::class, function ($mock) use ($disk) {
+        $mock->shouldReceive('disk')->andReturn($disk);
+    });
+
+    Setting::updateOrCreate(['key' => 'company.logo'], ['value' => 'company/logo-lama.png', 'group' => 'company']);
+
+    $this->actingAs(settingsAdmin())
+        ->put('/settings/company', [
+            'company_name' => 'CV Prana Media',
+            'company_logo' => companyLogo('logo-gagal.png'),
+        ])
+        ->assertRedirect()
+        ->assertSessionHas('error');
+
+    expect(Setting::value('company.logo'))->toBe('company/logo-lama.png');
 });
 
 it('rejects a company logo that is not an image', function () {

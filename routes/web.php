@@ -54,6 +54,7 @@ Route::middleware('auth')->group(function (): void {
     Route::get('orders/{order}', [OrderController::class, 'show'])->name('orders.show');
     Route::get('orders/{order}/edit', [OrderController::class, 'edit'])->name('orders.edit');
     Route::put('orders/{order}', [OrderController::class, 'update'])->name('orders.update');
+    Route::get('orders/{order}/print', [OrderController::class, 'print'])->name('orders.print');
     Route::post('orders/{order}/confirm', [OrderController::class, 'confirm'])->name('orders.confirm');
     Route::post('orders/{order}/cancel', [OrderController::class, 'cancel'])->name('orders.cancel');
 
@@ -100,6 +101,7 @@ Route::middleware('auth')->group(function (): void {
 
     // Piutang (receivables).
     Route::get('receivables', [ReceivableController::class, 'index'])->name('receivables.index');
+    Route::get('finance/hutang', [InvoiceController::class, 'hutang'])->name('finance.hutang.list');
 
     // Payments.
     Route::get('payments', [PaymentController::class, 'index'])->name('payments.index');

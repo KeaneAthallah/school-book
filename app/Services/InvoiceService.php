@@ -7,6 +7,7 @@ use App\Enums\ShipmentStatus;
 use App\Models\Invoice;
 use App\Models\InvoiceItem;
 use App\Models\Order;
+use App\Models\Product;
 use App\Models\Setting;
 use App\Models\Shipment;
 use App\Models\ShipmentItem;
@@ -20,6 +21,7 @@ class InvoiceService
     public function __construct(
         private readonly DocumentNumberService $numbers,
         private readonly AuditLogger $audit,
+        private readonly TaxCalculator $taxes,
     ) {}
 
     /**
@@ -115,8 +117,23 @@ class InvoiceService
             $subtotal = Money::add($subtotal, $line['subtotal']);
         }
 
-        $taxRate = (string) Setting::value('finance.tax_rate', '0');
-        $tax = Money::percentage($subtotal, $taxRate);
+        // Hitung pajak dari baris invoice memakai TaxCalculator.
+        $calc = $this->taxes->calculate(array_map(function (array $line): array {
+            /** @var Product|null $product */
+            $product = Product::query()->find((int) $line['product_id']);
+
+            return [
+                'type' => $product !== null ? $product->type : 'book',
+                'unit_price' => $line['unit_price'],
+                'quantity' => $line['quantity'],
+            ];
+        }, $lines));
+
+        $dpp = $calc['dpp'];
+        $ppn = $calc['ppn'];
+        $pph = $calc['pph'];
+        $tax = Money::add($ppn, $pph);
+
         $dueDays = (int) Setting::value('finance.invoice_due_days', '30');
         $invoiceDate = now()->toDateString();
 
@@ -130,7 +147,11 @@ class InvoiceService
             'status' => InvoiceStatus::Issued,
             'subtotal' => $subtotal,
             'discount_amount' => '0.00',
+            'discount_percent' => null,
             'tax_amount' => $tax,
+            'dpp_amount' => $dpp,
+            'ppn_amount' => $ppn,
+            'pph_amount' => $pph,
             'total_amount' => Money::add($subtotal, $tax),
             'paid_amount' => '0.00',
             'created_by' => $user->getKey(),

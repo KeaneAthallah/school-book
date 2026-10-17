@@ -11,6 +11,8 @@
 /resources/js/wayfinder
 /storage/*.key
 /storage/backups
+*.sql
+*.zip
 /storage/pail
 /vendor
 .env

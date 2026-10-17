@@ -33,7 +33,18 @@ return [
         'local' => [
             'driver' => 'local',
             'root' => storage_path('app/private'),
-            'serve' => true,
+            'serve' => false,
+            'throw' => false,
+            'report' => false,
+        ],
+
+        // Raw Dapodik snapshot dumps (storage/app/data/dapodik) shared between the
+        // browser capture script (scripts/dapodik/sulawesi-capture.cjs) and the
+        // schools:import-dapodik command. Deliberately separate from the private
+        // app disk, which is rooted at storage/app/private.
+        'dapodik' => [
+            'driver' => 'local',
+            'root' => storage_path('app/data/dapodik'),
             'throw' => false,
             'report' => false,
         ],
@@ -43,6 +54,7 @@ return [
             'root' => storage_path('app/public'),
             'url' => rtrim((string) env('APP_URL', 'http://localhost'), '/').'/storage',
             'visibility' => 'public',
+            'serve' => true,
             'throw' => false,
             'report' => false,
         ],

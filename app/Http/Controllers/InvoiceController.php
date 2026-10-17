@@ -173,6 +173,30 @@ class InvoiceController extends Controller
         return back()->with('success', 'Bukti foto pembayaran ditambahkan.');
     }
 
+    public function hutang(Request $request): View
+    {
+        abort_unless($this->userCan($request, 'invoices.view'), 403);
+
+        $invoices = Invoice::query()
+            ->with(['school:id,name', 'order:id,number'])
+            ->paidNotShipped()
+            ->orderByDesc('invoice_date')
+            ->get()
+            ->map(fn (Invoice $invoice): array => [
+                'id' => $invoice->getKey(),
+                'number' => $invoice->number,
+                'order_number' => $invoice->order?->number,
+                'school' => $invoice->school?->name,
+                'paid_date' => $invoice->invoice_date->toDateString(),
+                'due_date' => $invoice->due_date->toDateString(),
+                'total_amount' => $invoice->total_amount,
+            ])->all();
+
+        return view('finance.receivables.hutang', [
+            'invoices' => $invoices,
+        ]);
+    }
+
     public function print(Request $request, Invoice $invoice, PrintHeaderService $headers): View
     {
         abort_unless($this->userCan($request, 'invoices.view'), 403);

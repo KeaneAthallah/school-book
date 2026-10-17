@@ -17,10 +17,11 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @property string $name
  * @property string $status
  * @property int|null $sales_user_id
+ * @property int|null $zona_id
  */
 #[Fillable([
     'npsn', 'name', 'address', 'district', 'regency', 'province', 'postal_code',
-    'contact_person', 'phone', 'email', 'principal_name', 'status', 'sales_user_id',
+    'contact_person', 'phone', 'email', 'principal_name', 'status', 'sales_user_id', 'zona_id',
 ])]
 class School extends Model
 {
@@ -49,6 +50,14 @@ class School extends Model
     public function invoices(): HasMany
     {
         return $this->hasMany(Invoice::class);
+    }
+
+    /**
+     * @return BelongsTo<Zona, $this>
+     */
+    public function zona(): BelongsTo
+    {
+        return $this->belongsTo(Zona::class);
     }
 
     /**

@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Enums\OrderStatus;
+use App\Enums\ShipmentStatus;
 use App\Support\Money;
 use Database\Factories\OrderFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
@@ -24,14 +25,19 @@ use Illuminate\Support\Carbon;
  * @property OrderStatus $status
  * @property string $subtotal
  * @property string $discount_amount
+ * @property string $discount_percent
  * @property string $tax_amount
+ * @property string $dpp_amount
+ * @property string $ppn_amount
+ * @property string $pph_amount
  * @property string $total_amount
  * @property string|null $external_reference
  * @property Carbon|null $created_at
  */
 #[Fillable([
     'number', 'order_date', 'school_id', 'order_source_id', 'operator_id', 'status',
-    'subtotal', 'discount_amount', 'tax_amount', 'total_amount', 'notes',
+    'subtotal', 'discount_amount', 'discount_percent', 'tax_amount',
+    'dpp_amount', 'ppn_amount', 'pph_amount', 'total_amount', 'notes',
     'external_reference', 'external_source', 'source_payload', 'confirmed_at', 'completed_at',
 ])]
 class Order extends Model
@@ -49,7 +55,11 @@ class Order extends Model
             'status' => OrderStatus::class,
             'subtotal' => 'decimal:2',
             'discount_amount' => 'decimal:2',
+            'discount_percent' => 'decimal:2',
             'tax_amount' => 'decimal:2',
+            'dpp_amount' => 'decimal:2',
+            'ppn_amount' => 'decimal:2',
+            'pph_amount' => 'decimal:2',
             'total_amount' => 'decimal:2',
             'source_payload' => 'array',
             'confirmed_at' => 'datetime',
@@ -124,6 +134,47 @@ class Order extends Model
             ),
             '0.00',
         );
+    }
+
+    /**
+     * Total of all invoice totals attached to the order (lunas when paid >= this).
+     */
+    public function totalInvoiceAmount(): string
+    {
+        return $this->invoices->reduce(
+            fn (string $carry, Invoice $invoice): string => Money::add($carry, $invoice->total_amount),
+            '0.00',
+        );
+    }
+
+    public function paidAmount(): string
+    {
+        return $this->invoices->reduce(
+            fn (string $carry, Invoice $invoice): string => Money::add($carry, $invoice->paid_amount),
+            '0.00',
+        );
+    }
+
+    public function isPaid(): bool
+    {
+        return Money::compare($this->totalInvoiceAmount(), '0') > 0
+            && Money::compare($this->paidAmount(), $this->totalInvoiceAmount()) >= 0;
+    }
+
+    public function hasUnshippedDelivered(): bool
+    {
+        if ($this->relationLoaded('shipments')) {
+            return $this->shipments->doesntContain(fn (Shipment $s): bool => in_array(
+                $s->status->value,
+                [ShipmentStatus::Shipped->value, ShipmentStatus::Delivered->value],
+                true,
+            ));
+        }
+
+        return $this->shipments()->whereNotIn('status', [
+            ShipmentStatus::Shipped->value,
+            ShipmentStatus::Delivered->value,
+        ])->exists();
     }
 
     /**

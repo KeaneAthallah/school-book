@@ -4,9 +4,11 @@ namespace App\Models;
 
 use App\Enums\InvoicePaymentStatus;
 use App\Enums\InvoiceStatus;
+use App\Enums\ShipmentStatus;
 use App\Support\Money;
 use Database\Factories\InvoiceFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -26,12 +28,17 @@ use Illuminate\Support\Carbon;
  * @property string $subtotal
  * @property string $discount_amount
  * @property string $tax_amount
+ * @property string|null $discount_percent
+ * @property string $dpp_amount
+ * @property string $ppn_amount
+ * @property string $pph_amount
  * @property string $total_amount
  * @property string $paid_amount
  */
 #[Fillable([
     'number', 'order_id', 'shipment_id', 'school_id', 'invoice_date', 'due_date',
-    'status', 'subtotal', 'discount_amount', 'tax_amount', 'total_amount',
+    'status', 'subtotal', 'discount_amount', 'discount_percent', 'tax_amount',
+    'dpp_amount', 'ppn_amount', 'pph_amount', 'total_amount',
     'paid_amount', 'notes', 'created_by',
 ])]
 class Invoice extends Model
@@ -50,7 +57,11 @@ class Invoice extends Model
             'status' => InvoiceStatus::class,
             'subtotal' => 'decimal:2',
             'discount_amount' => 'decimal:2',
+            'discount_percent' => 'decimal:2',
             'tax_amount' => 'decimal:2',
+            'dpp_amount' => 'decimal:2',
+            'ppn_amount' => 'decimal:2',
+            'pph_amount' => 'decimal:2',
             'total_amount' => 'decimal:2',
             'paid_amount' => 'decimal:2',
         ];
@@ -139,5 +150,31 @@ class Invoice extends Model
     public function isIssued(): bool
     {
         return in_array($this->status, [InvoiceStatus::Issued, InvoiceStatus::Sent], true);
+    }
+
+    /**
+     * @param  Builder<Invoice>  $query
+     * @return Builder<Invoice>
+     */
+    public function scopePaidNotShipped(Builder $query): Builder
+    {
+        return $query->whereColumn('paid_amount', '>=', 'total_amount')
+            ->where('total_amount', '>', 0)
+            ->where(function ($q): void {
+                $q->whereDoesntHave('order')
+                    ->orWhereHas('order', function ($o): void {
+                        $o->whereDoesntHave('shipments', function ($s): void {
+                            $s->whereIn('status', [
+                                ShipmentStatus::Shipped->value,
+                                ShipmentStatus::Delivered->value,
+                            ]);
+                        });
+                    });
+            });
+    }
+
+    public function isPaid(): bool
+    {
+        return $this->paymentStatus() === InvoicePaymentStatus::Paid;
     }
 }
