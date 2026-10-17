@@ -194,6 +194,15 @@ class DashboardDemoSeeder extends Seeder
 
     private function seedPublishersAndBooks(): void
     {
+        // Prefer real catalog books when available (production/demo on real data).
+        $realBooks = Book::query()->with('product')->limit(24)->get();
+
+        if ($realBooks->isNotEmpty()) {
+            $this->books = $realBooks->all();
+
+            return;
+        }
+
         $publishers = [
             ['name' => 'Penerbit Cendekia Nusantara', 'contact_person' => 'Rani Puspita', 'phone' => '021-7700101'],
             ['name' => 'Penerbit Aksara Mandiri', 'contact_person' => 'Dimas Prakoso', 'phone' => '021-7700102'],
@@ -265,6 +274,23 @@ class DashboardDemoSeeder extends Seeder
 
     private function seedSchools(): void
     {
+        // Prefer real schools when available.
+        $realSchools = School::query()->limit(12)->get();
+
+        if ($realSchools->isNotEmpty()) {
+            $this->schools = $realSchools->all();
+
+            // Ensure sales_user_id is set for demo consistency.
+            foreach ($this->schools as $school) {
+                if ($school->sales_user_id === null) {
+                    $school->sales_user_id = $this->salesUser->getKey();
+                    $school->save();
+                }
+            }
+
+            return;
+        }
+
         $names = [
             'SMP Cendekia Harapan',
             'SMP Tunas Bangsa',
