@@ -90,13 +90,16 @@
         $totalQty = 0;
         $format = static fn (mixed $value): string => number_format((float) $value, 0, ',', '.');
         $money = static fn (mixed $value): string => (float) $value === 0.0 ? '-' : $format($value);
+        $hasGoods = $invoice->items->contains(
+            static fn ($item): bool => $item->product !== null && $item->product->type !== 'book',
+        );
     @endphp
 
     <table class="items">
         <thead>
             <tr>
                 <th class="c-no">NO</th>
-                <th class="col-title">JUDUL BUKU</th>
+                <th class="col-title">NAMA BARANG</th>
                 <th class="num">HARGA</th>
                 <th class="num">JUMLAH</th>
                 <th class="num">TOTAL</th>
@@ -126,7 +129,11 @@
     <div class="bottom">
         <div class="keterangan">
             <h4>Keterangan</h4>
-            <p>Peraturan Menteri Keuangan Nomor 5/PMK.010/2020 Tahun 2020 tentang Buku Pelajaran Umum, Kitab Suci, dan Buku Pelajaran Agama yang atas impor dan/atau penyerahannya dibebaskan dari pengenaan Pajak Pertambahan Nilai.</p>
+            @if ($hasGoods)
+                <p>Barang selain buku pelajaran dikenai Pajak Pertambahan Nilai dan pajak barang lainnya sesuai ketentuan yang berlaku.</p>
+            @else
+                <p>Peraturan Menteri Keuangan Nomor 5/PMK.010/2020 Tahun 2020 tentang Buku Pelajaran Umum, Kitab Suci, dan Buku Pelajaran Agama yang atas impor dan/atau penyerahannya dibebaskan dari pengenaan Pajak Pertambahan Nilai.</p>
+            @endif
             @if (! empty($invoice->notes))
                 <p>{{ $invoice->notes }}</p>
             @endif
@@ -136,7 +143,10 @@
             <table>
                 <tr><td>Subtotal</td><td>{{ $format($invoice->subtotal) }}</td></tr>
                 <tr><td>Diskon</td><td>{{ $money($invoice->discount_amount) }}</td></tr>
-                <tr><td>Pajak (DPP)</td><td>{{ $money($invoice->tax_amount) }}</td></tr>
+                @if ((float) $invoice->ppn_amount > 0)
+                    <tr><td>PPN</td><td>{{ $money($invoice->ppn_amount) }}</td></tr>
+                @endif
+                <tr><td>Pajak</td><td>{{ $money($invoice->pph_amount) }}</td></tr>
                 <tr class="total"><td>Total</td><td>{{ $format($invoice->total_amount) }}</td></tr>
                 <tr><td>Uang Muka</td><td>{{ $money($invoice->paid_amount) }}</td></tr>
                 <tr class="grand"><td>Sisa Yang Di Bayar</td><td>{{ $format($invoice->outstandingAmount()) }}</td></tr>

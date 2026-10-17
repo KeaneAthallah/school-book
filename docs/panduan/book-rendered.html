@@ -1799,7 +1799,6 @@
     <tr><td><code>finance.goods_tax_rate</code></td><td><strong>2</strong> — pajak untuk baris <em>barang lainnya</em>, dihitung dari DPP.</td></tr>
     <tr><td><code>finance.ppn_rate</code></td><td><strong>12</strong> — PPN untuk <em>barang lainnya</em>, dihitung dari DPP.</td></tr>
     <tr><td><code>inventory.low_stock_notice</code></td><td><strong>1</strong> (ya) — tampilkan peringatan stok menipis.</td></tr>
-    <tr><td><code>finance.tax_rate</code></td><td><strong>0</strong> — kolom lama; tidak dipakai untuk perhitungan pajak.</td></tr>
   </tbody>
 </table>
 
@@ -2605,9 +2604,16 @@
 </p>
 
 <p>
-  Pada invoice, kolom <strong>PPh</strong> memuat gabungan dari pajak buku dan
-  pajak barang lainnya. Bila invoice hanya berisi buku, kolom itu berisi pajak
-  buku saja; bila berisi barang lainnya, ditambah pajak barang lainnya.
+  Pada invoice, baris <strong>Pajak</strong> memuat gabungan pajak buku dan pajak
+  barang lainnya. Bila invoice hanya berisi buku, isinya pajak buku saja; bila
+  memuat barang lainnya, ditambah pajak barang lainnya. PPN ditampilkan pada
+  baris tersendiri.
+</p>
+
+<p>
+  DPP tidak ditampilkan sebagai baris tersendiri karena ia bukan nilai yang
+  ditambahkan ke total — ia hanya dasar perhitungan PPN dan pajak barang
+  lainnya. Nilainya tetap tersimpan pada data invoice.
 </p>
 
 <div class="kotak penting">
@@ -2640,17 +2646,24 @@
 </figure>
 
 <table class="tabel-field">
-  <thead><tr><th>Bagian</th><th>Arti</th></tr></thead>
+  <thead><tr><th style="width:34%">Bagian</th><th>Arti</th></tr></thead>
   <tbody>
     <tr><td>Deskripsi / Qty / Harga / Subtotal</td><td>Rincian barang yang ditagih pada invoice ini.</td></tr>
     <tr><td>Subtotal</td><td>Jumlah seluruh baris sebelum pajak.</td></tr>
-    <tr><td>DPP</td><td>Dasar Pengenaan Pajak.</td></tr>
-    <tr><td>PPN</td><td>Pajak Pertambahan Nilai.</td></tr>
-    <tr><td>PPh</td><td>Pajak Penghasilan yang dipotong.</td></tr>
+    <tr><td>Diskon</td><td>Potongan pada invoice.</td></tr>
+    <tr><td>PPN</td><td>Pajak Pertambahan Nilai. Baris ini <strong>hanya muncul bila invoice memuat barang lainnya</strong>. Invoice yang hanya berisi buku tidak menampilkannya.</td></tr>
+    <tr><td>Pajak</td><td>Pajak buku untuk baris buku, ditambah pajak barang lainnya untuk baris non-buku.</td></tr>
     <tr><td>Total</td><td>Nilai tagihan akhir.</td></tr>
     <tr><td>Dibayar / Sisa</td><td>Posisi pembayaran saat ini.</td></tr>
   </tbody>
 </table>
+
+<p class="catatan-kecil">
+  Halaman cetak invoice memakai susunan yang sama, ditambah baris
+  <em>Uang Muka</em> dan <em>Sisa Yang Di Bayar</em>. Catatan di bawah invoice
+  juga menyesuaikan isinya: keterangan pembebasan PPN hanya dicetak untuk
+  invoice yang seluruhnya berisi buku.
+</p>
 
 <h3>Mencetak invoice</h3>
 
@@ -2957,13 +2970,12 @@
 
 <p>
   Kartu <em>Keuangan</em> pada formulir ini menentukan tarif pajak yang dipakai
-  saat menghitung invoice. Tersedia empat kolom.
+  saat menghitung invoice. Tersedia tiga kolom.
 </p>
 
 <table class="tabel-field">
   <thead><tr><th style="width:36%">Kolom</th><th>Keterangan</th></tr></thead>
   <tbody>
-    <tr><td>Tarif Pajak (%)</td><td>Kolom lama. Perhitungan pajak invoice saat ini memakai tiga kolom di bawahnya, bukan kolom ini.</td></tr>
     <tr><td><strong>Pajak Buku (%)</strong></td><td>Pajak untuk baris <em>buku</em>. Buku tidak dikenai PPN. Nilai awal <strong>0,5</strong>.</td></tr>
     <tr><td><strong>Pajak Barang Lainnya (%)</strong></td><td>Pajak untuk baris <em>barang lainnya</em>, dihitung dari DPP. Nilai awal <strong>2</strong>.</td></tr>
     <tr><td><strong>PPN (%)</strong></td><td>PPN untuk <em>barang lainnya</em>, dihitung dari DPP. Nilai awal <strong>12</strong>.</td></tr>
@@ -4311,7 +4323,7 @@ tercatat pada laporan keuangan.</p>
     <tr><td>Packing</td><td>Mengemas barang yang sudah dipicking.</td></tr>
     <tr><td>Picking</td><td>Mengambil barang dari rak sesuai daftar.</td></tr>
     <tr><td>Piutang</td><td>Uang yang masih harus dibayar sekolah kepada kita.</td></tr>
-    <tr><td>PPh</td><td>Pajak Penghasilan yang dipotong. Pada invoice, kolom ini memuat pajak buku ditambah pajak barang lainnya.</td></tr>
+    <tr><td>PPh</td><td>Pajak Penghasilan yang dipotong. Pada invoice, nilainya tampil pada baris <em>Pajak</em> — bersama pajak buku dan pajak barang lainnya.</td></tr>
     <tr><td>PPN</td><td>Pajak Pertambahan Nilai yang ditambahkan. Hanya dikenakan pada barang lainnya, tidak pada buku.</td></tr>
     <tr><td>Pajak buku</td><td>Pajak atas penjualan buku. Buku tidak dikenai PPN.</td></tr>
     <tr><td>Pajak barang lainnya</td><td>Pajak atas penjualan barang non-buku, dihitung dari DPP.</td></tr>
@@ -4374,7 +4386,7 @@ tercatat pada laporan keuangan.</p>
     <tr><td>Barang lainnya — DPP</td><td>harga &times; 100 &divide; 111</td></tr>
     <tr><td>Barang lainnya — PPN</td><td>PPN (%) &times; DPP &nbsp;<span class="catatan-kecil">(awal: 12% &times; DPP)</span></td></tr>
     <tr><td>Barang lainnya — pajak barang lainnya</td><td>Pajak Barang Lainnya (%) &times; DPP &nbsp;<span class="catatan-kecil">(awal: 2% &times; DPP)</span></td></tr>
-    <tr><td>Kolom <em>PPh</em> pada invoice</td><td>pajak buku + pajak barang lainnya</td></tr>
+    <tr><td>Baris <em>Pajak</em> pada invoice</td><td>pajak buku + pajak barang lainnya</td></tr>
     <tr><td>Total invoice</td><td>Subtotal &minus; Diskon + PPN + PPh</td></tr>
   </tbody>
 </table>

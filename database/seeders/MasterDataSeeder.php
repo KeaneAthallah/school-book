@@ -140,7 +140,6 @@ class MasterDataSeeder extends Seeder
             ['key' => 'company.name', 'value' => 'PT Buku Sekolah Nusantara', 'group' => 'company'],
             ['key' => 'company.address', 'value' => 'Jl. Pendidikan No. 1, Makassar, Sulawesi Selatan', 'group' => 'company'],
             ['key' => 'company.phone', 'value' => '0411-123456', 'group' => 'company'],
-            ['key' => 'finance.tax_rate', 'value' => '0', 'group' => 'finance'],
             ['key' => 'finance.book_tax_rate', 'value' => '0.5', 'group' => 'finance'],
             ['key' => 'finance.goods_tax_rate', 'value' => '2', 'group' => 'finance'],
             ['key' => 'finance.ppn_rate', 'value' => '12', 'group' => 'finance'],

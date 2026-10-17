@@ -231,7 +231,9 @@ it('updates the company profile', function () {
             'company_address' => 'Jl. Merdeka No. 1, Makassar',
             'company_phone' => '0411-99999',
             'company_email' => 'halo@prana.media',
-            'tax_rate' => '11',
+            'book_tax_rate' => '1',
+            'goods_tax_rate' => '3',
+            'ppn_rate' => '11',
         ])
         ->assertRedirect();
 
@@ -239,23 +241,29 @@ it('updates the company profile', function () {
         ->and(Setting::value('company.address'))->toBe('Jl. Merdeka No. 1, Makassar')
         ->and(Setting::value('company.phone'))->toBe('0411-99999')
         ->and(Setting::value('company.email'))->toBe('halo@prana.media')
-        ->and(Setting::value('finance.tax_rate'))->toBe('11');
+        ->and(Setting::value('finance.book_tax_rate'))->toBe('1')
+        ->and(Setting::value('finance.goods_tax_rate'))->toBe('3')
+        ->and(Setting::value('finance.ppn_rate'))->toBe('11');
 });
 
-it('accepts an empty email and tax rate', function () {
+it('accepts an empty email and falls back to the default tax rates', function () {
     $this->actingAs(settingsAdmin())
         ->put('/settings/company', [
             'company_name' => 'CV Prana Media',
             'company_address' => '',
             'company_phone' => '',
             'company_email' => '',
-            'tax_rate' => '',
+            'book_tax_rate' => '',
+            'goods_tax_rate' => '',
+            'ppn_rate' => '',
         ])
         ->assertRedirect();
 
     expect(Setting::value('company.name'))->toBe('CV Prana Media')
         ->and(Setting::value('company.email'))->toBe('')
-        ->and(Setting::value('finance.tax_rate'))->toBe('0');
+        ->and(Setting::value('finance.book_tax_rate'))->toBe('0.5')
+        ->and(Setting::value('finance.goods_tax_rate'))->toBe('2')
+        ->and(Setting::value('finance.ppn_rate'))->toBe('12');
 });
 
 it('validates the company profile fields', function () {

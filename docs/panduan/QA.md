@@ -110,6 +110,33 @@ Tindakan yang sempat dicoba dan **gagal dengan aman** (tidak mengubah apa pun):
 php artisan db:seed --class=DemoDataResetSeeder
 ```
 
+### Keadaan basis data setelah buku ini dibangun
+
+`DemoDataResetSeeder` dijalankan setelah tangkapan layar diambil. Akibatnya data
+transaksi contoh tidak lagi ada pada basis data:
+
+| Tabel | Saat tangkapan layar diambil | Setelah reset |
+|---|---|---|
+| `orders` | 45 | 0 |
+| `shipments` | 22 | 0 |
+| `pickings` | 10 | 0 |
+| `goods_receipts` | 2 | 0 |
+| `invoices` | 17 | 17 (milik sekolah nyata, tidak ikut terhapus) |
+| `payments` | 12 | 12 |
+| `rebates` | 3 | 3 |
+| `schools`, `books`, `stocks` | 11.280 / 880 / 24 | tidak berubah |
+
+**Gambar yang sudah ada di `screens/` tetap sah** — diambil saat data masih ada.
+Yang berubah hanyalah basis datanya. Karena itu:
+
+- Jangan menjalankan `scripts/capture.mjs` sebelum data contoh diisi ulang; ia akan
+  menimpa gambar daftar yang baik dengan halaman kosong.
+- Dua gambar diperbarui setelah perubahan kode terakhir (formulir pajak dan cetakan
+  invoice) dengan penangkapan terarah, bukan dengan menjalankan ulang seluruh
+  pipeline.
+- Untuk membangun ulang seluruh gambar: jalankan `DashboardDemoSeeder` lebih dulu,
+  seperti dijelaskan pada `README.md` langkah 2.
+
 ---
 
 ## 5. Catatan Teknis yang Ditemukan saat Pengerjaan
@@ -179,9 +206,15 @@ berikutnya memindahkannya menjadi pengaturan yang dapat diubah Admin dari
 | Berkas | Perubahan |
 |---|---|
 | `app/Services/TaxCalculator.php` | Membaca tarif dari pengaturan, bukan angka tetap. |
-| `app/Http/Controllers/SettingsController.php` | Menyimpan tiga tarif baru dan menerima nama kolom alternatif. |
-| `resources/views/settings/company.blade.php` | Kartu <em>Keuangan</em> menampilkan empat kolom. |
-| `database/seeders/MasterDataSeeder.php` | Menyemai tiga kunci tarif baru. |
+| `app/Http/Controllers/SettingsController.php` | Menyimpan tiga tarif baru dan menerima nama kolom alternatif; kolom `tax_rate` yang lama dihapus. |
+| `resources/views/settings/company.blade.php` | Kartu <em>Keuangan</em> kini menampilkan <strong>tiga</strong> kolom tarif. |
+| `database/seeders/MasterDataSeeder.php` | Menyemai tiga kunci tarif baru; `finance.tax_rate` tidak lagi disemai. |
+| `app/Http/Controllers/InvoiceController.php` | Meneruskan DPP/PPN/PPh ke halaman detail invoice. |
+| `resources/views/finance/invoices/show.blade.php` | Menampilkan baris PPN hanya bila berlaku. |
+| `resources/views/print/invoice.blade.php` | Memperbaiki label pajak dan menyesuaikan catatan pembebasan PPN. |
+| `tests/Feature/TaxCalculatorTest.php` | Uji baru untuk perhitungan pajak. |
+| `tests/Feature/InvoiceTaxDisplayTest.php` | Uji baru untuk tampilan pajak pada invoice. |
+| `tests/Feature/CompanyProfileTest.php` | Uji profil perusahaan disesuaikan ke tiga tarif baru. |
 
 ### 8.2 Perilaku yang diverifikasi
 
@@ -207,16 +240,48 @@ Diperbaiki dengan mengembalikan `use App\Support\Money;`. Setelah perbaikan,
 seluruh hasil pada tabel 8.2 berjalan benar. Perbaikan ini disertakan pada
 direktori kerja, bukan pada basis data.
 
-### 8.4 Catatan untuk pembaca buku
+### 8.4 Kolom "Tarif Pajak (%)" dihapus
 
-- Kolom **Tarif Pajak (%)** (`finance.tax_rate`) masih ada di formulir tetapi
-  **tidak dipakai** dalam perhitungan pajak. Dinyatakan apa adanya pada Bagian 5.10.
+Formulir Profil Perusahaan semula menampilkan <strong>empat</strong> kolom:
+tiga tarif baru ditambahkan di samping kolom lama
+<strong>Tarif Pajak (%)</strong> (`finance.tax_rate`) yang sudah ada sebelumnya.
+
+Kolom lama itu tidak pernah dipakai: perhitungan pajak semula memakai angka tetap
+di dalam kode, dan sesudah perubahan memakai tiga tarif baru. Tidak ada satu pun
+kode yang membacanya. Karena itu kolom itu dihapus seluruhnya — dari formulir,
+dari pengendali, dan dari seeder — sehingga tinggal tiga kolom sesuai kebutuhan.
+
+Baris `finance.tax_rate` yang tersisa pada basis data lama tidak lagi dibaca
+maupun ditulis. Pada instalasi lain, baris itu dapat dibiarkan atau dihapus.
+
+### 8.5 Tampilan pajak pada invoice diperbaiki
+
+Perhitungan pajak sudah benar per jenis barang, tetapi tampilan invoice tidak
+memperlihatkannya. Ditemukan tiga masalah dan semuanya diperbaiki:
+
+| Masalah | Perbaikan |
+|---|---|
+| Label <strong>"Pajak (DPP)"</strong> pada invoice cetak, padahal nilainya `tax_amount` (PPN + PPh), bukan DPP. | Label diganti: baris <strong>PPN</strong> (muncul bila PPN &gt; 0) dan baris <strong>Pajak</strong>. |
+| Catatan pembebasan PPN selalu dicetak, termasuk untuk invoice berisi barang lainnya yang justru dikenai PPN. | Catatan dipilih menurut isi invoice. |
+| Judul kolom barang tertulis "JUDUL BUKU" meski isinya barang lainnya. | Diganti menjadi "NAMA BARANG". |
+
+Halaman detail invoice juga kini menampilkan baris <strong>PPN</strong> bila
+PPN memang berlaku. DPP tidak ditampilkan sebagai baris tersendiri karena ia
+bukan nilai yang ditambahkan ke total, melainkan hanya dasar perhitungan.
+
+Ketiga hal ini dijaga oleh `tests/Feature/InvoiceTaxDisplayTest.php`.
+
+### 8.6 Catatan untuk pembaca buku
+
 - Mengubah tarif hanya memengaruhi dokumen yang dihitung setelah perubahan
   disimpan, karena nilai pajak tersimpan pada dokumen saat dibuat.
 - Pengendali juga menuliskan beberapa kunci alternatif (misalnya
   `finance.tax_book_rate`, `finance.book_tax`, `finance.pajak_buku`, dan
   sejenisnya) dengan nilai yang sama. Kunci-kunci itu akan tampak pada daftar
   Konfigurasi; buku hanya menyebutkan kunci utamanya.
+- Seluruh 17 invoice pada data contoh hanya berisi buku, sehingga tidak ada
+  invoice barang lainnya yang dapat dipotret. Perilaku cabang barang lainnya
+  diverifikasi melalui pengujian, bukan melalui gambar.
 
 ---
 

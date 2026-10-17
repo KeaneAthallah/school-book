@@ -77,7 +77,25 @@ del public\hot        # Windows
 rm public/hot         # Unix
 ```
 
-### 2. Ambil tangkapan layar (pilihan — hanya bila antarmuka berubah)
+### 2. Pastikan data contoh tersedia
+
+Tangkapan layar hanya bermakna bila basis data berisi data contoh. Periksa dulu:
+
+```bash
+mysql -h 127.0.0.1 -u root -p db_school -e "SELECT COUNT(*) FROM orders;"
+```
+
+Bila jumlahnya nol (misalnya setelah menjalankan `DemoDataResetSeeder`), isi ulang
+sebelum mengambil gambar:
+
+```bash
+php artisan db:seed --class=DashboardDemoSeeder
+```
+
+Tanpa langkah ini, `capture.mjs` akan menimpa tangkapan layar yang baik dengan
+halaman daftar yang kosong.
+
+### 3. Ambil tangkapan layar (pilihan — hanya bila antarmuka berubah)
 
 ```bash
 node docs/panduan/scripts/capture.mjs
@@ -99,7 +117,7 @@ node docs/panduan/scripts/capture.mjs
   Mutasi dicatat ke `screens/mutations.md` dan dapat dipulihkan dengan
   `php artisan db:seed --class=DemoDataResetSeeder`.
 
-### 3. Bangun PDF
+### 4. Bangun PDF
 
 ```bash
 node docs/panduan/build/render.mjs
@@ -115,7 +133,7 @@ Skrip ini:
 
 Hasil: PDF di `docs/` dan `build-report.json`.
 
-### 4. Periksa mutu
+### 5. Periksa mutu
 
 ```bash
 python docs/panduan/scripts/qa_images.py    # gambar terisi, tidak kosong

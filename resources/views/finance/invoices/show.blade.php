@@ -50,7 +50,10 @@
             <dl class="divide-y divide-line text-sm">
                 <div class="flex justify-between px-4 py-2"><dt class="text-ink-soft">Subtotal</dt><dd class="text-ink tabular-nums">{{ Format::idr($invoice['subtotal']) }}</dd></div>
                 <div class="flex justify-between px-4 py-2"><dt class="text-ink-soft">Diskon</dt><dd class="text-ink tabular-nums">{{ Format::idr($invoice['discount_amount']) }}</dd></div>
-                <div class="flex justify-between px-4 py-2"><dt class="text-ink-soft">Pajak</dt><dd class="text-ink tabular-nums">{{ Format::idr($invoice['tax_amount']) }}</dd></div>
+                @if ((float) $invoice['ppn_amount'] > 0)
+                    <div class="flex justify-between px-4 py-2"><dt class="text-ink-soft">PPN</dt><dd class="text-ink tabular-nums">{{ Format::idr($invoice['ppn_amount']) }}</dd></div>
+                @endif
+                <div class="flex justify-between px-4 py-2"><dt class="text-ink-soft">Pajak</dt><dd class="text-ink tabular-nums">{{ Format::idr($invoice['pph_amount']) }}</dd></div>
                 <div class="flex justify-between px-4 py-2 font-semibold"><dt class="text-ink">Total</dt><dd class="text-ink tabular-nums">{{ Format::idr($invoice['total_amount']) }}</dd></div>
                 <div class="flex justify-between px-4 py-2"><dt class="text-ink-soft">Dibayar</dt><dd class="text-ink tabular-nums">{{ Format::idr($invoice['paid_amount']) }}</dd></div>
                 <div class="flex justify-between px-4 py-2 font-semibold"><dt class="text-ink">Sisa</dt><dd class="text-rose-600 tabular-nums dark:text-rose-400">{{ Format::idr($invoice['outstanding_amount']) }}</dd></div>

@@ -776,9 +776,16 @@
 </p>
 
 <p>
-  Pada invoice, kolom <strong>PPh</strong> memuat gabungan dari pajak buku dan
-  pajak barang lainnya. Bila invoice hanya berisi buku, kolom itu berisi pajak
-  buku saja; bila berisi barang lainnya, ditambah pajak barang lainnya.
+  Pada invoice, baris <strong>Pajak</strong> memuat gabungan pajak buku dan pajak
+  barang lainnya. Bila invoice hanya berisi buku, isinya pajak buku saja; bila
+  memuat barang lainnya, ditambah pajak barang lainnya. PPN ditampilkan pada
+  baris tersendiri.
+</p>
+
+<p>
+  DPP tidak ditampilkan sebagai baris tersendiri karena ia bukan nilai yang
+  ditambahkan ke total — ia hanya dasar perhitungan PPN dan pajak barang
+  lainnya. Nilainya tetap tersimpan pada data invoice.
 </p>
 
 <div class="kotak penting">
@@ -811,17 +818,24 @@
 </figure>
 
 <table class="tabel-field">
-  <thead><tr><th>Bagian</th><th>Arti</th></tr></thead>
+  <thead><tr><th style="width:34%">Bagian</th><th>Arti</th></tr></thead>
   <tbody>
     <tr><td>Deskripsi / Qty / Harga / Subtotal</td><td>Rincian barang yang ditagih pada invoice ini.</td></tr>
     <tr><td>Subtotal</td><td>Jumlah seluruh baris sebelum pajak.</td></tr>
-    <tr><td>DPP</td><td>Dasar Pengenaan Pajak.</td></tr>
-    <tr><td>PPN</td><td>Pajak Pertambahan Nilai.</td></tr>
-    <tr><td>PPh</td><td>Pajak Penghasilan yang dipotong.</td></tr>
+    <tr><td>Diskon</td><td>Potongan pada invoice.</td></tr>
+    <tr><td>PPN</td><td>Pajak Pertambahan Nilai. Baris ini <strong>hanya muncul bila invoice memuat barang lainnya</strong>. Invoice yang hanya berisi buku tidak menampilkannya.</td></tr>
+    <tr><td>Pajak</td><td>Pajak buku untuk baris buku, ditambah pajak barang lainnya untuk baris non-buku.</td></tr>
     <tr><td>Total</td><td>Nilai tagihan akhir.</td></tr>
     <tr><td>Dibayar / Sisa</td><td>Posisi pembayaran saat ini.</td></tr>
   </tbody>
 </table>
+
+<p class="catatan-kecil">
+  Halaman cetak invoice memakai susunan yang sama, ditambah baris
+  <em>Uang Muka</em> dan <em>Sisa Yang Di Bayar</em>. Catatan di bawah invoice
+  juga menyesuaikan isinya: keterangan pembebasan PPN hanya dicetak untuk
+  invoice yang seluruhnya berisi buku.
+</p>
 
 <h3>Mencetak invoice</h3>
 
@@ -1128,13 +1142,12 @@
 
 <p>
   Kartu <em>Keuangan</em> pada formulir ini menentukan tarif pajak yang dipakai
-  saat menghitung invoice. Tersedia empat kolom.
+  saat menghitung invoice. Tersedia tiga kolom.
 </p>
 
 <table class="tabel-field">
   <thead><tr><th style="width:36%">Kolom</th><th>Keterangan</th></tr></thead>
   <tbody>
-    <tr><td>Tarif Pajak (%)</td><td>Kolom lama. Perhitungan pajak invoice saat ini memakai tiga kolom di bawahnya, bukan kolom ini.</td></tr>
     <tr><td><strong>Pajak Buku (%)</strong></td><td>Pajak untuk baris <em>buku</em>. Buku tidak dikenai PPN. Nilai awal <strong>0,5</strong>.</td></tr>
     <tr><td><strong>Pajak Barang Lainnya (%)</strong></td><td>Pajak untuk baris <em>barang lainnya</em>, dihitung dari DPP. Nilai awal <strong>2</strong>.</td></tr>
     <tr><td><strong>PPN (%)</strong></td><td>PPN untuk <em>barang lainnya</em>, dihitung dari DPP. Nilai awal <strong>12</strong>.</td></tr>
