@@ -6,6 +6,8 @@ Dokumen ini menjelaskan seluruh fitur aplikasi secara detail agar pengguna dapat
 
 ## 1. Login dan Akun
 
+![Login](screenshots/login.png)
+
 ### 1.1 Cara Login
 1. Buka aplikasi di browser.
 2. Masukkan **Email** dan **Password**.
@@ -28,6 +30,8 @@ Dokumen ini menjelaskan seluruh fitur aplikasi secara detail agar pengguna dapat
 ---
 
 ## 2. Dashboard
+
+![Dashboard](screenshots/dashboard.png)
 Dashboard menampilkan:
 - Ringkasan pesanan
 - Stok
@@ -40,6 +44,8 @@ Dashboard menampilkan:
 ## 3. Master Data
 
 ### 3.1 Sekolah
+
+![Master Sekolah](screenshots/master-schools.png)
 Menu: **Master Data > Sekolah**
 
 Field:
@@ -78,6 +84,8 @@ Menu: **Master Data > Penerbit**
 Field: Nama, Kontak, Telepon, Email, Alamat, Logo, Status.
 
 ### 3.3 Buku
+
+![Master Buku](screenshots/master-books.png)
 Menu: **Master Data > Buku**
 
 Field:
@@ -147,6 +155,8 @@ Menu: **Master Data > Konfigurasi**
 Field: Grup, Kunci, Nilai.
 
 ### 3.13 Pinjaman Tunai
+
+![Pinjaman Tunai](screenshots/cash-loans.png)
 Menu: **Master Data > Pinjaman Tunai**
 
 Field:
@@ -169,6 +179,8 @@ Menu: **Pesanan > Nota Pesanan**
 - Klik nomor pesanan untuk melihat detail.
 
 ### 4.2 Buat Pesanan
+
+![Buat Pesanan](screenshots/order-form.png)
 Menu: **Pesanan > Buat Pesanan**
 
 Langkah:
@@ -280,6 +292,8 @@ Menu: **Stok & Gudang > Mutasi Stok**
 ---
 
 ## 10. Picking & Packing
+
+![Picking](screenshots/picking.png)
 Menu: **Picking & Packing > Daftar Picking**
 
 Langkah:
@@ -292,6 +306,8 @@ Langkah:
 ---
 
 ## 11. Pengiriman
+
+![Pengiriman](screenshots/shipments.png)
 Menu: **Pengiriman > Daftar Pengiriman**
 
 Langkah:
@@ -304,6 +320,8 @@ Langkah:
 ---
 
 ## 12. Invoice
+
+![Invoice](screenshots/invoices.png)
 Menu: **Invoice**
 
 Langkah:
@@ -322,6 +340,8 @@ Rincian invoice:
 ---
 
 ## 13. Daftar Hutang (Barang Belum Dikirim)
+
+![Hutang](screenshots/hutang.png)
 Menu: **Piutang > Barang Belum Dikirim**
 
 Menampilkan invoice yang sudah lunas tetapi pesanannya belum terkirim penuh.
