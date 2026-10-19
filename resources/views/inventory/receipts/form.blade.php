@@ -32,15 +32,6 @@
                     </x-select>
                 </x-field>
 
-                <x-field label="Gudang" name="warehouse_id" required>
-                    <x-select name="warehouse_id" :invalid="$errors->has('warehouse_id')">
-                        <option value="">— Pilih —</option>
-                        @foreach ($warehouses as $option)
-                            <option value="{{ $option['value'] }}" @selected(old('warehouse_id') == $option['value'])>{{ $option['label'] }}</option>
-                        @endforeach
-                    </x-select>
-                </x-field>
-
                 <x-field label="Tanggal" name="receipt_date" required>
                     <x-input type="date" name="receipt_date" value="{{ old('receipt_date', $defaultDate) }}" :invalid="$errors->has('receipt_date')" />
                 </x-field>

@@ -15,6 +15,7 @@ class DatabaseSeeder extends Seeder
             RbacSeeder::class,
             MasterDataSeeder::class,
             MasterPriceSeeder::class,
+            SchoolSeeder::class,
         ]);
     }
 }

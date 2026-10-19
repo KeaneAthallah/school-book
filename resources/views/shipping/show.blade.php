@@ -8,7 +8,6 @@
 
         $detail = [
             'Pesanan' => $shipment['order'] ?? '-',
-            'Gudang' => $shipment['warehouse'] ?? '-',
             'Kurir / Metode' => trim(($shipment['courier'] ?? '').' / '.($shipment['shipping_method'] ?? ''), ' /') ?: '-',
             'No. Resi' => $shipment['tracking_number'] ?? '-',
             'Penerima' => $shipment['recipient_name'] ?? '-',

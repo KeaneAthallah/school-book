@@ -5,13 +5,14 @@
 @section('content')
     @php
         $editing = isset($order);
-        $blank = ['product_id' => '', 'quantity' => 1, 'unit_price' => '', 'discount_amount' => '0'];
+        $blank = ['product_id' => '', 'quantity' => 1, 'unit_price' => '', 'discount_amount' => '0', 'availability_status' => 'available'];
         $items = $editing
             ? collect($order['items'])->map(fn (array $item): array => [
                 'product_id' => (string) $item['product_id'],
                 'quantity' => $item['quantity'],
                 'unit_price' => $item['unit_price'],
                 'discount_amount' => $item['discount_amount'],
+                'availability_status' => $item['availability_status'] ?? 'available',
             ])->all()
             : [$blank];
     @endphp
@@ -39,13 +40,13 @@
         <x-card>
             <x-card-header title="Informasi Pesanan" icon="cart" />
 
-            <div class="grid gap-3 p-4 sm:grid-cols-2 lg:grid-cols-3">
+            <div class="grid gap-3 p-4 sm:grid-cols-2 lg:grid-cols-3" x-data="{ schools: {{ json_encode(collect($schools)->mapWithKeys(fn ($s) => [(string) $s['value'] => $s['rebate_percent']])->all()) }}, discount: '{{ old('discount_percent', $editing ? ($order['discount_percent'] ?? '0') : '0') }}' }">
                 <x-field label="Tanggal" name="order_date" required>
                     <x-input type="date" name="order_date" value="{{ old('order_date', $editing ? $order['order_date'] : $defaultDate) }}" :invalid="$errors->has('order_date')" />
                 </x-field>
 
                 <x-field label="Sekolah" name="school_id" required>
-                    <x-select name="school_id" :invalid="$errors->has('school_id')">
+                    <x-select name="school_id" :invalid="$errors->has('school_id')" x-on:change="if (schools[$event.target.value] !== undefined && schools[$event.target.value] !== null) discount = schools[$event.target.value]">
                         <option value="">— Pilih Sekolah —</option>
                         @foreach ($schools as $option)
                             <option value="{{ $option['value'] }}" @selected((string) old('school_id', $editing ? $order['school_id'] : '') === (string) $option['value'])>{{ $option['label'] }}</option>
@@ -66,8 +67,8 @@
                     <x-input name="external_reference" value="{{ old('external_reference', $editing ? $order['external_reference'] : '') }}" :invalid="$errors->has('external_reference')" />
                 </x-field>
 
-                <x-field label="Diskon Pesanan" name="discount_amount">
-                    <x-input type="number" step="any" name="discount_amount" value="{{ old('discount_amount', $editing ? $order['discount_amount'] : '0') }}" :invalid="$errors->has('discount_amount')" />
+                <x-field label="Diskon Pesanan (%)" name="discount_percent">
+                    <x-input type="number" step="any" min="0" max="100" name="discount_percent" value="{{ old('discount_percent', $editing ? ($order['discount_percent'] ?? '0') : '0') }}" :invalid="$errors->has('discount_percent')" x-model="discount" />
                 </x-field>
 
                 <x-field label="Catatan" name="notes" class="sm:col-span-2 lg:col-span-3">
@@ -139,7 +140,12 @@
                             <x-input type="number" step="any" x-model="item.discount_amount" x-bind:name="`items[${index}][discount_amount]`" />
                         </x-field>
 
-                        <div class="flex items-end">
+                        <div class="flex items-end gap-2">
+                            <label class="flex items-center gap-1 text-xs">
+                                <input type="checkbox" :checked="item.availability_status === 'unavailable'" @change="item.availability_status = $event.target.checked ? 'unavailable' : 'available'" />
+                                Kosong
+                            </label>
+                            <input type="hidden" :name="`items[${index}][availability_status]`" x-model="item.availability_status" />
                             <x-button type="button" variant="ghost" size="sm" x-on:click="remove(index)" x-bind:disabled="items.length === 1">Hapus</x-button>
                         </div>
                     </div>

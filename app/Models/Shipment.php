@@ -17,13 +17,12 @@ use Illuminate\Support\Carbon;
  * @property string $number
  * @property string|null $delivery_note_number
  * @property int $order_id
- * @property int $warehouse_id
  * @property ShipmentStatus $status
  * @property Carbon|null $ship_date
  * @property Carbon|null $confirmed_at
  */
 #[Fillable([
-    'number', 'delivery_note_number', 'order_id', 'warehouse_id', 'courier_id',
+    'number', 'delivery_note_number', 'order_id', 'courier_id',
     'shipping_method_id', 'ship_date', 'tracking_number', 'recipient_name', 'address',
     'status', 'notes', 'created_by', 'confirmed_at',
 ])]
@@ -50,14 +49,6 @@ class Shipment extends Model
     public function order(): BelongsTo
     {
         return $this->belongsTo(Order::class);
-    }
-
-    /**
-     * @return BelongsTo<Warehouse, $this>
-     */
-    public function warehouse(): BelongsTo
-    {
-        return $this->belongsTo(Warehouse::class);
     }
 
     /**

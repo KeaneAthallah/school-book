@@ -11,10 +11,10 @@ beforeEach(function () {
 it('streams a csv export of a report', function () {
     $admin = User::query()->where('email', 'admin@sekolah.test')->firstOrFail();
 
-    $response = $this->actingAs($admin)->get('/reports/export?type=stock');
+    $response = $this->actingAs($admin)->get('/reports/export?type=order_summary');
 
     $response->assertOk();
-    expect($response->streamedContent())->toContain('Kode');
+    expect($response->streamedContent())->toContain('No. Pesanan');
 });
 
 it('forbids a role without the report permission', function () {

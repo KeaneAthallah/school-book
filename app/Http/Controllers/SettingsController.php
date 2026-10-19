@@ -104,13 +104,13 @@ class SettingsController extends Controller
         $bookRate = ($validated['book_tax_rate'] ?? null) === null ? '0.5' : (string) $validated['book_tax_rate'];
         $goodsRate = ($validated['goods_tax_rate'] ?? null) === null ? '2' : (string) $validated['goods_tax_rate'];
         $ppnRate = ($validated['ppn_rate'] ?? null) === null ? '12' : (string) $validated['ppn_rate'];
-        foreach (['finance.book_tax_rate','finance.tax_book_rate','finance.book_tax','finance.tax_book','finance.pajak_buku'] as $k) {
+        foreach (['finance.book_tax_rate', 'finance.tax_book_rate', 'finance.book_tax', 'finance.tax_book', 'finance.pajak_buku'] as $k) {
             $this->put($k, $bookRate, 'finance');
         }
-        foreach (['finance.goods_tax_rate','finance.tax_goods_rate','finance.goods_tax','finance.tax_goods','finance.pajak_barang_lainnya','finance.pajak_barang'] as $k) {
+        foreach (['finance.goods_tax_rate', 'finance.tax_goods_rate', 'finance.goods_tax', 'finance.tax_goods', 'finance.pajak_barang_lainnya', 'finance.pajak_barang'] as $k) {
             $this->put($k, $goodsRate, 'finance');
         }
-        foreach (['finance.ppn_rate','finance.tax_ppn_rate','finance.ppn','finance.tax_ppn'] as $k) {
+        foreach (['finance.ppn_rate', 'finance.tax_ppn_rate', 'finance.ppn', 'finance.tax_ppn'] as $k) {
             $this->put($k, $ppnRate, 'finance');
         }
 

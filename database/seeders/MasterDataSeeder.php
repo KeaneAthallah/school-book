@@ -13,7 +13,6 @@ use App\Models\Publisher;
 use App\Models\RebateRule;
 use App\Models\Setting;
 use App\Models\ShippingMethod;
-use App\Models\Warehouse;
 use App\Models\Zona;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Str;
@@ -27,11 +26,6 @@ class MasterDataSeeder extends Seeder
     {
         $this->seedSettings();
         $this->seedZonas();
-
-        $warehouse = Warehouse::query()->updateOrCreate(
-            ['code' => 'GDG-01'],
-            ['name' => 'Gudang Utama', 'address' => 'Jl. Pendidikan No. 1, Makassar', 'status' => 'active'],
-        );
 
         $publishers = [
             ['name' => 'Erlangga', 'contact_person' => 'Andi', 'phone' => '021-5550001'],
@@ -101,8 +95,6 @@ class MasterDataSeeder extends Seeder
         );
 
         $this->seedGoods();
-
-        unset($warehouse);
     }
 
     private function seedGoods(): void
@@ -123,7 +115,6 @@ class MasterDataSeeder extends Seeder
                     'title' => $data['title'],
                     'price' => $data['price'],
                     'cost_price' => (int) ($data['price'] * 0.7),
-                    'min_stock' => 5,
                     'rack_location' => null,
                     'status' => 'active',
                 ],

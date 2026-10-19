@@ -102,7 +102,7 @@
         <x-card>
             <x-card-header title="Stok Barang" icon="book" subtitle="Diurutkan dari ketersediaan terendah">
                 <x-slot:action>
-                    <a href="{{ route('stock.index') }}" class="text-xs font-medium text-brand-600 hover:underline dark:text-brand-300">Lihat stok</a>
+                    <a href="{{ route('receipts.index') }}" class="text-xs font-medium text-brand-600 hover:underline dark:text-brand-300">Lihat penerimaan</a>
                 </x-slot:action>
             </x-card-header>
 

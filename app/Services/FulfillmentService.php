@@ -7,7 +7,6 @@ use App\Models\Order;
 use App\Models\OrderItem;
 use App\Models\Picking;
 use App\Models\User;
-use App\Models\Warehouse;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
 
@@ -38,7 +37,6 @@ class FulfillmentService
             $picking = Picking::query()->create([
                 'number' => $this->numbers->generate('PCK', 'pickings'),
                 'order_id' => $locked->getKey(),
-                'warehouse_id' => (int) ($ready->first()->warehouse_id ?? Warehouse::default()->getKey()),
                 'status' => PickingStatus::Draft,
                 'created_by' => $user->getKey(),
             ]);

@@ -14,11 +14,10 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @property int $id
  * @property string $number
  * @property int $order_id
- * @property int $warehouse_id
  * @property PickingStatus $status
  */
 #[Fillable([
-    'number', 'order_id', 'warehouse_id', 'status', 'notes',
+    'number', 'order_id', 'status', 'notes',
     'created_by', 'picked_at', 'packed_at',
 ])]
 class Picking extends Model
@@ -44,14 +43,6 @@ class Picking extends Model
     public function order(): BelongsTo
     {
         return $this->belongsTo(Order::class);
-    }
-
-    /**
-     * @return BelongsTo<Warehouse, $this>
-     */
-    public function warehouse(): BelongsTo
-    {
-        return $this->belongsTo(Warehouse::class);
     }
 
     /**

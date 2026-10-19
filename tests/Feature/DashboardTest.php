@@ -107,15 +107,6 @@ it('renders the receivables page', function () {
         ->assertViewHas('aging');
 });
 
-it('renders the stock movement ledger', function () {
-    $this->actingAs(dashboardUser('admin@sekolah.test'))
-        ->get('/stock/movements')
-        ->assertOk()
-        ->assertViewIs('inventory.stock.movements')
-        ->assertViewHas('movements')
-        ->assertViewHas('types');
-});
-
 it('prints a delivery note for a shipment', function () {
     $shipment = Shipment::factory()->create();
 

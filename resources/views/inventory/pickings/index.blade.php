@@ -36,7 +36,6 @@
                 ['key' => 'number', 'label' => 'No. Picking', 'link' => 'pickings.show'],
                 ['key' => 'order', 'label' => 'Pesanan'],
                 ['key' => 'school', 'label' => 'Sekolah'],
-                ['key' => 'warehouse', 'label' => 'Gudang'],
                 ['key' => 'items_count', 'label' => 'Item', 'align' => 'right', 'class' => 'tabular-nums'],
                 ['key' => 'status', 'label' => 'Status', 'view' => 'components.status-label'],
                 ['key' => 'created_at', 'label' => 'Dibuat', 'type' => 'datetime'],

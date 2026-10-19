@@ -9,7 +9,6 @@ use App\Models\OrderItem;
 use App\Models\Shipment;
 use App\Models\ShipmentItem;
 use App\Models\User;
-use App\Models\Warehouse;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
@@ -18,7 +17,6 @@ class ShipmentService
 {
     public function __construct(
         private readonly DocumentNumberService $numbers,
-        private readonly InventoryService $inventory,
         private readonly OrderStatusResolver $statusResolver,
         private readonly AuditLogger $audit,
     ) {}
@@ -47,16 +45,10 @@ class ShipmentService
                 ]);
             }
 
-            $firstItem = $locked->items->firstWhere('id', $lines[0]['order_item_id']);
-            $warehouseId = $firstItem instanceof OrderItem
-                ? (int) $firstItem->warehouse_id
-                : (int) Warehouse::default()->getKey();
-
             $shipment = Shipment::query()->create([
                 'number' => $this->numbers->generate('SHP', 'shipments'),
                 'delivery_note_number' => $this->numbers->generate('SJ', 'shipments', column: 'delivery_note_number'),
                 'order_id' => $locked->getKey(),
-                'warehouse_id' => $warehouseId,
                 'courier_id' => $data['courier_id'] ?? null,
                 'shipping_method_id' => $data['shipping_method_id'] ?? null,
                 'ship_date' => $data['ship_date'] ?? null,
@@ -109,8 +101,6 @@ class ShipmentService
                         'quantity' => "Jumlah kirim melebihi stok yang direservasi untuk barang #{$item->product_id}.",
                     ]);
                 }
-
-                $this->inventory->ship($item, $shipmentItem->quantity, $user, 'Pengiriman '.$locked->number);
 
                 $item->reserved_quantity -= $shipmentItem->quantity;
                 $item->shipped_quantity += $shipmentItem->quantity;

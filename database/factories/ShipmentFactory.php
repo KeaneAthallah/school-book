@@ -5,7 +5,6 @@ namespace Database\Factories;
 use App\Enums\ShipmentStatus;
 use App\Models\Order;
 use App\Models\Shipment;
-use App\Models\Warehouse;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Str;
 
@@ -25,7 +24,6 @@ class ShipmentFactory extends Factory
             'number' => 'SHP-TEST-'.Str::upper(Str::random(8)),
             'delivery_note_number' => null,
             'order_id' => Order::factory(),
-            'warehouse_id' => Warehouse::factory(),
             'courier_id' => null,
             'shipping_method_id' => null,
             'ship_date' => null,

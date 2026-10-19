@@ -122,7 +122,7 @@ class ShipmentController extends Controller
     {
         abort_unless($this->userCan($request, 'shipments.view'), 403);
 
-        $shipment->load(['order:id,number', 'order.school:id,name,address', 'warehouse:id,name', 'courier:id,name', 'shippingMethod:id,name', 'items.product:id,code,title']);
+        $shipment->load(['order:id,number', 'order.school:id,name,address', 'courier:id,name', 'shippingMethod:id,name', 'items.product:id,code,title']);
 
         return view('shipping.show', [
             'shipment' => [
@@ -132,7 +132,6 @@ class ShipmentController extends Controller
                 'order' => $shipment->order?->number,
                 'school' => $shipment->order?->school?->name,
                 'address' => $shipment->address ?? $shipment->order?->school?->address,
-                'warehouse' => $shipment->warehouse?->name,
                 'courier' => $shipment->courier?->name,
                 'shipping_method' => $shipment->shippingMethod?->name,
                 'tracking_number' => $shipment->tracking_number,
@@ -222,7 +221,7 @@ class ShipmentController extends Controller
     {
         abort_unless($this->userCan($request, 'shipments.view'), 403);
 
-        $shipment->load(['order.school', 'warehouse', 'courier', 'shippingMethod', 'createdBy:id,name', 'items.product']);
+        $shipment->load(['order.school', 'courier', 'shippingMethod', 'createdBy:id,name', 'items.product']);
 
         return view('print.delivery-note', [
             'shipment' => $shipment,

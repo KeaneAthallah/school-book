@@ -20,7 +20,7 @@ class PickingController extends Controller
         $status = $request->string('status')->toString();
 
         $pickings = Picking::query()
-            ->with(['order:id,number,school_id', 'order.school:id,name', 'warehouse:id,name'])
+            ->with(['order:id,number,school_id', 'order.school:id,name'])
             ->withCount('items')
             ->when($status !== '', fn (Builder $query) => $query->where('status', $status))
             ->orderByDesc('id')
@@ -31,7 +31,6 @@ class PickingController extends Controller
                 'number' => $picking->number,
                 'order' => $picking->order?->number,
                 'school' => $picking->order?->school?->name,
-                'warehouse' => $picking->warehouse?->name,
                 'status' => $picking->status->value,
                 'status_label' => $picking->status->label(),
                 'items_count' => (int) $picking->getAttribute('items_count'),
@@ -63,7 +62,7 @@ class PickingController extends Controller
     {
         abort_unless($this->userCan($request, 'fulfillment.view'), 403);
 
-        $picking->load(['order:id,number', 'order.school:id,name', 'warehouse:id,name', 'items.product:id,code,title']);
+        $picking->load(['order:id,number', 'order.school:id,name', 'items.product:id,code,title']);
 
         return view('inventory.pickings.show', [
             'picking' => [
@@ -71,7 +70,6 @@ class PickingController extends Controller
                 'number' => $picking->number,
                 'order' => $picking->order?->number,
                 'school' => $picking->order?->school?->name,
-                'warehouse' => $picking->warehouse?->name,
                 'status' => $picking->status->value,
                 'status_label' => $picking->status->label(),
                 'items' => $picking->items->map(fn ($item): array => [

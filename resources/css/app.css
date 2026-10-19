@@ -120,10 +120,22 @@
     .brand-grid {
         background-image:
             linear-gradient(var(--t-brand-grid-line) 1px, transparent 1px),
-            linear-gradient(90deg, var(--t-brand-grid-line) 1px, transparent 1px);
+            linear-gradient(
+                90deg,
+                var(--t-brand-grid-line) 1px,
+                transparent 1px
+            );
         background-size: 44px 44px;
-        -webkit-mask-image: radial-gradient(ellipse 90% 80% at 60% 20%, black 30%, transparent 75%);
-        mask-image: radial-gradient(ellipse 90% 80% at 60% 20%, black 30%, transparent 75%);
+        -webkit-mask-image: radial-gradient(
+            ellipse 90% 80% at 60% 20%,
+            black 30%,
+            transparent 75%
+        );
+        mask-image: radial-gradient(
+            ellipse 90% 80% at 60% 20%,
+            black 30%,
+            transparent 75%
+        );
     }
 
     /* Alpine: hide elements until the component is initialised */

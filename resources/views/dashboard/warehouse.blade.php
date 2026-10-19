@@ -12,11 +12,10 @@
     @include('dashboard.partials.quick-actions', ['actions' => [
         ['label' => 'Catat Barang Masuk', 'icon' => 'inbox', 'route' => 'receipts.create', 'permission' => 'receipts.manage'],
         ['label' => 'Daftar Penerimaan', 'icon' => 'fileText', 'route' => 'receipts.index', 'permission' => 'receipts.view'],
-        ['label' => 'Stok Barang', 'icon' => 'boxes', 'route' => 'stock.index', 'permission' => 'stock.view'],
-        ['label' => 'Mutasi Stok', 'icon' => 'refresh', 'route' => 'stock.movements', 'permission' => 'stock.view'],
+        ['label' => 'Back Order', 'icon' => 'refresh', 'route' => 'backorders.index', 'permission' => 'procurement.view'],
+        ['label' => 'Item Tidak Tersedia', 'icon' => 'alert', 'route' => 'backorders.unavailable', 'permission' => 'procurement.view'],
         ['label' => 'Picking & Packing', 'icon' => 'clipboard', 'route' => 'pickings.index', 'permission' => 'fulfillment.view'],
         ['label' => 'Pengiriman', 'icon' => 'truck', 'route' => 'shipments.index', 'permission' => 'shipments.view'],
-        ['label' => 'Back Order', 'icon' => 'inbox', 'route' => 'reports.index', 'params' => ['type' => 'backorders'], 'permission' => 'reports.view'],
     ]])
 
     <x-card class="mt-4">
@@ -43,7 +42,7 @@
         <x-card>
             <x-card-header title="Stok Menipis & Habis" icon="alert" subtitle="Ketersediaan terendah lebih dahulu">
                 <x-slot:action>
-                    <a href="{{ route('stock.index') }}" class="text-xs font-medium text-brand-600 hover:underline dark:text-brand-300">Kelola stok</a>
+                    <a href="{{ route('receipts.index') }}" class="text-xs font-medium text-brand-600 hover:underline dark:text-brand-300">Kelola penerimaan</a>
                 </x-slot:action>
             </x-card-header>
 
@@ -76,7 +75,7 @@
     <x-card class="mt-4">
         <x-card-header title="Mutasi Stok Terbaru" icon="refresh" subtitle="Seluruh pergerakan stok mengikuti aturan reservasi dan pengiriman yang berlaku">
             <x-slot:action>
-                <a href="{{ route('stock.movements') }}" class="text-xs font-medium text-brand-600 hover:underline dark:text-brand-300">Lihat semua</a>
+                <a href="{{ route('receipts.index') }}" class="text-xs font-medium text-brand-600 hover:underline dark:text-brand-300">Lihat semua</a>
             </x-slot:action>
         </x-card-header>
 
@@ -86,7 +85,6 @@
             :rows="$data['stock_movements']"
             :columns="[
                 ['key' => 'product', 'label' => 'Barang'],
-                ['key' => 'warehouse', 'label' => 'Gudang'],
                 ['key' => 'type', 'label' => 'Jenis'],
                 ['key' => 'quantity', 'label' => 'Jumlah', 'align' => 'right', 'class' => 'tabular-nums'],
                 ['label' => 'Waktu', 'view' => 'dashboard.partials.movement-time'],

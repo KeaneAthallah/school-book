@@ -18,7 +18,6 @@ class StoreGoodsReceiptRequest extends FormRequest
     {
         return [
             'publisher_id' => ['required', 'integer', 'exists:publishers,id'],
-            'warehouse_id' => ['required', 'integer', 'exists:warehouses,id'],
             'receipt_date' => ['required', 'date'],
             'notes' => ['nullable', 'string'],
             'items' => ['required', 'array', 'min:1'],

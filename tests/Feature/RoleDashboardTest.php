@@ -198,11 +198,10 @@ it('forbids warehouse users from financial operations', function () {
 it('forbids finance users from inventory operations', function () {
     $finance = dashUser('keuangan@sekolah.test');
 
-    expect($finance->hasPermission('stock.adjust'))->toBeFalse()
+    expect($finance->hasPermission('procurement.manage'))->toBeFalse()
         ->and($finance->hasPermission('receipts.manage'))->toBeFalse()
         ->and($finance->hasPermission('fulfillment.pick'))->toBeFalse();
 
-    $this->actingAs($finance)->post('/stock/adjust', [])->assertForbidden();
     $this->actingAs($finance)->post('/receipts', [])->assertForbidden();
     $this->actingAs($finance)->post('/pickings', [])->assertForbidden();
 });

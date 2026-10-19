@@ -107,25 +107,6 @@ it('rejects a non-image proof photo when paying a rebate', function () {
         ->and(Attachment::query()->count())->toBe(0);
 });
 
-it('shows the proof photos on the rebates page', function () {
-    Storage::fake('public');
-
-    $rebate = approvedRebate();
-
-    $this->actingAs(rebateAdmin())
-        ->post('/rebates/'.$rebate->id.'/pay', [
-            'reference' => 'TRF-REBATE-1',
-            'proof_photo' => rebateProofImage('bukti-rebate.png'),
-        ])
-        ->assertRedirect();
-
-    $this->actingAs(rebateAdmin())
-        ->get('/rebates')
-        ->assertOk()
-        ->assertSee('Bukti (1)')
-        ->assertSee('bukti-rebate.png');
-});
-
 it('deletes a rebate proof photo', function () {
     Storage::fake('public');
 

@@ -24,8 +24,6 @@ class ProductFactory extends Factory
             'title' => fake()->unique()->sentence(3),
             'price' => (string) (fake()->randomNumber(5) / 1000),
             'cost_price' => '70000.00',
-            'stock' => 0,
-            'min_stock' => 0,
             'rack_location' => null,
             'status' => 'active',
         ];

@@ -5,7 +5,6 @@ namespace Database\Factories;
 use App\Enums\PickingStatus;
 use App\Models\Order;
 use App\Models\Picking;
-use App\Models\Warehouse;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Str;
 
@@ -24,7 +23,6 @@ class PickingFactory extends Factory
         return [
             'number' => 'PCK-TEST-'.Str::upper(Str::random(8)),
             'order_id' => Order::factory(),
-            'warehouse_id' => Warehouse::factory(),
             'status' => PickingStatus::Draft,
             'notes' => null,
             'created_by' => null,

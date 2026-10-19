@@ -52,10 +52,9 @@ use Illuminate\Support\Facades\DB;
  *                            per invoice.
  *  - Piutang Jatuh Tempo ... outstanding > 0 AND due_date < today. A fully paid
  *                            invoice is never overdue debt.
- *  - Stok Menipis .......... available = quantity - reserved_quantity;
- *                            "habis" when available <= 0, "menipis" when
- *                            quantity <= min_stock and available > 0.
- *  - Nilai Persediaan ...... SUM(stocks.quantity * books.cost_price).
+ *  - Stok .................. physical stock tracking (stocks, warehouses,
+ *                            min_stock) was removed, so the stock panels are
+ *                            placeholders that return empty data.
  *
  * Every method takes a DashboardScope so role restrictions are applied inside
  * SQL rather than being filtered after the fact.
@@ -92,12 +91,7 @@ class DashboardMetrics
      */
     public function inventoryValue(): string
     {
-        $total = DB::table('stocks')
-            ->join('products', 'products.id', '=', 'stocks.product_id')
-            ->selectRaw('COALESCE(SUM(stocks.quantity * products.cost_price), 0) as total')
-            ->value('total');
-
-        return Money::add((string) $total, '0');
+        return '0.00';
     }
 
     // ---------------------------------------------------------------- orders
@@ -276,27 +270,7 @@ class DashboardMetrics
      */
     public function stockAlerts(): array
     {
-        $row = DB::table('stocks')
-            ->join('products', 'products.id', '=', 'stocks.product_id')
-            ->groupBy('products.id', 'products.min_stock')
-            ->selectRaw('products.min_stock as min_stock, SUM(stocks.quantity) as quantity, SUM(stocks.reserved_quantity) as reserved')
-            ->get();
-
-        $low = 0;
-        $out = 0;
-
-        foreach ($row as $item) {
-            $available = (int) $item->quantity - (int) $item->reserved;
-            $minStock = (int) $item->min_stock;
-
-            if ($available <= 0) {
-                $out++;
-            } elseif ($minStock > 0 && (int) $item->quantity <= $minStock) {
-                $low++;
-            }
-        }
-
-        return ['low' => $low, 'out' => $out];
+        return ['low' => 0, 'out' => 0];
     }
 
     /**
@@ -306,30 +280,7 @@ class DashboardMetrics
      */
     public function stockRows(int $limit = 6): array
     {
-        return DB::table('stocks')
-            ->join('products', 'products.id', '=', 'stocks.product_id')
-            ->groupBy('products.id', 'products.code', 'products.title', 'products.min_stock')
-            ->selectRaw('products.code as code, products.title as title, products.min_stock as min_stock, SUM(stocks.quantity) as quantity, SUM(stocks.reserved_quantity) as reserved')
-            ->orderByRaw('(SUM(stocks.quantity) - SUM(stocks.reserved_quantity)) asc')
-            ->limit($limit)
-            ->get()
-            ->map(function (object $row): array {
-                $quantity = (int) $row->quantity;
-                $reserved = (int) $row->reserved;
-                $available = max(0, $quantity - $reserved);
-                $minStock = (int) $row->min_stock;
-
-                return [
-                    'code' => (string) $row->code,
-                    'title' => (string) $row->title,
-                    'quantity' => $quantity,
-                    'reserved' => $reserved,
-                    'available' => $available,
-                    'min_stock' => $minStock,
-                    'state' => $available <= 0 ? 'out' : ($minStock > 0 && $quantity <= $minStock ? 'low' : 'ok'),
-                ];
-            })
-            ->all();
+        return [];
     }
 
     /**
@@ -337,28 +288,7 @@ class DashboardMetrics
      */
     public function stockMovements(int $limit = 8): array
     {
-        return DB::table('stock_movements')
-            ->join('products', 'products.id', '=', 'stock_movements.product_id')
-            ->leftJoin('warehouses', 'warehouses.id', '=', 'stock_movements.warehouse_id')
-            ->orderByDesc('stock_movements.id')
-            ->limit($limit)
-            ->get([
-                'stock_movements.id',
-                'stock_movements.type',
-                'stock_movements.quantity',
-                'stock_movements.created_at',
-                'products.title as product',
-                'warehouses.name as warehouse',
-            ])
-            ->map(fn (object $row): array => [
-                'id' => (int) $row->id,
-                'type' => (string) $row->type,
-                'quantity' => (int) $row->quantity,
-                'product' => (string) $row->product,
-                'warehouse' => $row->warehouse === null ? null : (string) $row->warehouse,
-                'time' => (string) $row->created_at,
-            ])
-            ->all();
+        return [];
     }
 
     // ----------------------------------------------------------- fulfillment
@@ -958,7 +888,6 @@ class DashboardMetrics
     {
         return DB::table('goods_receipts')
             ->leftJoin('publishers', 'publishers.id', '=', 'goods_receipts.publisher_id')
-            ->leftJoin('warehouses', 'warehouses.id', '=', 'goods_receipts.warehouse_id')
             ->orderByDesc('goods_receipts.receipt_date')
             ->orderByDesc('goods_receipts.id')
             ->limit($limit)
@@ -968,14 +897,12 @@ class DashboardMetrics
                 'goods_receipts.receipt_date',
                 'goods_receipts.status',
                 'publishers.name as publisher',
-                'warehouses.name as warehouse',
             ])
             ->map(fn (object $row): array => [
                 'id' => (int) $row->id,
                 'number' => (string) $row->number,
                 'date' => substr((string) $row->receipt_date, 0, 10),
                 'publisher' => $row->publisher === null ? null : (string) $row->publisher,
-                'warehouse' => $row->warehouse === null ? null : (string) $row->warehouse,
                 'status' => (string) $row->status,
                 'status_label' => GoodsReceiptStatus::from((string) $row->status)->label(),
             ])

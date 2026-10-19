@@ -10,9 +10,7 @@ use App\Models\Order;
 use App\Models\OrderItem;
 use App\Models\Product;
 use App\Models\School;
-use App\Models\Stock;
 use App\Models\User;
-use App\Models\Warehouse;
 use App\Support\Money;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
@@ -21,7 +19,6 @@ class OrderService
 {
     public function __construct(
         private readonly DocumentNumberService $numbers,
-        private readonly InventoryService $inventory,
         private readonly OrderStatusResolver $statusResolver,
         private readonly AuditLogger $audit,
         private readonly TaxCalculator $taxes,
@@ -118,26 +115,18 @@ class OrderService
             }
 
             foreach ($locked->items as $item) {
-                $item->warehouse_id = $this->pickWarehouse((int) $item->product_id)->getKey();
+                $item->reserved_quantity = 0;
+                $item->backorder_quantity = $item->quantity;
+                $item->status = $this->statusResolver->resolveItem($item->quantity, 0, 0);
                 $item->save();
 
-                $reserved = $this->inventory->reserveAvailable($item, $item->quantity, $user);
-                $shortage = $item->quantity - $reserved;
-
-                $item->reserved_quantity = $reserved;
-                $item->backorder_quantity = $shortage;
-                $item->status = $this->statusResolver->resolveItem($item->quantity, $reserved, 0);
-                $item->save();
-
-                if ($shortage > 0) {
-                    Backorder::query()->create([
-                        'order_item_id' => $item->getKey(),
-                        'product_id' => $item->product_id,
-                        'quantity' => $shortage,
-                        'fulfilled_quantity' => 0,
-                        'status' => BackorderStatus::Open,
-                    ]);
-                }
+                Backorder::query()->create([
+                    'order_item_id' => $item->getKey(),
+                    'product_id' => $item->product_id,
+                    'quantity' => $item->quantity,
+                    'fulfilled_quantity' => 0,
+                    'status' => BackorderStatus::Open,
+                ]);
             }
 
             $locked->forceFill([
@@ -171,12 +160,9 @@ class OrderService
             $locked->load('items');
 
             foreach ($locked->items as $item) {
-                if ($item->reserved_quantity > 0) {
-                    $this->inventory->release($item, $item->reserved_quantity, $user, 'Pembatalan pesanan '.$locked->number);
-                    $item->reserved_quantity = 0;
-                    $item->status = OrderItemStatus::Pending;
-                    $item->save();
-                }
+                $item->reserved_quantity = 0;
+                $item->status = OrderItemStatus::Pending;
+                $item->save();
 
                 Backorder::query()
                     ->where('order_item_id', $item->getKey())
@@ -237,6 +223,7 @@ class OrderService
                 'discount_amount' => $discount,
                 'subtotal' => $subtotal,
                 'status' => OrderItemStatus::Pending,
+                'availability_status' => $line['availability_status'] ?? 'available',
             ]);
         }
     }
@@ -286,24 +273,6 @@ class OrderService
             'pph_amount' => $pph,
             'total_amount' => $total,
         ])->save();
-    }
-
-    /**
-     * Pick the warehouse holding the most available stock for a product,
-     * falling back to the default warehouse.
-     */
-    private function pickWarehouse(int $productId): Warehouse
-    {
-        $best = Stock::query()
-            ->where('product_id', $productId)
-            ->orderByRaw('(quantity - reserved_quantity) DESC')
-            ->first();
-
-        if ($best !== null && $best->availableQuantity() > 0) {
-            return Warehouse::query()->findOrFail((int) $best->warehouse_id);
-        }
-
-        return Warehouse::default();
     }
 
     /**

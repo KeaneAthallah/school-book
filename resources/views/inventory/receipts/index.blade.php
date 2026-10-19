@@ -34,7 +34,6 @@
                 ['key' => 'number', 'label' => 'No. Penerimaan', 'link' => 'receipts.show'],
                 ['key' => 'receipt_date', 'label' => 'Tanggal', 'type' => 'date'],
                 ['key' => 'publisher', 'label' => 'Penerbit'],
-                ['key' => 'warehouse', 'label' => 'Gudang'],
                 ['key' => 'items_count', 'label' => 'Item', 'align' => 'right', 'class' => 'tabular-nums'],
                 ['key' => 'status', 'label' => 'Status', 'view' => 'components.status-label'],
             ]"

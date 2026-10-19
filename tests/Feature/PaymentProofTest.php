@@ -9,7 +9,6 @@ use App\Models\Product;
 use App\Models\Publisher;
 use App\Models\School;
 use App\Models\User;
-use App\Models\Warehouse;
 use App\Services\GoodsReceiptService;
 use App\Services\InvoiceService;
 use App\Services\OrderService;
@@ -37,17 +36,12 @@ function paymentProofImage(string $name): UploadedFile
 
 function invoicedOrder(): Invoice
 {
-    $warehouse = Warehouse::factory()->create(['code' => 'GDG-PAY', 'status' => 'active']);
     $publisher = Publisher::factory()->create();
     $product = Product::factory()->create(['price' => '1000.00', 'cost_price' => '600.00']);
     $book = Book::factory()->for($publisher)->create(['product_id' => $product->id]);
     $school = School::factory()->create();
     $source = OrderSource::factory()->create();
     $user = User::factory()->create();
-
-    $receipt = GoodsReceipt::factory()->for($publisher)->for($warehouse)->create();
-    $receipt->items()->create(['product_id' => $product->id, 'quantity' => 60, 'unit_cost' => '600.00']);
-    app(GoodsReceiptService::class)->confirm($receipt, $user);
 
     $order = app(OrderService::class)->create([
         'order_date' => now()->toDateString(),
@@ -58,6 +52,10 @@ function invoicedOrder(): Invoice
         ],
     ], $user);
     app(OrderService::class)->confirm($order, $user);
+
+    $receipt = GoodsReceipt::factory()->for($publisher)->create();
+    $receipt->items()->create(['product_id' => $product->id, 'quantity' => 60, 'unit_cost' => '600.00']);
+    app(GoodsReceiptService::class)->confirm($receipt, $user);
 
     $order->refresh()->load('items');
 

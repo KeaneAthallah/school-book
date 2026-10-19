@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Enums\ItemAvailability;
 use App\Enums\OrderItemStatus;
 use Database\Factories\OrderItemFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
@@ -21,10 +22,12 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property int $shipped_quantity
  * @property int $backorder_quantity
  * @property OrderItemStatus $status
+ * @property ItemAvailability $availability_status
  */
 #[Fillable([
-    'order_id', 'product_id', 'warehouse_id', 'quantity', 'unit_price', 'discount_amount',
+    'order_id', 'product_id', 'quantity', 'unit_price', 'discount_amount',
     'subtotal', 'reserved_quantity', 'shipped_quantity', 'backorder_quantity', 'status',
+    'availability_status',
 ])]
 class OrderItem extends Model
 {
@@ -38,6 +41,7 @@ class OrderItem extends Model
     {
         return [
             'status' => OrderItemStatus::class,
+            'availability_status' => ItemAvailability::class,
             'unit_price' => 'decimal:2',
             'discount_amount' => 'decimal:2',
             'subtotal' => 'decimal:2',
@@ -62,14 +66,6 @@ class OrderItem extends Model
     public function product(): BelongsTo
     {
         return $this->belongsTo(Product::class);
-    }
-
-    /**
-     * @return BelongsTo<Warehouse, $this>
-     */
-    public function warehouse(): BelongsTo
-    {
-        return $this->belongsTo(Warehouse::class);
     }
 
     public function outstandingQuantity(): int

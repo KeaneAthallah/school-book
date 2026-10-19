@@ -21,6 +21,8 @@ return [
         'goods.manage' => ['name' => 'Kelola Barang Lainnya', 'group' => 'Master Data'],
         'categories.manage' => ['name' => 'Kelola Kategori Buku', 'group' => 'Master Data'],
         'warehouses.manage' => ['name' => 'Kelola Gudang', 'group' => 'Master Data'],
+        'catalogs.view' => ['name' => 'Lihat Katalog', 'group' => 'Katalog'],
+        'catalogs.manage' => ['name' => 'Kelola Katalog', 'group' => 'Katalog'],
         'order-sources.manage' => ['name' => 'Kelola Sumber Pesanan', 'group' => 'Master Data'],
         'couriers.manage' => ['name' => 'Kelola Kurir & Metode Kirim', 'group' => 'Master Data'],
         'payment-methods.manage' => ['name' => 'Kelola Metode Pembayaran', 'group' => 'Master Data'],
@@ -42,8 +44,8 @@ return [
         'receipts.view' => ['name' => 'Lihat Penerimaan Barang', 'group' => 'Inventori'],
         'receipts.manage' => ['name' => 'Kelola Penerimaan Barang', 'group' => 'Inventori'],
         'receipts.confirm' => ['name' => 'Konfirmasi Penerimaan Barang', 'group' => 'Inventori'],
-        'stock.view' => ['name' => 'Lihat Stok', 'group' => 'Inventori'],
-        'stock.adjust' => ['name' => 'Penyesuaian Stok', 'group' => 'Inventori'],
+        'procurement.view' => ['name' => 'Lihat Pengadaan', 'group' => 'Pengadaan'],
+        'procurement.manage' => ['name' => 'Kelola Pengadaan', 'group' => 'Pengadaan'],
         'fulfillment.view' => ['name' => 'Lihat Picking & Packing', 'group' => 'Inventori'],
         'fulfillment.pick' => ['name' => 'Proses Picking', 'group' => 'Inventori'],
         'fulfillment.pack' => ['name' => 'Konfirmasi Packing', 'group' => 'Inventori'],
@@ -81,7 +83,7 @@ return [
             'description' => 'Menginput dan memvalidasi pesanan.',
             'permissions' => [
                 'dashboard.view', 'schools.view', 'books.view', 'goods.view', 'orders.view',
-                'orders.manage', 'orders.confirm', 'stock.view', 'reports.view',
+                'orders.manage', 'orders.confirm', 'procurement.view', 'reports.view',
             ],
         ],
         'gudang' => [
@@ -89,7 +91,7 @@ return [
             'description' => 'Mengelola penerimaan, stok, picking, packing, dan pengiriman.',
             'permissions' => [
                 'dashboard.view', 'books.view', 'goods.view', 'orders.view', 'receipts.view',
-                'receipts.manage', 'receipts.confirm', 'stock.view', 'stock.adjust',
+                'receipts.manage', 'receipts.confirm', 'procurement.view', 'procurement.manage',
                 'fulfillment.view', 'fulfillment.pick', 'fulfillment.pack',
                 'shipments.view', 'shipments.manage', 'shipments.confirm', 'reports.view',
             ],

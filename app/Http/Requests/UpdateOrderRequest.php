@@ -31,6 +31,7 @@ class UpdateOrderRequest extends FormRequest
             'items.*.quantity' => ['required', 'integer', 'min:1'],
             'items.*.unit_price' => ['required', 'numeric', 'min:0'],
             'items.*.discount_amount' => ['nullable', 'numeric', 'min:0'],
+            'items.*.availability_status' => ['nullable', 'string', 'in:available,unavailable'],
         ];
     }
 }

@@ -22,6 +22,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 #[Fillable([
     'npsn', 'name', 'address', 'district', 'regency', 'province', 'postal_code',
     'contact_person', 'phone', 'email', 'principal_name', 'status', 'sales_user_id', 'zona_id',
+    'rebate_percent',
 ])]
 class School extends Model
 {

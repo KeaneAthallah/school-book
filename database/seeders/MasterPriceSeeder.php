@@ -253,8 +253,6 @@ class MasterPriceSeeder extends Seeder
                         'title' => $row['title'],
                         'price' => $row['price'],
                         'cost_price' => $row['cost_price'],
-                        'stock' => 0,
-                        'min_stock' => 0,
                         'rack_location' => null,
                         'status' => 'active',
                     ];

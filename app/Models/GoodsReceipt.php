@@ -15,13 +15,12 @@ use Illuminate\Support\Carbon;
  * @property int $id
  * @property string $number
  * @property int $publisher_id
- * @property int $warehouse_id
  * @property Carbon $receipt_date
  * @property GoodsReceiptStatus $status
  * @property Carbon|null $confirmed_at
  */
 #[Fillable([
-    'number', 'publisher_id', 'warehouse_id', 'receipt_date', 'status', 'notes',
+    'number', 'publisher_id', 'receipt_date', 'status', 'notes',
     'created_by', 'confirmed_by', 'confirmed_at',
 ])]
 class GoodsReceipt extends Model
@@ -47,14 +46,6 @@ class GoodsReceipt extends Model
     public function publisher(): BelongsTo
     {
         return $this->belongsTo(Publisher::class);
-    }
-
-    /**
-     * @return BelongsTo<Warehouse, $this>
-     */
-    public function warehouse(): BelongsTo
-    {
-        return $this->belongsTo(Warehouse::class);
     }
 
     /**

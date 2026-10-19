@@ -3,6 +3,8 @@
 use App\Http\Controllers\AttachmentController;
 use App\Http\Controllers\AuditLogController;
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
+use App\Http\Controllers\BackorderController;
+use App\Http\Controllers\CatalogController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\GoodsReceiptController;
 use App\Http\Controllers\HomeController;
@@ -20,7 +22,6 @@ use App\Http\Controllers\RoleController;
 use App\Http\Controllers\SearchController;
 use App\Http\Controllers\SettingsController;
 use App\Http\Controllers\ShipmentController;
-use App\Http\Controllers\StockController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 
@@ -66,11 +67,6 @@ Route::middleware('auth')->group(function (): void {
     Route::post('receipts/{receipt}/confirm', [GoodsReceiptController::class, 'confirm'])->name('receipts.confirm');
     Route::delete('receipts/{receipt}', [GoodsReceiptController::class, 'destroy'])->name('receipts.destroy');
 
-    // Stock.
-    Route::get('stock', [StockController::class, 'index'])->name('stock.index');
-    Route::get('stock/movements', [StockController::class, 'movements'])->name('stock.movements');
-    Route::post('stock/adjust', [StockController::class, 'adjust'])->name('stock.adjust');
-
     // Picking & packing.
     Route::get('pickings', [PickingController::class, 'index'])->name('pickings.index');
     Route::post('pickings', [PickingController::class, 'store'])->name('pickings.store');
@@ -109,6 +105,28 @@ Route::middleware('auth')->group(function (): void {
     Route::post('payments', [PaymentController::class, 'store'])->name('payments.store');
     Route::post('payments/{payment}/verify', [PaymentController::class, 'verify'])->name('payments.verify');
     Route::post('payments/{payment}/reverse', [PaymentController::class, 'reverse'])->name('payments.reverse');
+
+    // Cash loans (pinjaman tunai) - master data resource with a dedicated URL.
+    Route::get('pinjaman-tunai', [MasterDataController::class, 'index'])->defaults('resource', 'cash-loans')->name('cash-loans.index');
+    Route::get('pinjaman-tunai/create', [MasterDataController::class, 'create'])->defaults('resource', 'cash-loans')->name('cash-loans.create');
+    Route::post('pinjaman-tunai', [MasterDataController::class, 'store'])->defaults('resource', 'cash-loans')->name('cash-loans.store');
+    Route::get('pinjaman-tunai/{id}/edit', [MasterDataController::class, 'edit'])->defaults('resource', 'cash-loans')->name('cash-loans.edit');
+    Route::put('pinjaman-tunai/{id}', [MasterDataController::class, 'update'])->defaults('resource', 'cash-loans')->name('cash-loans.update');
+    Route::delete('pinjaman-tunai/{id}', [MasterDataController::class, 'destroy'])->defaults('resource', 'cash-loans')->name('cash-loans.destroy');
+
+    // Back orders & procurement.
+    Route::get('backorders', [BackorderController::class, 'index'])->name('backorders.index');
+    Route::post('backorders/order', [BackorderController::class, 'orderStore'])->name('backorders.orderStore');
+    Route::get('backorders/unavailable', [BackorderController::class, 'unavailable'])->name('backorders.unavailable');
+
+    // Catalogs.
+    Route::get('catalogs', [CatalogController::class, 'index'])->name('catalogs.index');
+    Route::get('catalogs/create', [CatalogController::class, 'create'])->name('catalogs.create');
+    Route::post('catalogs', [CatalogController::class, 'store'])->name('catalogs.store');
+    Route::get('catalogs/{catalog}/edit', [CatalogController::class, 'edit'])->name('catalogs.edit');
+    Route::put('catalogs/{catalog}', [CatalogController::class, 'update'])->name('catalogs.update');
+    Route::delete('catalogs/{catalog}', [CatalogController::class, 'destroy'])->name('catalogs.destroy');
+    Route::get('catalogs/{catalog}/pdf', [CatalogController::class, 'printPdf'])->name('catalogs.printPdf');
 
     // Rebates.
     Route::get('rebates', [RebateController::class, 'index'])->name('rebates.index');

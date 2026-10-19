@@ -17,7 +17,6 @@ use App\Models\School;
 use App\Models\Setting;
 use App\Models\ShippingMethod;
 use App\Models\User;
-use App\Models\Warehouse;
 use App\Models\Zona;
 use App\Services\DocumentNumberService;
 use Illuminate\Database\Eloquent\Model;
@@ -58,7 +57,6 @@ class MasterDataRegistry
             'categories' => self::categories(),
             'books' => self::books(),
             'barang-lainnya' => self::goods(),
-            'warehouses' => self::warehouses(),
             'order-sources' => self::orderSources(),
             'couriers' => self::couriers(),
             'shipping-methods' => self::shippingMethods(),
@@ -148,6 +146,7 @@ class MasterDataRegistry
                 ['name' => 'email', 'label' => 'Email', 'type' => 'email'],
                 ['name' => 'principal_name', 'label' => 'Kepala Sekolah', 'type' => 'text'],
                 ['name' => 'sales_user_id', 'label' => 'Sales/PIC', 'type' => 'select', 'options' => fn (): array => self::activeOptions(User::class)],
+                ['name' => 'rebate_percent', 'label' => 'Rebate (%)', 'type' => 'number', 'hint' => 'Diskon otomatis saat membuat nota pesanan'],
                 ['name' => 'status', 'label' => 'Status', 'type' => 'select', 'options' => [['value' => 'active', 'label' => 'Aktif'], ['value' => 'inactive', 'label' => 'Nonaktif']]],
             ],
             'rules' => fn (?Model $model): array => [
@@ -163,6 +162,7 @@ class MasterDataRegistry
                 'email' => ['nullable', 'email', 'max:255'],
                 'principal_name' => ['nullable', 'string', 'max:255'],
                 'sales_user_id' => ['nullable', 'integer', 'exists:users,id'],
+                'rebate_percent' => ['nullable', 'numeric', 'min:0', 'max:100'],
                 'status' => ['required', Rule::in(['active', 'inactive'])],
             ],
         ];
@@ -287,7 +287,6 @@ class MasterDataRegistry
                 ['name' => 'price_zona_4', 'label' => 'Harga Jual Zona 4', 'type' => 'number'],
                 ['name' => 'price_zona_5', 'label' => 'Harga Jual Zona 5', 'type' => 'number'],
                 ['name' => 'cost_price', 'label' => 'Harga Pokok', 'type' => 'number'],
-                ['name' => 'min_stock', 'label' => 'Stok Minimum', 'type' => 'number'],
                 ['name' => 'rack_location', 'label' => 'Lokasi Rak', 'type' => 'text'],
                 ['name' => 'status', 'label' => 'Status', 'type' => 'select', 'options' => [['value' => 'active', 'label' => 'Aktif'], ['value' => 'inactive', 'label' => 'Nonaktif']]],
             ],
@@ -304,7 +303,6 @@ class MasterDataRegistry
                 'price_zona_4' => ['nullable', 'numeric', 'min:0', 'required_without_all:price_zona_3,price_zona_5'],
                 'price_zona_5' => ['nullable', 'numeric', 'min:0', 'required_without_all:price_zona_3,price_zona_4'],
                 'cost_price' => ['nullable', 'numeric', 'min:0'],
-                'min_stock' => ['nullable', 'integer', 'min:0'],
                 'rack_location' => ['nullable', 'string', 'max:255'],
                 'status' => ['required', Rule::in(['active', 'inactive'])],
             ],
@@ -331,7 +329,6 @@ class MasterDataRegistry
                     'price_zona_4' => $zonePrices['Z4'] ?? null,
                     'price_zona_5' => $zonePrices['Z5'] ?? null,
                     'cost_price' => $product?->cost_price,
-                    'min_stock' => $product?->min_stock,
                     'rack_location' => $product?->rack_location,
                     'status' => $product?->status,
                 ];
@@ -344,7 +341,6 @@ class MasterDataRegistry
                     'title' => $attributes['title'],
                     'price' => $attributes['price_zona_3'] ?? '0',
                     'cost_price' => $attributes['cost_price'] ?? 0,
-                    'min_stock' => $attributes['min_stock'] ?? 0,
                     'rack_location' => $attributes['rack_location'] ?? null,
                     'status' => $attributes['status'],
                 ])->save();
@@ -433,7 +429,6 @@ class MasterDataRegistry
                 ['key' => 'product.title', 'label' => 'Nama Barang'],
                 ['key' => 'product.price', 'label' => 'Harga', 'type' => 'currency'],
                 ['key' => 'product.cost_price', 'label' => 'Harga Pokok', 'type' => 'currency'],
-                ['key' => 'product.min_stock', 'label' => 'Stok Minimum'],
                 ['key' => 'product.status', 'label' => 'Status', 'type' => 'status'],
             ],
             'fields' => [
@@ -441,7 +436,6 @@ class MasterDataRegistry
                 ['name' => 'title', 'label' => 'Nama Barang', 'type' => 'text', 'required' => true],
                 ['name' => 'price', 'label' => 'Harga Jual', 'type' => 'number', 'required' => true],
                 ['name' => 'cost_price', 'label' => 'Harga Pokok', 'type' => 'number'],
-                ['name' => 'min_stock', 'label' => 'Stok Minimum', 'type' => 'number'],
                 ['name' => 'rack_location', 'label' => 'Lokasi Rak', 'type' => 'text'],
                 ['name' => 'store_name', 'label' => 'Nama Toko', 'type' => 'text'],
                 ['name' => 'unit', 'label' => 'Satuan', 'type' => 'text'],
@@ -452,7 +446,6 @@ class MasterDataRegistry
                 'title' => ['required', 'string', 'max:255'],
                 'price' => ['required', 'numeric', 'min:0'],
                 'cost_price' => ['nullable', 'numeric', 'min:0'],
-                'min_stock' => ['nullable', 'integer', 'min:0'],
                 'rack_location' => ['nullable', 'string', 'max:255'],
                 'store_name' => ['nullable', 'string', 'max:255'],
                 'unit' => ['nullable', 'string', 'max:255'],
@@ -466,7 +459,6 @@ class MasterDataRegistry
                     'title' => $product?->title,
                     'price' => $product?->price,
                     'cost_price' => $product?->cost_price,
-                    'min_stock' => $product?->min_stock,
                     'rack_location' => $product?->rack_location,
                     'store_name' => $goods->store_name,
                     'unit' => $goods->unit,
@@ -481,7 +473,6 @@ class MasterDataRegistry
                     'title' => $attributes['title'],
                     'price' => $attributes['price'],
                     'cost_price' => $attributes['cost_price'] ?? 0,
-                    'min_stock' => $attributes['min_stock'] ?? 0,
                     'rack_location' => $attributes['rack_location'] ?? null,
                     'status' => $attributes['status'],
                 ])->save();
@@ -501,32 +492,6 @@ class MasterDataRegistry
     /**
      * @return array<string, mixed>
      */
-    private static function warehouses(): array
-    {
-        return [
-            ...self::base('Gudang', Warehouse::class, 'warehouses.manage', 'warehouses.manage'),
-            'search' => ['code', 'name'],
-            'sort' => 'name',
-            'columns' => [
-                ['key' => 'code', 'label' => 'Kode'],
-                ['key' => 'name', 'label' => 'Nama Gudang'],
-                ['key' => 'address', 'label' => 'Alamat'],
-                ['key' => 'status', 'label' => 'Status', 'type' => 'status'],
-            ],
-            'fields' => [
-                ['name' => 'code', 'label' => 'Kode', 'type' => 'text', 'required' => true],
-                ['name' => 'name', 'label' => 'Nama Gudang', 'type' => 'text', 'required' => true],
-                ['name' => 'address', 'label' => 'Alamat', 'type' => 'textarea'],
-                ['name' => 'status', 'label' => 'Status', 'type' => 'select', 'options' => [['value' => 'active', 'label' => 'Aktif'], ['value' => 'inactive', 'label' => 'Nonaktif']]],
-            ],
-            'rules' => fn (?Model $model): array => [
-                'code' => ['required', 'string', 'max:255', Rule::unique('warehouses', 'code')->ignore($model?->getKey())],
-                'name' => ['required', 'string', 'max:255'],
-                'status' => ['required', Rule::in(['active', 'inactive'])],
-            ],
-        ];
-    }
-
     /**
      * @return array<string, mixed>
      */

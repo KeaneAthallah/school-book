@@ -101,7 +101,6 @@
                 empty-icon="boxes"
                 :columns="[
                     ['label' => 'Barang', 'view' => 'orders.partials.item-book'],
-                    ['key' => 'warehouse', 'label' => 'Gudang'],
                     ['key' => 'quantity', 'label' => 'Dipesan', 'align' => 'right', 'class' => 'tabular-nums'],
                     ['key' => 'reserved_quantity', 'label' => 'Ready', 'align' => 'right', 'class' => 'tabular-nums'],
                     ['key' => 'shipped_quantity', 'label' => 'Terkirim', 'align' => 'right', 'class' => 'tabular-nums'],

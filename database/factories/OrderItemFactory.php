@@ -6,7 +6,6 @@ use App\Enums\OrderItemStatus;
 use App\Models\Order;
 use App\Models\OrderItem;
 use App\Models\Product;
-use App\Models\Warehouse;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -24,7 +23,6 @@ class OrderItemFactory extends Factory
         return [
             'order_id' => Order::factory(),
             'product_id' => Product::factory(),
-            'warehouse_id' => Warehouse::factory(),
             'quantity' => 1,
             'unit_price' => '100000.00',
             'discount_amount' => '0.00',

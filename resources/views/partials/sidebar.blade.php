@@ -36,22 +36,18 @@
             ['label' => 'Buku', 'route' => 'master.index', 'params' => ['resource' => 'books'], 'match' => 'master.*', 'permission' => 'books.view'],
             ['label' => 'Barang Lainnya', 'route' => 'master.index', 'params' => ['resource' => 'barang-lainnya'], 'match' => 'master.*', 'permission' => 'goods.view'],
             ['label' => 'Kategori Buku', 'route' => 'master.index', 'params' => ['resource' => 'categories'], 'match' => 'master.*', 'permission' => 'categories.manage'],
-            ['label' => 'Gudang', 'route' => 'master.index', 'params' => ['resource' => 'warehouses'], 'match' => 'master.*', 'permission' => 'warehouses.manage'],
             ['label' => 'Sumber Pesanan', 'route' => 'master.index', 'params' => ['resource' => 'order-sources'], 'match' => 'master.*', 'permission' => 'order-sources.manage'],
             ['label' => 'Kurir', 'route' => 'master.index', 'params' => ['resource' => 'couriers'], 'match' => 'master.*', 'permission' => 'couriers.manage'],
             ['label' => 'Metode Kirim', 'route' => 'master.index', 'params' => ['resource' => 'shipping-methods'], 'match' => 'master.*', 'permission' => 'couriers.manage'],
             ['label' => 'Metode Bayar', 'route' => 'master.index', 'params' => ['resource' => 'payment-methods'], 'match' => 'master.*', 'permission' => 'payment-methods.manage'],
             ['label' => 'Aturan Rebate', 'route' => 'master.index', 'params' => ['resource' => 'rebate-rules'], 'match' => 'master.*', 'permission' => 'rebate-rules.manage'],
-            ['label' => 'Pinjaman Tunai', 'route' => 'master.index', 'params' => ['resource' => 'cash-loans'], 'match' => 'master.*', 'permission' => 'loans.view'],
             ['label' => 'Konfigurasi', 'route' => 'master.index', 'params' => ['resource' => 'settings'], 'match' => 'master.*', 'permission' => 'settings.manage'],
         ]],
 
-        ['kind' => 'group', 'label' => 'Stok & Gudang', 'icon' => 'boxes', 'permission' => 'stock.view', 'items' => [
-            ['label' => 'Stok Barang', 'route' => 'stock.index', 'match' => 'stock.index', 'permission' => 'stock.view'],
-            ['label' => 'Barang Masuk', 'route' => 'receipts.index', 'match' => 'receipts.*', 'permission' => 'receipts.view'],
-            ['label' => 'Mutasi Stok', 'route' => 'stock.movements', 'match' => 'stock.movements', 'permission' => 'stock.view'],
-            ['label' => 'Stok Minimum', 'route' => 'reports.index', 'query' => ['type' => 'low_stock'], 'match' => 'reports.index', 'permission' => 'reports.view'],
-            ['label' => 'Back Order', 'route' => 'reports.index', 'query' => ['type' => 'backorders'], 'match' => 'reports.index', 'permission' => 'reports.view'],
+        ['kind' => 'group', 'label' => 'Pengadaan', 'icon' => 'boxes', 'permission' => 'procurement.view', 'items' => [
+            ['label' => 'Back Order', 'route' => 'backorders.index', 'match' => 'backorders.index', 'permission' => 'procurement.view'],
+            ['label' => 'Rekap Item Tidak Tersedia', 'route' => 'backorders.unavailable', 'match' => 'backorders.unavailable', 'permission' => 'procurement.view'],
+            ['label' => 'Penerimaan dari Penerbit', 'route' => 'receipts.index', 'match' => 'receipts.*', 'permission' => 'receipts.view'],
         ]],
 
         ['kind' => 'group', 'label' => 'Picking & Packing', 'icon' => 'clipboard', 'permission' => 'fulfillment.view', 'items' => [
@@ -75,6 +71,8 @@
             ['label' => 'Riwayat Pembayaran', 'route' => 'payments.index', 'match' => 'payments.*', 'permission' => 'payments.view'],
         ]],
 
+        ['kind' => 'link', 'label' => 'Pinjaman Tunai', 'icon' => 'wallet', 'route' => 'cash-loans.index', 'match' => 'cash-loans.*', 'permission' => 'loans.view'],
+        ['kind' => 'link', 'label' => 'Katalog', 'icon' => 'book', 'route' => 'catalogs.index', 'match' => 'catalogs.*', 'permission' => 'catalogs.view'],
         ['kind' => 'link', 'label' => 'Rebate / Cashback', 'icon' => 'percent', 'route' => 'rebates.index', 'match' => 'rebates.*', 'permission' => 'rebates.view'],
         ['kind' => 'link', 'label' => 'Laporan', 'icon' => 'chart', 'route' => 'reports.index', 'match' => 'reports.*', 'permission' => 'reports.view'],
 

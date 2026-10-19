@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 /**
  * @property int $id
@@ -54,5 +55,13 @@ class Backorder extends Model
     public function outstandingQuantity(): int
     {
         return max(0, $this->quantity - $this->fulfilled_quantity);
+    }
+
+    /**
+     * @return HasMany<BackorderOrder, $this>
+     */
+    public function orders(): HasMany
+    {
+        return $this->hasMany(BackorderOrder::class, 'backorder_id');
     }
 }

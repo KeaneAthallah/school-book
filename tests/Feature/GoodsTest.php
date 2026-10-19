@@ -23,8 +23,6 @@ function goodsRecord(array $attributes = []): Goods
         'title' => 'Kipas Angin',
         'price' => '75000.00',
         'cost_price' => '50000.00',
-        'stock' => 0,
-        'min_stock' => 0,
         'status' => 'active',
         ...$attributes,
     ]);
@@ -51,7 +49,6 @@ it('creates barang lainnya with the goods type', function () {
             'title' => 'Meja Lipat',
             'price' => '75000.00',
             'cost_price' => '50000.00',
-            'min_stock' => 5,
             'rack_location' => 'RAK-A1',
             'unit' => 'pcs',
             'status' => 'active',

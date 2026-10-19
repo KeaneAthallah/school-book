@@ -4,14 +4,12 @@ namespace App\Services;
 
 use App\Enums\BackorderStatus;
 use App\Enums\GoodsReceiptStatus;
-use App\Enums\StockMovementType;
+use App\Enums\OrderItemStatus;
 use App\Models\Backorder;
+use App\Models\BackorderOrder;
 use App\Models\GoodsReceipt;
 use App\Models\OrderItem;
-use App\Models\Stock;
-use App\Models\StockMovement;
 use App\Models\User;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
 
@@ -22,36 +20,9 @@ class InventoryService
         private readonly OrderStatusResolver $statusResolver,
     ) {}
 
-    public function stock(int $productId, int $warehouseId): Stock
-    {
-        return Stock::query()->firstOrCreate(
-            ['product_id' => $productId, 'warehouse_id' => $warehouseId],
-            ['quantity' => 0, 'reserved_quantity' => 0],
-        );
-    }
-
     /**
-     * Return the stock row locked for update. Must be called inside a transaction.
-     */
-    public function lockedStock(int $productId, int $warehouseId): Stock
-    {
-        $this->stock($productId, $warehouseId);
-
-        return Stock::query()
-            ->where('product_id', $productId)
-            ->where('warehouse_id', $warehouseId)
-            ->lockForUpdate()
-            ->firstOrFail();
-    }
-
-    public function availableQuantity(int $productId, int $warehouseId): int
-    {
-        return $this->stock($productId, $warehouseId)->availableQuantity();
-    }
-
-    /**
-     * Confirm a goods receipt, increasing physical stock and allocating any
-     * waiting back orders for the received titles.
+     * Confirm a goods receipt: allocate received quantities to waiting
+     * back orders (FIFO), without touching physical stock.
      */
     public function receive(GoodsReceipt $receipt, User $user): GoodsReceipt
     {
@@ -72,23 +43,6 @@ class InventoryService
                 ]);
             }
 
-            foreach ($locked->items as $item) {
-                $stock = $this->lockedStock($item->product_id, $locked->warehouse_id);
-                $stock->quantity += $item->quantity;
-                $stock->save();
-
-                $this->recordMovement(
-                    productId: $item->product_id,
-                    warehouseId: $locked->warehouse_id,
-                    type: StockMovementType::Receipt,
-                    quantity: $item->quantity,
-                    balanceAfter: $stock->quantity,
-                    reference: $locked,
-                    note: 'Penerimaan '.$locked->number,
-                    user: $user,
-                );
-            }
-
             $locked->forceFill([
                 'status' => GoodsReceiptStatus::Confirmed,
                 'confirmed_by' => $user->getKey(),
@@ -96,7 +50,7 @@ class InventoryService
             ])->save();
 
             foreach ($locked->items as $item) {
-                $this->allocateBackorders($item->product_id, $locked->warehouse_id, $user);
+                $this->allocateBackorders((int) $item->product_id, (int) $item->quantity, $user);
             }
 
             $this->audit->log(
@@ -111,190 +65,15 @@ class InventoryService
     }
 
     /**
-     * Apply a manual stock adjustment.
+     * Allocate received quantity to waiting back orders (FIFO by order date).
      */
-    public function adjust(int $productId, int $warehouseId, int $delta, string $reason, User $user): Stock
+    public function allocateBackorders(int $productId, int $quantity, User $user): int
     {
-        if ($delta === 0) {
-            throw ValidationException::withMessages(['quantity' => 'Jumlah penyesuaian tidak boleh nol.']);
-        }
-
-        return DB::transaction(function () use ($productId, $warehouseId, $delta, $reason, $user): Stock {
-            $stock = $this->lockedStock($productId, $warehouseId);
-
-            if ($stock->quantity + $delta < 0) {
-                throw ValidationException::withMessages([
-                    'quantity' => 'Penyesuaian akan membuat stok fisik menjadi negatif.',
-                ]);
-            }
-
-            $stock->quantity += $delta;
-            $stock->save();
-
-            $this->recordMovement(
-                productId: $productId,
-                warehouseId: $warehouseId,
-                type: $delta > 0 ? StockMovementType::AdjustmentIn : StockMovementType::AdjustmentOut,
-                quantity: $delta,
-                balanceAfter: $stock->quantity,
-                reference: null,
-                note: $reason,
-                user: $user,
-            );
-
-            $this->audit->log(
-                action: 'stock.adjusted',
-                subject: $stock,
-                description: 'Penyesuaian stok '.$delta.' ('.$reason.')',
-                newValues: ['quantity' => $stock->quantity, 'delta' => $delta],
-                user: $user,
-            );
-
-            return $stock;
-        });
-    }
-
-    /**
-     * Reserve stock for an order line. Must run inside a transaction.
-     */
-    public function reserve(OrderItem $item, int $quantity, User $user): void
-    {
-        if ($quantity <= 0) {
-            return;
-        }
-
-        $warehouseId = (int) $item->warehouse_id;
-        $stock = $this->lockedStock($item->product_id, $warehouseId);
-
-        if ($stock->availableQuantity() < $quantity) {
-            throw ValidationException::withMessages([
-                'quantity' => "Stok tersedia untuk barang #{$item->product_id} tidak mencukupi.",
-            ]);
-        }
-
-        $stock->reserved_quantity += $quantity;
-        $stock->save();
-
-        $this->recordMovement(
-            productId: $item->product_id,
-            warehouseId: $warehouseId,
-            type: StockMovementType::Reservation,
-            quantity: $quantity,
-            balanceAfter: $stock->reserved_quantity,
-            reference: $item,
-            note: 'Reservasi pesanan '.$item->order->number,
-            user: $user,
-        );
-    }
-
-    /**
-     * Reserve as much of the requested quantity as is available, returning the
-     * quantity that was actually reserved. Must run inside a transaction.
-     */
-    public function reserveAvailable(OrderItem $item, int $requested, User $user): int
-    {
-        if ($requested <= 0) {
-            return 0;
-        }
-
-        $warehouseId = (int) $item->warehouse_id;
-        $stock = $this->lockedStock($item->product_id, $warehouseId);
-        $quantity = min($requested, $stock->availableQuantity());
-
         if ($quantity <= 0) {
             return 0;
         }
 
-        $stock->reserved_quantity += $quantity;
-        $stock->save();
-
-        $this->recordMovement(
-            productId: $item->product_id,
-            warehouseId: $warehouseId,
-            type: StockMovementType::Reservation,
-            quantity: $quantity,
-            balanceAfter: $stock->reserved_quantity,
-            reference: $item,
-            note: 'Reservasi pesanan '.$item->order->number,
-            user: $user,
-        );
-
-        return $quantity;
-    }
-
-    /**
-     * Release previously reserved stock. Must run inside a transaction.
-     */
-    public function release(OrderItem $item, int $quantity, User $user, string $note = 'Pelepasan reservasi'): void
-    {
-        if ($quantity <= 0) {
-            return;
-        }
-
-        $warehouseId = (int) $item->warehouse_id;
-        $stock = $this->lockedStock($item->product_id, $warehouseId);
-        $stock->reserved_quantity = max(0, $stock->reserved_quantity - $quantity);
-        $stock->save();
-
-        $this->recordMovement(
-            productId: $item->product_id,
-            warehouseId: $warehouseId,
-            type: StockMovementType::ReservationRelease,
-            quantity: -$quantity,
-            balanceAfter: $stock->reserved_quantity,
-            reference: $item,
-            note: $note,
-            user: $user,
-        );
-    }
-
-    /**
-     * Deduct physical and reserved stock for a confirmed shipment.
-     * Must run inside a transaction.
-     */
-    public function ship(OrderItem $item, int $quantity, User $user, string $note): void
-    {
-        if ($quantity <= 0) {
-            return;
-        }
-
-        $warehouseId = (int) $item->warehouse_id;
-        $stock = $this->lockedStock($item->product_id, $warehouseId);
-
-        if ($stock->quantity < $quantity || $stock->reserved_quantity < $quantity) {
-            throw ValidationException::withMessages([
-                'quantity' => "Stok fisik atau reservasi untuk barang #{$item->product_id} tidak mencukupi untuk dikirim.",
-            ]);
-        }
-
-        $stock->quantity -= $quantity;
-        $stock->reserved_quantity -= $quantity;
-        $stock->save();
-
-        $this->recordMovement(
-            productId: $item->product_id,
-            warehouseId: $warehouseId,
-            type: StockMovementType::Shipment,
-            quantity: -$quantity,
-            balanceAfter: $stock->quantity,
-            reference: $item,
-            note: $note,
-            user: $user,
-        );
-    }
-
-    /**
-     * Allocate available stock to waiting back orders using a FIFO policy
-     * (oldest order date first, then oldest back order).
-     */
-    public function allocateBackorders(int $productId, int $warehouseId, User $user): int
-    {
-        $stock = $this->lockedStock($productId, $warehouseId);
-        $available = $stock->availableQuantity();
-
-        if ($available <= 0) {
-            return 0;
-        }
+        $available = $quantity;
 
         $backorders = Backorder::query()
             ->where('backorders.product_id', $productId)
@@ -324,11 +103,7 @@ class InventoryService
 
             $item->reserved_quantity += $take;
             $item->backorder_quantity = max(0, $item->backorder_quantity - $take);
-            $item->status = $this->statusResolver->resolveItem(
-                $item->quantity,
-                $item->reserved_quantity,
-                $item->shipped_quantity,
-            );
+            $item->status = $this->resolveItemStatus($item);
             $item->save();
 
             $backorder->fulfilled_quantity += $take;
@@ -337,51 +112,48 @@ class InventoryService
                 : BackorderStatus::Partial;
             $backorder->save();
 
-            $stock->reserved_quantity += $take;
+            // Mark pending backorder_orders as received (FIFO) up to $take.
+            $remaining = $take;
+            $pendingOrders = BackorderOrder::query()
+                ->where('backorder_id', $backorder->getKey())
+                ->where('status', 'pending')
+                ->orderBy('id')
+                ->lockForUpdate()
+                ->get();
+
+            foreach ($pendingOrders as $bo) {
+                if ($remaining <= 0) {
+                    break;
+                }
+                $consume = min($remaining, (int) $bo->quantity);
+                if ($consume >= (int) $bo->quantity) {
+                    $bo->status = 'received';
+                    $bo->save();
+                } else {
+                    // partial receive: reduce quantity? keep simple: mark received when fully consumed
+                    $bo->quantity -= $consume;
+                    $bo->save();
+                }
+                $remaining -= $consume;
+            }
+
             $available -= $take;
             $allocated += $take;
-
-            $this->recordMovement(
-                productId: $productId,
-                warehouseId: $warehouseId,
-                type: StockMovementType::Reservation,
-                quantity: $take,
-                balanceAfter: $stock->reserved_quantity,
-                reference: $backorder,
-                note: 'Alokasi back order',
-                user: $user,
-            );
 
             if ($item->order !== null) {
                 $this->statusResolver->apply($item->order);
             }
         }
 
-        $stock->save();
-
         return $allocated;
     }
 
-    private function recordMovement(
-        int $productId,
-        int $warehouseId,
-        StockMovementType $type,
-        int $quantity,
-        int $balanceAfter,
-        ?Model $reference,
-        string $note,
-        User $user,
-    ): void {
-        StockMovement::query()->create([
-            'product_id' => $productId,
-            'warehouse_id' => $warehouseId,
-            'type' => $type,
-            'quantity' => $quantity,
-            'balance_after' => $balanceAfter,
-            'reference_type' => $reference === null ? null : $reference::class,
-            'reference_id' => $reference?->getKey(),
-            'note' => $note,
-            'user_id' => $user->getKey(),
-        ]);
+    private function resolveItemStatus(OrderItem $item): OrderItemStatus
+    {
+        return $this->statusResolver->resolveItem(
+            $item->quantity,
+            $item->reserved_quantity,
+            $item->shipped_quantity,
+        );
     }
 }

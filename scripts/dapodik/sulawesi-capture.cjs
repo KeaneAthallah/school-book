@@ -35,14 +35,21 @@ const PROVINCES = ['180000', '330000'];
 
 // Resolve project root from this file's location (scripts/dapodik/<file> -> project root).
 const PROJECT_ROOT = path.resolve(__dirname, '..', '..');
-const OUT_DIR = path.join(PROJECT_ROOT, 'storage', 'app', 'data', 'dapodik', 'sulawesi');
+const OUT_DIR = path.join(
+    PROJECT_ROOT,
+    'storage',
+    'app',
+    'data',
+    'dapodik',
+    'sulawesi',
+);
 const PROVINCES_SEED = path.join(
     PROJECT_ROOT,
     'storage',
     'app',
     'data',
     'dapodik',
-    'sulawesi-kabupaten.json'
+    'sulawesi-kabupaten.json',
 );
 const CACHE_FILE = path.join(
     PROJECT_ROOT,
@@ -50,11 +57,13 @@ const CACHE_FILE = path.join(
     'app',
     'data',
     'dapodik',
-    'sulawesi-kabupaten-cache.json'
+    'sulawesi-kabupaten-cache.json',
 );
 
 const TYPES = process.env.DAPODIK_TYPES
-    ? process.env.DAPODIK_TYPES.split(',').map((t) => t.trim().toUpperCase()).filter(Boolean)
+    ? process.env.DAPODIK_TYPES.split(',')
+          .map((t) => t.trim().toUpperCase())
+          .filter(Boolean)
     : null; // null = capture everything (PAUD included)
 
 function sleep(ms) {
@@ -65,22 +74,26 @@ function args() {
     const out = { region: null, force: false };
     process.argv.slice(2).forEach((a) => {
         if (a === '--force') out.force = true;
-        else if (a.startsWith('--region=')) out.region = a.slice('--region='.length);
+        else if (a.startsWith('--region='))
+            out.region = a.slice('--region='.length);
     });
     return out;
 }
 
 async function fetchJson(page, pathname, token) {
-    const r = await page.evaluate(async ({ path: p, base, tok }) => {
-        const res = await fetch(p, {
-            headers: {
-                Authorization: `Bearer ${tok}`,
-                'Content-Type': 'application/json',
-                Accept: 'application/json',
-            },
-        });
-        return { status: res.status, text: await res.text() };
-    }, { path: pathname, base: BASE, tok: token });
+    const r = await page.evaluate(
+        async ({ path: p, tok }) => {
+            const res = await fetch(p, {
+                headers: {
+                    Authorization: `Bearer ${tok}`,
+                    'Content-Type': 'application/json',
+                    Accept: 'application/json',
+                },
+            });
+            return { status: res.status, text: await res.text() };
+        },
+        { path: pathname, tok: token },
+    );
     if (r.status !== 200) {
         throw new Error(`${pathname} -> HTTP ${r.status}`);
     }
@@ -109,15 +122,19 @@ async function discoverKabupaten(page, token, province) {
     try {
         const body = await fetchJson(page, url, token);
         const rows = (body && body.data ? body.data : body || []).filter(
-            (r) => String(r.kode_kabupaten || '').length >= 4
+            (r) => String(r.kode_kabupaten || '').length >= 4,
         );
         // The endpoint filters by province, but guard against a stale/wrong province
         // code silently sweeping another province's kabupaten (rows carry provinsi).
         const own = rows.filter(
-            (r) => !r.kode_provinsi || String(r.kode_provinsi) === String(province.kode_provinsi)
+            (r) =>
+                !r.kode_provinsi ||
+                String(r.kode_provinsi) === String(province.kode_provinsi),
         );
         if (own.length !== rows.length) {
-            console.log(`  discover ${province.nama}: dropped ${rows.length - own.length} kabupaten from another province`);
+            console.log(
+                `  discover ${province.nama}: dropped ${rows.length - own.length} kabupaten from another province`,
+            );
         }
         return own.map((r) => ({
             kode_kabupaten: String(r.kode_kabupaten),
@@ -135,7 +152,9 @@ async function captureKabupaten(page, token, kab, force) {
     const outFile = path.join(OUT_DIR, `${kab.kode_kabupaten}.json`);
     if (!force && fs.existsSync(outFile)) {
         const snap = readJson(outFile);
-        console.log(`skip ${kab.kabupaten} (${kab.kode_kabupaten}) — snapshot exists (${snap ? snap.schools?.length ?? 0 : '?'} schools)`);
+        console.log(
+            `skip ${kab.kabupaten} (${kab.kode_kabupaten}) — snapshot exists (${snap ? (snap.schools?.length ?? 0) : '?'} schools)`,
+        );
         return false;
     }
 
@@ -144,17 +163,23 @@ async function captureKabupaten(page, token, kab, force) {
         const body = await fetchJson(
             page,
             `/api/progress-pengiriman/kecamatan?kode_kabupaten=${kab.kode_kabupaten}`,
-            token
+            token,
         );
-        let rows = (body && body.data ? body.data : body || []);
+        let rows = body && body.data ? body.data : body || [];
         // Keep only kecamatan that actually belong to this kabupaten (filters stray rows).
-        kecamatan = rows.filter((r) => String(r.kode_kabupaten).startsWith(kab.kode_kabupaten.slice(0, 4)));
+        kecamatan = rows.filter((r) =>
+            String(r.kode_kabupaten).startsWith(kab.kode_kabupaten.slice(0, 4)),
+        );
     } catch (e) {
-        console.log(`  kecamatan ${kab.kabupaten} failed: ${e.message.slice(0, 120)}`);
+        console.log(
+            `  kecamatan ${kab.kabupaten} failed: ${e.message.slice(0, 120)}`,
+        );
         return false;
     }
 
-    console.log(`${kab.kabupaten} (${kab.kode_kabupaten}): ${kecamatan.length} kecamatan`);
+    console.log(
+        `${kab.kabupaten} (${kab.kode_kabupaten}): ${kecamatan.length} kecamatan`,
+    );
     if (!kecamatan.length) return false;
 
     const all = [];
@@ -164,12 +189,22 @@ async function captureKabupaten(page, token, kab, force) {
                 await fetchJson(
                     page,
                     `/api/progress-pengiriman/kecamatan/school?kode_kecamatan=${kec.kode_kecamatan}`,
-                    token
+                    token,
                 )
             )?.data || [];
-        const keep = TYPES ? schools.filter((s) => TYPES.includes(String(s.bentuk_pendidikan || '').toUpperCase())) : schools;
-        all.push(...keep.map((s) => ({ ...s, kode_kecamatan: kec.kode_kecamatan })));
-        console.log(`    ${kec.kecamatan}: ${schools.length} sekolah, ${keep.length} dipertahikan`);
+        const keep = TYPES
+            ? schools.filter((s) =>
+                  TYPES.includes(
+                      String(s.bentuk_pendidikan || '').toUpperCase(),
+                  ),
+              )
+            : schools;
+        all.push(
+            ...keep.map((s) => ({ ...s, kode_kecamatan: kec.kode_kecamatan })),
+        );
+        console.log(
+            `    ${kec.kecamatan}: ${schools.length} sekolah, ${keep.length} dipertahikan`,
+        );
         await sleep(SLOW_BY);
     }
 
@@ -180,13 +215,19 @@ async function captureKabupaten(page, token, kab, force) {
         try {
             const rows =
                 (
-                    await fetchJson(page, `/api/detail-sekolah?npsn=${s.npsn}`, token)
+                    await fetchJson(
+                        page,
+                        `/api/detail-sekolah?npsn=${s.npsn}`,
+                        token,
+                    )
                 )?.data || [];
             if (!rows.length) throw new Error(`empty detail for ${s.npsn}`);
             details.push(rows[0]);
         } catch (e) {
             failed++;
-            console.log(`    detail fail ${s.npsn}: ${e.message.slice(0, 120)}`);
+            console.log(
+                `    detail fail ${s.npsn}: ${e.message.slice(0, 120)}`,
+            );
         }
         await sleep(SLOW_BY);
     }
@@ -198,17 +239,22 @@ async function captureKabupaten(page, token, kab, force) {
         region_name: kab.kabupaten,
         province_code: kab.kode_provinsi,
         province: kab.provinsi,
-        semester: details[0] && 'semester' in details[0] ? details[0].semester : null,
+        semester:
+            details[0] && 'semester' in details[0] ? details[0].semester : null,
         schools: details,
     });
-    console.log(`    wrote ${outFile} (${details.length} schools, ${failed} failed)`);
+    console.log(
+        `    wrote ${outFile} (${details.length} schools, ${failed} failed)`,
+    );
 
     return true;
 }
 
 (async () => {
     const { region, force } = args();
-    console.log(`capture region ${region ? region + ' only' : 'Sulawesi Tengah + Sulawesi Barat'}`);
+    console.log(
+        `capture region ${region ? region + ' only' : 'Sulawesi Tengah + Sulawesi Barat'}`,
+    );
 
     let snapshotsWritten = 0;
 
@@ -217,8 +263,14 @@ async function captureKabupaten(page, token, kab, force) {
         throw new Error(`provinsi seed not found: ${PROVINCES_SEED}`);
     }
 
-    const browser = await chromium.launch({ channel: 'msedge', headless: false });
-    const context = await browser.newContext({ viewport: { width: 1440, height: 900 }, locale: 'id-ID' });
+    const browser = await chromium.launch({
+        channel: 'msedge',
+        headless: false,
+    });
+    const context = await browser.newContext({
+        viewport: { width: 1440, height: 900 },
+        locale: 'id-ID',
+    });
     const page = await context.newPage();
     page.setDefaultTimeout(60000);
 
@@ -231,9 +283,13 @@ async function captureKabupaten(page, token, kab, force) {
     if (!token) throw new Error('no VITE_API_TOKEN found in env.js');
     console.log('token ok');
 
-    await page.goto(BASE + '/', { waitUntil: 'domcontentloaded', timeout: 90000 }).catch(() => {});
+    await page
+        .goto(BASE + '/', { waitUntil: 'domcontentloaded', timeout: 90000 })
+        .catch(() => {});
     await sleep(4000);
-    await page.goto(BASE + '/', { waitUntil: 'domcontentloaded', timeout: 90000 }).catch(() => {});
+    await page
+        .goto(BASE + '/', { waitUntil: 'domcontentloaded', timeout: 90000 })
+        .catch(() => {});
     await sleep(3000);
     console.log('waf challenge ok');
 
@@ -242,16 +298,24 @@ async function captureKabupaten(page, token, kab, force) {
     let cacheDirty = false;
     const provincesToSweep = provinces
         .filter((p) => PROVINCES.includes(p.kode_provinsi))
-        .filter((p) => !region || p.kode_provinsi.startsWith(region.slice(0, 2)));
+        .filter(
+            (p) => !region || p.kode_provinsi.startsWith(region.slice(0, 2)),
+        );
 
     for (const prov of provincesToSweep) {
         if (!cache[prov.kode_provinsi]) {
-            cache[prov.kode_provinsi] = await discoverKabupaten(page, token, prov);
+            cache[prov.kode_provinsi] = await discoverKabupaten(
+                page,
+                token,
+                prov,
+            );
             cacheDirty = true;
         }
         const kabs = cache[prov.kode_provinsi];
         if (!kabs.length) {
-            console.log(`WARN ${prov.nama}: no kabupaten discovered (seed sulawesi-kabupaten-cache.json)`);
+            console.log(
+                `WARN ${prov.nama}: no kabupaten discovered (seed sulawesi-kabupaten-cache.json)`,
+            );
             continue;
         }
         const target = region
@@ -268,7 +332,9 @@ async function captureKabupaten(page, token, kab, force) {
     await browser.close();
 
     if (snapshotsWritten === 0) {
-        throw new Error('no kabupaten snapshots were written — check the endpoint errors and WAF session output above');
+        throw new Error(
+            'no kabupaten snapshots were written — check the endpoint errors and WAF session output above',
+        );
     }
 
     console.log(`capture done (${snapshotsWritten} snapshot file(s) written)`);

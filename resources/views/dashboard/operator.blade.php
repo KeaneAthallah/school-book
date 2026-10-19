@@ -24,7 +24,7 @@
         ['label' => 'Antrean Pesanan', 'icon' => 'cart', 'route' => 'orders.index', 'permission' => 'orders.view'],
         ['label' => 'Import SIPLah', 'icon' => 'bolt', 'route' => 'integrations.index', 'permission' => 'integrations.view'],
         ['label' => 'e-Katalog', 'icon' => 'refresh', 'route' => 'integrations.index', 'permission' => 'integrations.view'],
-        ['label' => 'Cek Stok', 'icon' => 'boxes', 'route' => 'stock.index', 'permission' => 'stock.view'],
+        ['label' => 'Penerimaan', 'icon' => 'inbox', 'route' => 'receipts.index', 'permission' => 'receipts.view'],
         ['label' => 'Laporan', 'icon' => 'chart', 'route' => 'reports.index', 'permission' => 'reports.view'],
     ]])
 
@@ -69,7 +69,7 @@
         <x-card>
             <x-card-header title="Menunggu Stok" icon="clock" subtitle="Sudah dikonfirmasi, menunggu ketersediaan barang">
                 <x-slot:action>
-                    <a href="{{ route('stock.index') }}" class="text-xs font-medium text-brand-600 hover:underline dark:text-brand-300">Cek stok</a>
+                    <a href="{{ route('receipts.index') }}" class="text-xs font-medium text-brand-600 hover:underline dark:text-brand-300">Cek penerimaan</a>
                 </x-slot:action>
             </x-card-header>
 

@@ -64,7 +64,6 @@
         </div>
         <div>
             <h3>Pengiriman</h3>
-            <div>Gudang: {{ $shipment->warehouse?->name ?? '-' }}</div>
             <div>Kurir: {{ $shipment->courier?->name ?? '-' }}</div>
             <div>Metode: {{ $shipment->shippingMethod?->name ?? '-' }}</div>
             <div>No. Resi: {{ $shipment->tracking_number ?? '-' }}</div>

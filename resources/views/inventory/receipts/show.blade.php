@@ -48,10 +48,6 @@
                     <dd class="mt-0.5"><x-status-badge :value="$receipt['status']" :label="$receipt['status_label']" /></dd>
                 </div>
                 <div>
-                    <dt class="text-xs text-ink-soft">Gudang</dt>
-                    <dd class="text-ink">{{ $receipt['warehouse'] ?? '-' }}</dd>
-                </div>
-                <div>
                     <dt class="text-xs text-ink-soft">Dikonfirmasi oleh</dt>
                     <dd class="text-ink">{{ $receipt['confirmed_by'] ?? '-' }}</dd>
                 </div>

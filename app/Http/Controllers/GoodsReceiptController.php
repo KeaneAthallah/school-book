@@ -6,7 +6,6 @@ use App\Http\Requests\StoreGoodsReceiptRequest;
 use App\Models\GoodsReceipt;
 use App\Models\Product;
 use App\Models\Publisher;
-use App\Models\Warehouse;
 use App\Services\GoodsReceiptService;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\RedirectResponse;
@@ -22,7 +21,7 @@ class GoodsReceiptController extends Controller
         $search = $request->string('search')->toString();
 
         $receipts = GoodsReceipt::query()
-            ->with(['publisher:id,name', 'warehouse:id,name'])
+            ->with(['publisher:id,name'])
             ->withCount('items')
             ->when($search !== '', fn (Builder $query) => $query->where('number', 'like', '%'.$search.'%'))
             ->orderByDesc('receipt_date')
@@ -34,7 +33,6 @@ class GoodsReceiptController extends Controller
                 'number' => $receipt->number,
                 'receipt_date' => $receipt->receipt_date->toDateString(),
                 'publisher' => $receipt->publisher?->name,
-                'warehouse' => $receipt->warehouse?->name,
                 'status' => $receipt->status->value,
                 'status_label' => $receipt->status->label(),
                 'items_count' => (int) $receipt->getAttribute('items_count'),
@@ -65,7 +63,7 @@ class GoodsReceiptController extends Controller
     {
         abort_unless($this->userCan($request, 'receipts.view'), 403);
 
-        $receipt->load(['publisher:id,name', 'warehouse:id,name', 'items.product:id,code,title', 'confirmedBy:id,name']);
+        $receipt->load(['publisher:id,name', 'items.product:id,code,title', 'confirmedBy:id,name']);
 
         return view('inventory.receipts.show', [
             'receipt' => [
@@ -73,7 +71,6 @@ class GoodsReceiptController extends Controller
                 'number' => $receipt->number,
                 'receipt_date' => $receipt->receipt_date->toDateString(),
                 'publisher' => $receipt->publisher?->name,
-                'warehouse' => $receipt->warehouse?->name,
                 'status' => $receipt->status->value,
                 'status_label' => $receipt->status->label(),
                 'notes' => $receipt->notes,
@@ -116,8 +113,6 @@ class GoodsReceiptController extends Controller
         return [
             'publishers' => Publisher::query()->active()->orderBy('name')->get(['id', 'name'])
                 ->map(fn (Publisher $publisher): array => ['value' => $publisher->getKey(), 'label' => $publisher->name])->all(),
-            'warehouses' => Warehouse::query()->active()->orderBy('name')->get(['id', 'name'])
-                ->map(fn (Warehouse $warehouse): array => ['value' => $warehouse->getKey(), 'label' => $warehouse->name])->all(),
             'products' => Product::query()->active()->orderBy('title')->get(['id', 'code', 'title', 'cost_price'])
                 ->map(fn (Product $product): array => [
                     'value' => $product->getKey(),

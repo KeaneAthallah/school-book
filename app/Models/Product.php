@@ -20,13 +20,11 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
  * @property string $title
  * @property string $price
  * @property string $cost_price
- * @property int $stock
- * @property int $min_stock
  * @property string|null $rack_location
  * @property string $status
  */
 #[Fillable([
-    'type', 'code', 'title', 'price', 'cost_price', 'stock', 'min_stock',
+    'type', 'code', 'title', 'price', 'cost_price',
     'rack_location', 'status',
 ])]
 class Product extends Model
@@ -42,8 +40,6 @@ class Product extends Model
         return [
             'price' => 'decimal:2',
             'cost_price' => 'decimal:2',
-            'stock' => 'integer',
-            'min_stock' => 'integer',
         ];
     }
 
@@ -110,22 +106,6 @@ class Product extends Model
     public function receiptItems(): HasMany
     {
         return $this->hasMany(GoodsReceiptItem::class);
-    }
-
-    /**
-     * @return HasMany<Stock, $this>
-     */
-    public function stocks(): HasMany
-    {
-        return $this->hasMany(Stock::class);
-    }
-
-    /**
-     * @return HasMany<StockMovement, $this>
-     */
-    public function stockMovements(): HasMany
-    {
-        return $this->hasMany(StockMovement::class);
     }
 
     /**

@@ -7,10 +7,10 @@ use App\Http\Requests\StoreOrderRequest;
 use App\Http\Requests\UpdateOrderRequest;
 use App\Models\Backorder;
 use App\Models\Order;
+use App\Models\OrderItem;
 use App\Models\OrderSource;
 use App\Models\Product;
 use App\Models\School;
-use App\Models\Stock;
 use App\Models\User;
 use App\Models\Zona;
 use App\Services\OrderService;
@@ -98,7 +98,6 @@ class OrderController extends Controller
             'orderSource:id,name',
             'operator:id,name',
             'items' => fn ($query) => $query->with('product:id,code,title')->orderBy('id'),
-            'items.warehouse:id,name',
             'shipments' => fn ($query) => $query->orderBy('id'),
             'shipments.items',
             'invoices' => fn ($query) => $query->orderBy('id'),
@@ -130,7 +129,6 @@ class OrderController extends Controller
                     'id' => $item->getKey(),
                     'product' => $item->product?->title,
                     'code' => $item->product?->code,
-                    'warehouse' => $item->warehouse?->name,
                     'quantity' => $item->quantity,
                     'reserved_quantity' => $item->reserved_quantity,
                     'shipped_quantity' => $item->shipped_quantity,
@@ -196,11 +194,13 @@ class OrderController extends Controller
                 'notes' => $order->notes,
                 'external_reference' => $order->external_reference,
                 'discount_amount' => $order->discount_amount,
-                'items' => $order->items()->get()->map(fn ($item): array => [
+                'discount_percent' => $order->discount_percent,
+                'items' => $order->items()->get()->map(fn (OrderItem $item): array => [
                     'product_id' => $item->product_id,
                     'quantity' => $item->quantity,
                     'unit_price' => $item->unit_price,
                     'discount_amount' => $item->discount_amount,
+                    'availability_status' => $item->availability_status->value,
                 ])->all(),
             ],
         ]);
@@ -240,7 +240,6 @@ class OrderController extends Controller
             'school',
             'orderSource:id,name',
             'items' => fn ($query) => $query->with('product:id,code,title')->orderBy('id'),
-            'items.warehouse:id,name',
             'invoices',
         ]);
 
@@ -255,14 +254,13 @@ class OrderController extends Controller
      */
     private function formProps(Request $request): array
     {
-        $availability = Stock::query()
-            ->selectRaw('product_id, COALESCE(SUM(quantity - reserved_quantity), 0) as available')
-            ->groupBy('product_id')
-            ->pluck('available', 'product_id');
-
         return [
-            'schools' => School::query()->active()->orderBy('name')->get(['id', 'name', 'npsn', 'zona_id'])
-                ->map(fn (School $school): array => ['value' => $school->getKey(), 'label' => $school->name.' ('.$school->npsn.')'])
+            'schools' => School::query()->active()->orderBy('name')->get(['id', 'name', 'npsn', 'zona_id', 'rebate_percent'])
+                ->map(fn (School $school): array => [
+                    'value' => $school->getKey(),
+                    'label' => $school->name.' ('.$school->npsn.')',
+                    'rebate_percent' => $school->rebate_percent,
+                ])
                 ->all(),
             'sources' => OrderSource::query()->active()->orderBy('name')->get(['id', 'name'])
                 ->map(fn (OrderSource $source): array => ['value' => $source->getKey(), 'label' => $source->name])
@@ -275,7 +273,6 @@ class OrderController extends Controller
                     'zona_prices' => $product->prices
                         ->mapWithKeys(fn ($price): array => [(string) $price->zona_id => (string) $price->price])
                         ->all(),
-                    'available' => (int) ($availability[$product->getKey()] ?? 0),
                 ])
                 ->all(),
             'zonas' => Zona::query()->active()->orderBy('code')->get(['id', 'code', 'name'])

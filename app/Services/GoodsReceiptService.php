@@ -25,7 +25,6 @@ class GoodsReceiptService
             $receipt = GoodsReceipt::query()->create([
                 'number' => $this->numbers->generate('GR', 'goods_receipts', $data['receipt_date'] ?? null),
                 'publisher_id' => (int) $data['publisher_id'],
-                'warehouse_id' => (int) $data['warehouse_id'],
                 'receipt_date' => $data['receipt_date'],
                 'status' => GoodsReceiptStatus::Draft,
                 'notes' => $data['notes'] ?? null,
@@ -54,7 +53,6 @@ class GoodsReceiptService
         return DB::transaction(function () use ($receipt, $data, $user): GoodsReceipt {
             $receipt->fill([
                 'publisher_id' => (int) $data['publisher_id'],
-                'warehouse_id' => (int) $data['warehouse_id'],
                 'receipt_date' => $data['receipt_date'],
                 'notes' => $data['notes'] ?? null,
             ])->save();

@@ -1,84 +1,80 @@
 @extends('layouts.app')
 
-@section('title', 'Rebate')
+@section('title', 'Rebate / Cashback')
 
 @section('content')
-    @php
-        use App\Support\Format;
-    @endphp
-
     <x-page-header
         title="Rebate / Cashback"
-        subtitle="Pengajuan, persetujuan, dan pembayaran rebate."
+        subtitle="Rekap rebate otomatis dari nota pesanan per sekolah."
         icon="percent"
-    >
-        <x-slot:actions>
-            @if ($can['request'])
-                <x-button x-on:click="$dispatch('open-modal', 'request-rebate')">Ajukan Rebate</x-button>
-            @endif
-        </x-slot:actions>
-    </x-page-header>
+    />
 
     <x-card>
         <x-filter-bar method="get" :action="route('rebates.index')">
-            <x-field label="Cari" class="w-56">
-                <x-input type="search" name="search" value="{{ $filters['search'] }}" placeholder="Nomor / sekolah" />
+            <x-field label="Dari" class="w-40">
+                <x-input type="date" name="date_from" value="{{ $filters['date_from'] }}" />
             </x-field>
-            <x-button type="submit" variant="secondary">Cari</x-button>
+            <x-field label="Sampai" class="w-40">
+                <x-input type="date" name="date_to" value="{{ $filters['date_to'] }}" />
+            </x-field>
+            <x-field label="Sekolah" class="w-56">
+                <x-select name="school_id">
+                    <option value="">— Semua —</option>
+                    @foreach ($schools as $option)
+                        <option value="{{ $option['value'] }}" @selected((string) $filters['school_id'] === (string) $option['value'])>{{ $option['label'] }}</option>
+                    @endforeach
+                </x-select>
+            </x-field>
+            <x-button type="submit" variant="secondary">Filter</x-button>
         </x-filter-bar>
 
-        <x-data-table
-            empty="Belum ada rebate."
-            empty-icon="percent"
-            :rows="$rebates"
-            :columns="[
-                ['key' => 'number', 'label' => 'No. Rebate'],
-                ['key' => 'school', 'label' => 'Sekolah'],
-                ['key' => 'invoice', 'label' => 'Invoice'],
-                ['key' => 'type', 'label' => 'Tipe'],
-                ['key' => 'base_amount', 'label' => 'Dasar', 'type' => 'currency', 'align' => 'right'],
-                ['key' => 'amount', 'label' => 'Nilai Rebate', 'type' => 'currency', 'align' => 'right'],
-                ['key' => 'status', 'label' => 'Status', 'view' => 'components.status-label'],
-                ['key' => 'requested_at', 'label' => 'Diajukan', 'type' => 'datetime'],
-                ['label' => 'Aksi', 'view' => 'finance.rebates.partials.actions', 'align' => 'right'],
-            ]"
-        />
-    </x-card>
-
-    <div class="mt-3">{{ $rebates->links() }}</div>
-
-    @if ($can['request'])
-        <x-modal name="request-rebate" title="Ajukan Rebate">
-            <form method="POST" action="{{ route('rebates.store') }}" class="space-y-3">
-                @csrf
-
-                <x-field label="Invoice (harus sudah lunas)" name="invoice_id" required hint="Hanya invoice lunas yang dapat diajukan rebate.">
-                    <x-select name="invoice_id" :invalid="$errors->has('invoice_id')">
-                        <option value="">— Pilih Invoice —</option>
-                        @foreach ($eligibleInvoices as $option)
-                            <option value="{{ $option['value'] }}" @selected(old('invoice_id') == $option['value'])>{{ $option['label'] }}</option>
-                        @endforeach
-                    </x-select>
-                </x-field>
-
-                <x-field label="Aturan Rebate" name="rebate_rule_id" required>
-                    <x-select name="rebate_rule_id" :invalid="$errors->has('rebate_rule_id')">
-                        <option value="">— Pilih Aturan —</option>
-                        @foreach ($rules as $rule)
-                            <option value="{{ $rule['value'] }}" @selected(old('rebate_rule_id') == $rule['value'])>{{ $rule['label'] }}</option>
-                        @endforeach
-                    </x-select>
-                </x-field>
-
-                <x-field label="Catatan" name="notes">
-                    <x-textarea name="notes" rows="2">{{ old('notes') }}</x-textarea>
-                </x-field>
-
-                <div class="flex justify-end gap-2 pt-1">
-                    <x-button type="button" variant="secondary" x-on:click="$dispatch('close-modal', 'request-rebate')">Batal</x-button>
-                    <x-button type="submit">Ajukan</x-button>
+        @forelse ($groups as $group)
+            <div class="mb-4 rounded-control border border-line">
+                <div class="flex flex-wrap items-center justify-between gap-2 bg-panel-soft px-4 py-3">
+                    <div>
+                        <p class="font-medium text-ink">{{ $group['school'] }}</p>
+                        <p class="text-xs text-ink-soft">Rebate {{ $group['rebate_percent'] }}% · {{ $group['order_count'] }} nota</p>
+                    </div>
+                    <div class="text-right text-sm">
+                        <p>Subtotal: <span class="font-medium">{{ number_format((float) $group['total_subtotal'], 2, ',', '.') }}</span></p>
+                        <p>Nilai Rebate: <span class="font-medium text-emerald-600">{{ number_format((float) $group['total_discount'], 2, ',', '.') }}</span></p>
+                    </div>
                 </div>
-            </form>
-        </x-modal>
-    @endif
+                <div class="overflow-x-auto">
+                    <table class="w-full text-sm">
+                        <thead>
+                            <tr class="border-b border-line text-left text-xs text-ink-soft">
+                                <th class="px-4 py-2">No. Nota</th>
+                                <th class="px-4 py-2">Tanggal</th>
+                                <th class="px-4 py-2 text-right">Subtotal</th>
+                                <th class="px-4 py-2 text-right">Diskon %</th>
+                                <th class="px-4 py-2 text-right">Nilai Diskon</th>
+                                <th class="px-4 py-2">Faktur Terkait</th>
+                                <th class="px-4 py-2">Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach ($group['orders'] as $order)
+                                <tr class="border-b border-line last:border-0">
+                                    <td class="px-4 py-2">{{ $order['number'] }}</td>
+                                    <td class="px-4 py-2">{{ $order['date'] }}</td>
+                                    <td class="px-4 py-2 text-right">{{ number_format((float) $order['subtotal'], 2, ',', '.') }}</td>
+                                    <td class="px-4 py-2 text-right">{{ $order['discount_percent'] }}</td>
+                                    <td class="px-4 py-2 text-right">{{ number_format((float) $order['discount_amount'], 2, ',', '.') }}</td>
+                                    <td class="px-4 py-2">
+                                        @foreach ($order['invoices'] as $inv)
+                                            <span class="mr-1 inline-block rounded bg-panel-soft px-2 py-0.5 text-xs">{{ $inv['number'] }} ({{ $inv['status'] }})</span>
+                                        @endforeach
+                                    </td>
+                                    <td class="px-4 py-2">{{ $order['status'] }}</td>
+                                </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        @empty
+            <p class="p-4 text-sm text-ink-soft">Belum ada rebate.</p>
+        @endforelse
+    </x-card>
 @endsection

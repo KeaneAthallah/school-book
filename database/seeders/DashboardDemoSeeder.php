@@ -17,10 +17,8 @@ use App\Models\School;
 use App\Models\Setting;
 use App\Models\Shipment;
 use App\Models\User;
-use App\Models\Warehouse;
 use App\Services\FulfillmentService;
 use App\Services\GoodsReceiptService;
-use App\Services\InventoryService;
 use App\Services\InvoiceService;
 use App\Services\OrderService;
 use App\Services\PaymentService;
@@ -63,8 +61,6 @@ class DashboardDemoSeeder extends Seeder
     private User $approver;
 
     private User $salesUser;
-
-    private Warehouse $warehouse;
 
     /**
      * @var array<int, Book>
@@ -165,10 +161,6 @@ class DashboardDemoSeeder extends Seeder
         $this->approver = $this->requireUser('pimpinan@sekolah.test');
         $this->salesUser = $this->requireUser('sales@sekolah.test');
 
-        $this->warehouse = Warehouse::query()->firstOrCreate(
-            ['code' => 'GDG-01'],
-            ['name' => 'Gudang Utama', 'address' => 'Jl. Pendidikan No. 1, Makassar', 'status' => 'active'],
-        );
     }
 
     /**
@@ -251,7 +243,6 @@ class DashboardDemoSeeder extends Seeder
                             'title' => sprintf('%s Kelas %s (%s)', $subject, $grade, $edition),
                             'price' => (string) ($this->rand(45, 135) * 1000),
                             'cost_price' => (string) ($this->rand(30, 95) * 1000),
-                            'min_stock' => 40,
                             'rack_location' => 'RAK-'.$grade,
                             'status' => 'active',
                         ],
@@ -355,7 +346,6 @@ class DashboardDemoSeeder extends Seeder
         foreach ($byPublisher as $publisherId => $items) {
             $receipt = $receipts->create([
                 'publisher_id' => $publisherId,
-                'warehouse_id' => $this->warehouse->getKey(),
                 'receipt_date' => Carbon::today()->subMonths($monthsAgo)->addDays(3)->toDateString(),
                 'notes' => 'Stok awal demo',
                 'items' => $items,
@@ -364,14 +354,6 @@ class DashboardDemoSeeder extends Seeder
             $receipts->confirm($receipt, $this->warehouseUser);
         }
 
-        // Books that never received stock still get an (empty) balance row so
-        // the "out of stock" state is visible. A zero balance with no
-        // movements stays consistent with the ledger.
-        $inventory = app(InventoryService::class);
-
-        foreach (array_slice($this->books, max(0, count($this->books) - 2)) as $book) {
-            $inventory->stock($book->product->getKey(), $this->warehouse->getKey());
-        }
     }
 
     /**
@@ -388,7 +370,6 @@ class DashboardDemoSeeder extends Seeder
 
         $receipts->create([
             'publisher_id' => $book->publisher_id,
-            'warehouse_id' => $this->warehouse->getKey(),
             'receipt_date' => Carbon::today()->subDays(2)->toDateString(),
             'notes' => 'Menunggu pemeriksaan gudang',
             'items' => [[

@@ -23,8 +23,6 @@ class ReportService
             'order_summary' => 'Ringkasan Pesanan',
             'receivables' => 'Piutang per Sekolah',
             'overdue_invoices' => 'Invoice Jatuh Tempo',
-            'stock' => 'Stok per Barang',
-            'low_stock' => 'Stok Menipis',
             'backorders' => 'Back Order',
         ];
     }
@@ -42,8 +40,6 @@ class ReportService
             'order_summary' => $this->orderSummary($filters),
             'receivables' => $this->receivables(),
             'overdue_invoices' => $this->overdueInvoices(),
-            'stock' => $this->stock(),
-            'low_stock' => $this->lowStock(),
             'backorders' => $this->backorders(),
             default => ['columns' => [], 'rows' => []],
         };
@@ -215,70 +211,6 @@ class ReportService
                 'school' => (string) $row->school,
                 'total' => Money::add((string) $row->total, '0'),
                 'outstanding' => Money::add((string) $row->outstanding, '0'),
-            ])->all(),
-        );
-    }
-
-    /**
-     * @return array{columns: list<array{key: string, label: string, type?: string}>, rows: array<int, array<string, mixed>>}
-     */
-    private function stock(): array
-    {
-        $rows = DB::table('stocks')
-            ->join('products', 'products.id', '=', 'stocks.product_id')
-            ->join('warehouses', 'warehouses.id', '=', 'stocks.warehouse_id')
-            ->selectRaw('products.code as code, products.title as title, warehouses.name as warehouse, stocks.quantity as quantity, stocks.reserved_quantity as reserved, (stocks.quantity - stocks.reserved_quantity) as available')
-            ->orderBy('products.title')
-            ->get();
-
-        return $this->table(
-            [
-                ['key' => 'code', 'label' => 'Kode'],
-                ['key' => 'title', 'label' => 'Judul'],
-                ['key' => 'warehouse', 'label' => 'Gudang'],
-                ['key' => 'quantity', 'label' => 'Fisik', 'type' => 'number'],
-                ['key' => 'reserved', 'label' => 'Reservasi', 'type' => 'number'],
-                ['key' => 'available', 'label' => 'Tersedia', 'type' => 'number'],
-            ],
-            $rows->map(fn (object $row): array => [
-                'code' => (string) $row->code,
-                'title' => (string) $row->title,
-                'warehouse' => (string) $row->warehouse,
-                'quantity' => (int) $row->quantity,
-                'reserved' => (int) $row->reserved,
-                'available' => (int) $row->available,
-            ])->all(),
-        );
-    }
-
-    /**
-     * @return array{columns: list<array{key: string, label: string, type?: string}>, rows: array<int, array<string, mixed>>}
-     */
-    private function lowStock(): array
-    {
-        $rows = DB::table('stocks')
-            ->join('products', 'products.id', '=', 'stocks.product_id')
-            ->join('warehouses', 'warehouses.id', '=', 'stocks.warehouse_id')
-            ->whereColumn('stocks.quantity', '<=', 'products.min_stock')
-            ->where('products.min_stock', '>', 0)
-            ->selectRaw('products.code as code, products.title as title, warehouses.name as warehouse, stocks.quantity as quantity, products.min_stock as min_stock')
-            ->orderBy('stocks.quantity')
-            ->get();
-
-        return $this->table(
-            [
-                ['key' => 'code', 'label' => 'Kode'],
-                ['key' => 'title', 'label' => 'Judul'],
-                ['key' => 'warehouse', 'label' => 'Gudang'],
-                ['key' => 'quantity', 'label' => 'Fisik', 'type' => 'number'],
-                ['key' => 'min_stock', 'label' => 'Stok Min', 'type' => 'number'],
-            ],
-            $rows->map(fn (object $row): array => [
-                'code' => (string) $row->code,
-                'title' => (string) $row->title,
-                'warehouse' => (string) $row->warehouse,
-                'quantity' => (int) $row->quantity,
-                'min_stock' => (int) $row->min_stock,
             ])->all(),
         );
     }

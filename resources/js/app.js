@@ -289,17 +289,29 @@ Alpine.data('lineItems', (config = {}) => ({
     products: config.products ?? [],
     productQuery: '',
     zone: config.zone ?? '',
-    blank: config.blank ?? { product_id: '', quantity: 1, unit_price: '', product_search: '', showDropdown: false },
+    blank: config.blank ?? {
+        product_id: '',
+        quantity: 1,
+        unit_price: '',
+        product_search: '',
+        showDropdown: false,
+    },
     items: [],
 
     init() {
         this.items =
             Array.isArray(config.items) && config.items.length > 0
                 ? config.items.map((item) => {
-                      const merged = { ...this.blank, ...item, showDropdown: false };
+                      const merged = {
+                          ...this.blank,
+                          ...item,
+                          showDropdown: false,
+                      };
                       if (merged.product_id && !merged.product_search) {
                           const product = this.products.find(
-                              (candidate) => String(candidate.value) === String(merged.product_id),
+                              (candidate) =>
+                                  String(candidate.value) ===
+                                  String(merged.product_id),
                           );
                           merged.product_search = product?.label ?? '';
                       }
@@ -321,7 +333,8 @@ Alpine.data('lineItems', (config = {}) => ({
     pick(index) {
         const product = this.products.find(
             (candidate) =>
-                String(candidate.value) === String(this.items[index].product_id),
+                String(candidate.value) ===
+                String(this.items[index].product_id),
         );
 
         if (!product) {
@@ -334,7 +347,8 @@ Alpine.data('lineItems', (config = {}) => ({
         const zonaPrice = this.zonePriceFor(product);
 
         if (current === '' || current === null || current === undefined) {
-            this.items[index][targetKey] = zonaPrice || product[sourceKey] || '';
+            this.items[index][targetKey] =
+                zonaPrice || product[sourceKey] || '';
         }
     },
 
@@ -349,7 +363,8 @@ Alpine.data('lineItems', (config = {}) => ({
     applyZone() {
         this.items.forEach((item, index) => {
             const product = this.products.find(
-                (candidate) => String(candidate.value) === String(item.product_id),
+                (candidate) =>
+                    String(candidate.value) === String(item.product_id),
             );
 
             if (!product) {
@@ -359,13 +374,17 @@ Alpine.data('lineItems', (config = {}) => ({
             const targetKey = config.priceKey ?? 'unit_price';
             const zonaPrice = this.zonePriceFor(product);
 
-            if (zonaPrice !== null && zonaPrice !== undefined && zonaPrice !== '') {
+            if (
+                zonaPrice !== null &&
+                zonaPrice !== undefined &&
+                zonaPrice !== ''
+            ) {
                 this.items[index][targetKey] = zonaPrice;
             }
         });
     },
 
-filteredProducts() {
+    filteredProducts() {
         const q = this.productQuery.trim().toLowerCase();
 
         if (q === '') {
@@ -373,7 +392,9 @@ filteredProducts() {
         }
 
         return this.products.filter((product) =>
-            String(product.label ?? '').toLowerCase().includes(q),
+            String(product.label ?? '')
+                .toLowerCase()
+                .includes(q),
         );
     },
 
@@ -389,6 +410,85 @@ filteredProducts() {
 
     money(value) {
         return 'Rp ' + numberFormatter.format(Math.round(Number(value || 0)));
+    },
+}));
+
+/**
+ * Searchable multi-product picker (catalog form).
+ *
+ * Usage:
+ *   <div x-data="productPicker({ products: [...], selected: [...] })">…</div>
+ */
+Alpine.data('productPicker', (config = {}) => ({
+    products: config.products ?? [],
+    selected: (Array.isArray(config.selected) ? config.selected : []).map(
+        Number,
+    ),
+    query: '',
+    category: '',
+    showDropdown: false,
+
+    get categories() {
+        const names = this.products.map((product) => this.categoryOf(product));
+
+        return [...new Set(names)]
+            .filter(Boolean)
+            .sort((a, b) => a.localeCompare(b, 'id'));
+    },
+
+    get available() {
+        const q = this.query.trim().toLowerCase();
+
+        return this.products
+            .filter((product) => !this.selected.includes(Number(product.id)))
+            .filter(
+                (product) =>
+                    this.category === '' ||
+                    this.categoryOf(product) === this.category,
+            )
+            .filter(
+                (product) =>
+                    q === '' ||
+                    String(product.code ?? '')
+                        .toLowerCase()
+                        .includes(q) ||
+                    String(product.title ?? '')
+                        .toLowerCase()
+                        .includes(q),
+            );
+    },
+
+    get selectedProducts() {
+        return this.selected
+            .map((id) =>
+                this.products.find((product) => Number(product.id) === id),
+            )
+            .filter(Boolean);
+    },
+
+    categoryOf(product) {
+        return product.book?.category?.name ?? '';
+    },
+
+    add(id) {
+        const productId = Number(id);
+
+        if (!this.selected.includes(productId)) {
+            this.selected.push(productId);
+        }
+
+        this.query = '';
+        this.$refs.picker?.focus();
+    },
+
+    remove(id) {
+        this.selected = this.selected.filter(
+            (productId) => productId !== Number(id),
+        );
+    },
+
+    money(value) {
+        return numberFormatter.format(Math.round(Number(value || 0)));
     },
 }));
 

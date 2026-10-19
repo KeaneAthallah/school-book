@@ -25,7 +25,7 @@
         ['label' => 'Penjualan', 'icon' => 'trendUp', 'route' => 'reports.index', 'params' => ['type' => 'sales'], 'permission' => 'reports.view'],
         ['label' => 'Pemenuhan Pesanan', 'icon' => 'truck', 'route' => 'shipments.index', 'permission' => 'shipments.view'],
         ['label' => 'Piutang', 'icon' => 'fileText', 'route' => 'receivables.index', 'permission' => 'invoices.view'],
-        ['label' => 'Risiko Stok', 'icon' => 'boxes', 'route' => 'stock.index', 'permission' => 'stock.view'],
+        ['label' => 'Penerimaan', 'icon' => 'inbox', 'route' => 'receipts.index', 'permission' => 'receipts.view'],
         ['label' => 'Rebate', 'icon' => 'percent', 'route' => 'rebates.index', 'permission' => 'rebates.view'],
         ['label' => 'Audit Log', 'icon' => 'shield', 'route' => 'audit.index', 'permission' => 'audit.view'],
     ]])
@@ -142,7 +142,7 @@
         <x-card>
             <x-card-header title="Risiko Stok" icon="boxes" subtitle="Ketersediaan terendah lebih dahulu">
                 <x-slot:action>
-                    <a href="{{ route('stock.index') }}" class="text-xs font-medium text-brand-600 hover:underline dark:text-brand-300">Lihat stok</a>
+                    <a href="{{ route('receipts.index') }}" class="text-xs font-medium text-brand-600 hover:underline dark:text-brand-300">Lihat penerimaan</a>
                 </x-slot:action>
             </x-card-header>
 
