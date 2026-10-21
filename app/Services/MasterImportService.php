@@ -47,7 +47,7 @@ class MasterImportService
             ['name' => 'category_id', 'label' => 'Kategori', 'type' => 'category'],
             ['name' => 'grade', 'label' => 'Kelas'],
             ['name' => 'subject', 'label' => 'Mata Pelajaran'],
-            ['name' => 'classification', 'label' => 'Klasifikasi', 'type' => 'enum', 'options' => ['Het', 'Reguler', 'Depag', 'Banpem', 'Alcom']],
+            ['name' => 'classification', 'label' => 'Klasifikasi', 'type' => 'classification', 'options' => ['Het', 'Reguler', 'Depag', 'Banpem', 'Alcom']],
             ['name' => 'price_zona_3', 'label' => 'Harga Jual Zona 3', 'type' => 'price'],
             ['name' => 'price_zona_4', 'label' => 'Harga Jual Zona 4', 'type' => 'price'],
             ['name' => 'price_zona_5', 'label' => 'Harga Jual Zona 5', 'type' => 'price'],
@@ -89,7 +89,8 @@ class MasterImportService
         '- Kode harus unik. Jika kode sudah ada di sistem, data baris tersebut akan memperbarui data lama (bukan duplikat).',
         '- Penerbit dan Kategori diisi dengan nama. Nama yang belum terdaftar akan dibuat otomatis.',
         '- Harga diisi angka saja tanpa "Rp" (boleh pakai titik pemisah ribuan, contoh: 90.000).',
-        '- Klasifikasi dan Status memakai pilihan dropdown — jangan mengetik manual.',
+        '- Klasifikasi hanya boleh: Het, Reguler, Depag, Banpem, atau Alcom (pilih dari dropdown).',
+        '- Status hanya boleh: Aktif atau Nonaktif (pilih dari dropdown).',
         '- Status kosong otomatis dianggap "Aktif".',
         '- Buku Reguler: Harga Jual Zona 3, 4 dan 5 wajib diisi semuanya dan nilainya harus sama.',
         '- Baris yang seluruh kolomnya kosong akan dilewati.',
@@ -337,6 +338,7 @@ class MasterImportService
                 'price' => $this->parsePrice($value),
                 'publisher' => $this->resolvePublisher($value),
                 'category' => $this->resolveCategory($value),
+                'classification' => $this->parseClassification($value),
                 'status' => $this->parseStatus($value),
                 default => $this->text($value),
             };
@@ -418,6 +420,25 @@ class MasterImportService
             'nonaktif', 'inactive' => 'inactive',
             default => 'active',
         };
+    }
+
+    /** Normalize the classification value (case-insensitive) against the allowed list. */
+    private function parseClassification(mixed $value): ?string
+    {
+        $text = $this->text($value);
+
+        if ($text === null) {
+            return null;
+        }
+
+        foreach (['Het', 'Reguler', 'Depag', 'Banpem', 'Alcom'] as $allowed) {
+            if (mb_strtolower($text) === mb_strtolower($allowed)) {
+                return $allowed;
+            }
+        }
+
+        // Unknown value is kept as-is so the validator reports a clear error.
+        return $text;
     }
 
     /** Parse Indonesian-formatted prices ("95.000", "1.250.000,50") into a decimal string. */
