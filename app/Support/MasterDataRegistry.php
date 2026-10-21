@@ -12,7 +12,6 @@ use App\Models\OrderSource;
 use App\Models\PaymentMethod;
 use App\Models\Product;
 use App\Models\Publisher;
-use App\Models\RebateRule;
 use App\Models\School;
 use App\Models\Setting;
 use App\Models\ShippingMethod;
@@ -61,7 +60,6 @@ class MasterDataRegistry
             'couriers' => self::couriers(),
             'shipping-methods' => self::shippingMethods(),
             'payment-methods' => self::paymentMethods(),
-            'rebate-rules' => self::rebateRules(),
             'settings' => self::settings(),
             'cash-loans' => self::cashLoans(),
         ];
@@ -122,7 +120,6 @@ class MasterDataRegistry
     {
         return [
             ...self::base('Sekolah', School::class, 'schools.view', 'schools.manage'),
-            'with' => ['salesUser:id,name'],
             'search' => ['name', 'npsn', 'district'],
             'sort' => 'name',
             'columns' => [
@@ -130,7 +127,7 @@ class MasterDataRegistry
                 ['key' => 'name', 'label' => 'Nama Sekolah'],
                 ['key' => 'district', 'label' => 'Kecamatan'],
                 ['key' => 'regency', 'label' => 'Kab/Kota'],
-                ['key' => 'salesUser.name', 'label' => 'Sales/PIC'],
+                ['key' => 'rebate_percent', 'label' => 'Rebate (%)'],
                 ['key' => 'status', 'label' => 'Status', 'type' => 'status'],
             ],
             'fields' => [
@@ -604,45 +601,6 @@ class MasterDataRegistry
             'rules' => fn (?Model $model): array => [
                 'code' => ['required', 'string', 'max:255', Rule::unique('payment_methods', 'code')->ignore($model?->getKey())],
                 'name' => ['required', 'string', 'max:255'],
-                'status' => ['required', Rule::in(['active', 'inactive'])],
-            ],
-        ];
-    }
-
-    /**
-     * @return array<string, mixed>
-     */
-    private static function rebateRules(): array
-    {
-        return [
-            ...self::base('Aturan Rebate', RebateRule::class, 'rebate-rules.manage', 'rebate-rules.manage'),
-            'with' => ['publisher:id,name'],
-            'search' => ['name'],
-            'sort' => 'name',
-            'columns' => [
-                ['key' => 'name', 'label' => 'Nama Aturan'],
-                ['key' => 'publisher.name', 'label' => 'Penerbit'],
-                ['key' => 'type', 'label' => 'Tipe'],
-                ['key' => 'value', 'label' => 'Nilai', 'type' => 'currency'],
-                ['key' => 'requires_full_payment', 'label' => 'Wajib Lunas', 'type' => 'boolean'],
-                ['key' => 'status', 'label' => 'Status', 'type' => 'status'],
-            ],
-            'fields' => [
-                ['name' => 'name', 'label' => 'Nama Aturan', 'type' => 'text', 'required' => true],
-                ['name' => 'publisher_id', 'label' => 'Penerbit', 'type' => 'select', 'options' => fn (): array => self::activeOptions(Publisher::class)],
-                ['name' => 'type', 'label' => 'Tipe', 'type' => 'select', 'required' => true, 'options' => [['value' => 'percentage', 'label' => 'Persentase (%)'], ['value' => 'fixed', 'label' => 'Nominal Tetap']]],
-                ['name' => 'value', 'label' => 'Nilai', 'type' => 'number', 'required' => true],
-                ['name' => 'min_invoice_amount', 'label' => 'Minimum Invoice', 'type' => 'number'],
-                ['name' => 'requires_full_payment', 'label' => 'Wajib Lunas', 'type' => 'checkbox'],
-                ['name' => 'status', 'label' => 'Status', 'type' => 'select', 'options' => [['value' => 'active', 'label' => 'Aktif'], ['value' => 'inactive', 'label' => 'Nonaktif']]],
-            ],
-            'rules' => fn (?Model $model): array => [
-                'name' => ['required', 'string', 'max:255'],
-                'publisher_id' => ['nullable', 'integer', 'exists:publishers,id'],
-                'type' => ['required', Rule::in(['percentage', 'fixed'])],
-                'value' => ['required', 'numeric', 'min:0'],
-                'min_invoice_amount' => ['nullable', 'numeric', 'min:0'],
-                'requires_full_payment' => ['boolean'],
                 'status' => ['required', Rule::in(['active', 'inactive'])],
             ],
         ];

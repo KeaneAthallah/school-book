@@ -130,7 +130,7 @@
 
     <div class="mt-4 grid gap-4 xl:grid-cols-3">
         <x-card class="xl:col-span-2">
-            <x-card-header title="Piutang Jatuh Tempo" icon="alert" :subtitle="$data['rebate_counts']['submitted'].' rebate menunggu · '.$data['rebate_counts']['approved'].' disetujui'">
+            <x-card-header title="Piutang Jatuh Tempo" icon="alert" :subtitle="$data['rebate_counts']['count'].' nota dengan rebate'">
                 <x-slot:action>
                     <a href="{{ route('receivables.index', ['bucket' => 'overdue']) }}" class="text-xs font-medium text-brand-600 hover:underline dark:text-brand-300">Lihat semua</a>
                 </x-slot:action>

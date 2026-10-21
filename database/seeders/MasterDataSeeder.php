@@ -10,7 +10,6 @@ use App\Models\OrderSource;
 use App\Models\PaymentMethod;
 use App\Models\Product;
 use App\Models\Publisher;
-use App\Models\RebateRule;
 use App\Models\Setting;
 use App\Models\ShippingMethod;
 use App\Models\Zona;
@@ -81,18 +80,6 @@ class MasterDataSeeder extends Seeder
         ] as $method) {
             PaymentMethod::query()->updateOrCreate(['code' => $method['code']], [...$method, 'status' => 'active']);
         }
-
-        RebateRule::query()->updateOrCreate(
-            ['name' => 'Rebate Penerbit 2%'],
-            [
-                'publisher_id' => null,
-                'type' => 'percentage',
-                'value' => '2.00',
-                'min_invoice_amount' => '1000000.00',
-                'requires_full_payment' => true,
-                'status' => 'active',
-            ],
-        );
 
         $this->seedGoods();
     }

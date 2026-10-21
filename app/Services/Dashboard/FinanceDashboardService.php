@@ -26,7 +26,7 @@ class FinanceDashboardService extends RoleDashboard
         $invoicedPrevious = $this->metrics->invoiceTotal($period, $scope, true);
         $buckets = $this->metrics->invoicePaymentBuckets($scope);
         $pending = $this->metrics->paymentsAwaitingVerification($scope);
-        $rebates = $this->metrics->rebateCounts($scope);
+        $rebates = $this->metrics->rebateSummary($period, $scope);
         $incoming = $this->metrics->ordersInPeriod($period, $scope);
         $incomingPrevious = $this->metrics->ordersInPeriod($period, $scope, true);
         $inTransit = $this->metrics->inTransitCount($scope);

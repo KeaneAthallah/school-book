@@ -102,7 +102,7 @@
             <x-card-header
                 title="Rebate & Cashback"
                 icon="percent"
-                :subtitle="$data['rebate_counts']['submitted'].' menunggu · '.$data['rebate_counts']['approved'].' disetujui · '.$data['rebate_counts']['paid'].' dibayar'"
+                :subtitle="$data['rebate_counts']['count'].' nota · '.number_format((float) $data['rebate_counts']['amount'], 0, ',', '.').' nilai rebate'"
             >
                 <x-slot:action>
                     <a href="{{ route('rebates.index') }}" class="text-xs font-medium text-brand-600 hover:underline dark:text-brand-300">Lihat semua</a>

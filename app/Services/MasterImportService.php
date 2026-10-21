@@ -117,6 +117,8 @@ class MasterImportService
         $this->buildGuideSheet($spreadsheet->getActiveSheet(), $resource);
         $this->buildDataSheet($spreadsheet->createSheet(), $resource, $columns);
 
+        $spreadsheet->setActiveSheetIndex(1);
+
         $fileName = 'template-'.($resource === 'books' ? 'buku' : 'barang').'.xlsx';
 
         return response()->streamDownload(function () use ($spreadsheet): void {
@@ -149,8 +151,10 @@ class MasterImportService
             return $result;
         }
 
+        $sheet = $spreadsheet->getSheetByName('Data') ?? $spreadsheet->getActiveSheet();
+
         /** @var list<list<null|bool|int|float|string>> $rows */
-        $rows = $spreadsheet->getActiveSheet()->toArray(null, true, false);
+        $rows = $sheet->toArray(null, true, false);
         $spreadsheet->disconnectWorksheets();
         unset($spreadsheet);
 

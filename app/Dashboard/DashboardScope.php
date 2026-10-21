@@ -6,7 +6,6 @@ use App\Models\Invoice;
 use App\Models\Order;
 use App\Models\Payment;
 use App\Models\Picking;
-use App\Models\Rebate;
 use App\Models\School;
 use App\Models\Shipment;
 use App\Models\User;

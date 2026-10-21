@@ -6,9 +6,10 @@
     empty-icon="percent"
     :rows="$rows"
     :columns="[
-        ['key' => 'number', 'label' => 'No. Rebate'],
+        ['key' => 'number', 'label' => 'No. Nota'],
         ['key' => 'school', 'label' => 'Sekolah'],
-        ['key' => 'status', 'label' => 'Status', 'view' => 'components.status-label'],
-        ['key' => 'amount', 'label' => 'Nilai', 'type' => 'currency', 'align' => 'right'],
+        ['key' => 'percent', 'label' => 'Rebate %', 'align' => 'right'],
+        ['key' => 'amount', 'label' => 'Nilai Rebate', 'type' => 'currency', 'align' => 'right'],
+        ['key' => 'date', 'label' => 'Tanggal'],
     ]"
 />

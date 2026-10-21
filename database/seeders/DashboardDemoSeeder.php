@@ -12,7 +12,6 @@ use App\Models\OrderSource;
 use App\Models\PaymentMethod;
 use App\Models\Product;
 use App\Models\Publisher;
-use App\Models\RebateRule;
 use App\Models\School;
 use App\Models\Setting;
 use App\Models\Shipment;
@@ -22,7 +21,6 @@ use App\Services\GoodsReceiptService;
 use App\Services\InvoiceService;
 use App\Services\OrderService;
 use App\Services\PaymentService;
-use App\Services\RebateService;
 use App\Services\ShipmentService;
 use Carbon\CarbonInterface;
 use Illuminate\Console\Command;
@@ -602,9 +600,6 @@ class DashboardDemoSeeder extends Seeder
 
         $this->pay($invoice, 1.0, $invoiceDate->copy()->addDays(9)->min(Carbon::today()));
 
-        if ($scenario === 9) {
-            $this->requestRebate($invoice);
-        }
     }
 
     private function ship(Order $order, bool $partial, CarbonInterface $shipDate): ?Shipment
@@ -668,35 +663,6 @@ class DashboardDemoSeeder extends Seeder
         ], $this->financeUser);
 
         $payments->verify($payment, $this->financeUser);
-    }
-
-    private function requestRebate(Invoice $invoice): void
-    {
-        $rule = RebateRule::query()->first();
-
-        if ($rule === null) {
-            return;
-        }
-
-        try {
-            $rebates = app(RebateService::class);
-
-            $rebate = $rebates->request([
-                'invoice_id' => $invoice->getKey(),
-                'rebate_rule_id' => $rule->getKey(),
-                'notes' => 'Data demonstrasi',
-            ], $this->salesUser);
-
-            // Rotate through the approval states deterministically.
-            match ($this->rand(0, 3)) {
-                0 => null, // stays submitted
-                1 => $rebates->approve($rebate, $this->approver),
-                2 => $rebates->reject($rebate, 'Dokumen pendukung belum lengkap', $this->approver),
-                default => $rebates->markPaid($rebates->approve($rebate, $this->approver), 'DEMO-TRF-'.$rebate->getKey(), $this->financeUser),
-            };
-        } catch (\Throwable) {
-            // Rebate rules may not match every invoice; demo seeding continues.
-        }
     }
 
     /**

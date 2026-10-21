@@ -10,7 +10,6 @@ use App\Enums\InvoiceStatus;
 use App\Enums\OrderStatus;
 use App\Enums\PaymentStatus;
 use App\Enums\PickingStatus;
-use App\Enums\RebateStatus;
 use App\Enums\ShipmentStatus;
 use App\Models\AuditLog;
 use App\Models\Backorder;
@@ -20,7 +19,6 @@ use App\Models\Order;
 use App\Models\Payment;
 use App\Models\Picking;
 use App\Models\Publisher;
-use App\Models\Rebate;
 use App\Models\Role;
 use App\Models\School;
 use App\Models\Shipment;
@@ -601,22 +599,21 @@ class DashboardMetrics
     }
 
     /**
-     * @return array<string, int>
+     * Rekap rebate sekolah: nilai diskon otomatis dari schools.rebate_percent
+     * yang tersimpan di orders.discount_amount.
+     *
+     * @return array<string, string>
      */
-    public function rebateCounts(DashboardScope $scope): array
+    public function rebateSummary(Period $period, DashboardScope $scope): array
     {
-        $counts = $scope->rebates(Rebate::query())
-            ->selectRaw('status, COUNT(*) as total')
-            ->groupBy('status')
-            ->pluck('total', 'status');
-
-        $get = fn (RebateStatus $status): int => (int) ($counts[$status->value] ?? 0);
+        $orders = $scope->orders(Order::query())
+            ->where('discount_percent', '>', 0)
+            ->whereDate('order_date', '>=', $period->start->toDateString())
+            ->whereDate('order_date', '<=', $period->end->toDateString());
 
         return [
-            'submitted' => $get(RebateStatus::Submitted) + $get(RebateStatus::PendingApproval),
-            'approved' => $get(RebateStatus::Approved),
-            'paid' => $get(RebateStatus::Paid),
-            'rejected' => $get(RebateStatus::Rejected),
+            'count' => (string) (clone $orders)->count(),
+            'amount' => (string) ((clone $orders)->sum('discount_amount') ?: '0'),
         ];
     }
 
@@ -625,18 +622,19 @@ class DashboardMetrics
      */
     public function rebates(DashboardScope $scope, int $limit = 6): array
     {
-        return $scope->rebates(Rebate::query())
+        return $scope->orders(Order::query())
             ->with('school:id,name')
-            ->orderByDesc('id')
+            ->where('discount_percent', '>', 0)
+            ->orderByDesc('order_date')
             ->limit($limit)
             ->get()
-            ->map(fn (Rebate $rebate): array => [
-                'id' => $rebate->getKey(),
-                'number' => $rebate->number,
-                'school' => $rebate->school?->name,
-                'amount' => $rebate->amount,
-                'status' => $rebate->status->value,
-                'status_label' => $rebate->status->label(),
+            ->map(fn (Order $order): array => [
+                'id' => $order->getKey(),
+                'number' => $order->number,
+                'school' => $order->school?->name,
+                'amount' => $order->discount_amount,
+                'percent' => $order->discount_percent,
+                'date' => $order->order_date->toDateString(),
             ])
             ->all();
     }

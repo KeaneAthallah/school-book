@@ -133,12 +133,8 @@ Route::middleware('auth')->group(function (): void {
     Route::delete('catalogs/{catalog}', [CatalogController::class, 'destroy'])->name('catalogs.destroy');
     Route::get('catalogs/{catalog}/pdf', [CatalogController::class, 'printPdf'])->name('catalogs.printPdf');
 
-    // Rebates.
+    // Rebate sekolah (rekap dari schools.rebate_percent via nota pesanan).
     Route::get('rebates', [RebateController::class, 'index'])->name('rebates.index');
-    Route::post('rebates', [RebateController::class, 'store'])->name('rebates.store');
-    Route::post('rebates/{rebate}/approve', [RebateController::class, 'approve'])->name('rebates.approve');
-    Route::post('rebates/{rebate}/reject', [RebateController::class, 'reject'])->name('rebates.reject');
-    Route::post('rebates/{rebate}/pay', [RebateController::class, 'pay'])->name('rebates.pay');
 
     // Reports.
     Route::get('reports', [ReportController::class, 'index'])->name('reports.index');

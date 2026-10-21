@@ -26,7 +26,6 @@ return [
         'order-sources.manage' => ['name' => 'Kelola Sumber Pesanan', 'group' => 'Master Data'],
         'couriers.manage' => ['name' => 'Kelola Kurir & Metode Kirim', 'group' => 'Master Data'],
         'payment-methods.manage' => ['name' => 'Kelola Metode Pembayaran', 'group' => 'Master Data'],
-        'rebate-rules.manage' => ['name' => 'Kelola Aturan Rebate', 'group' => 'Master Data'],
         'settings.manage' => ['name' => 'Kelola Konfigurasi', 'group' => 'Master Data'],
         'zonas.manage' => ['name' => 'Kelola Zona', 'group' => 'Master Data'],
         'loans.view' => ['name' => 'Lihat Pinjaman Tunai', 'group' => 'Pinjaman'],

@@ -40,7 +40,6 @@
             ['label' => 'Kurir', 'route' => 'master.index', 'params' => ['resource' => 'couriers'], 'match' => 'master.*', 'permission' => 'couriers.manage'],
             ['label' => 'Metode Kirim', 'route' => 'master.index', 'params' => ['resource' => 'shipping-methods'], 'match' => 'master.*', 'permission' => 'couriers.manage'],
             ['label' => 'Metode Bayar', 'route' => 'master.index', 'params' => ['resource' => 'payment-methods'], 'match' => 'master.*', 'permission' => 'payment-methods.manage'],
-            ['label' => 'Aturan Rebate', 'route' => 'master.index', 'params' => ['resource' => 'rebate-rules'], 'match' => 'master.*', 'permission' => 'rebate-rules.manage'],
             ['label' => 'Konfigurasi', 'route' => 'master.index', 'params' => ['resource' => 'settings'], 'match' => 'master.*', 'permission' => 'settings.manage'],
         ]],
 

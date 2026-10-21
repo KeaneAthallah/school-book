@@ -3,7 +3,6 @@
 use App\Enums\BackorderStatus;
 use App\Enums\InvoicePaymentStatus;
 use App\Enums\OrderStatus;
-use App\Enums\RebateStatus;
 use App\Models\Backorder;
 use App\Models\Book;
 use App\Models\GoodsReceipt;
@@ -13,8 +12,6 @@ use App\Models\OrderItem;
 use App\Models\OrderSource;
 use App\Models\Product;
 use App\Models\Publisher;
-use App\Models\Rebate;
-use App\Models\RebateRule;
 use App\Models\School;
 use App\Models\Shipment;
 use App\Models\User;
@@ -22,7 +19,6 @@ use App\Services\GoodsReceiptService;
 use App\Services\InvoiceService;
 use App\Services\OrderService;
 use App\Services\PaymentService;
-use App\Services\RebateService;
 use App\Services\ShipmentService;
 
 it('runs the full order lifecycle with partial stock, back orders, invoicing, payments, and rebates', function () {
@@ -139,21 +135,6 @@ it('runs the full order lifecycle with partial stock, back orders, invoicing, pa
 
     expect($invoice->refresh()->paymentStatus())->toBe(InvoicePaymentStatus::Paid)
         ->and($secondInvoice->refresh()->paymentStatus())->toBe(InvoicePaymentStatus::Paid);
-
-    // Rebate eligibility requires a fully paid invoice (2% of the first invoice).
-    $rule = RebateRule::factory()->create(['type' => 'percentage', 'value' => '2.00', 'requires_full_payment' => true]);
-    $rebate = app(RebateService::class)->request([
-        'invoice_id' => $invoice->id,
-        'rebate_rule_id' => $rule->id,
-    ], $user);
-
-    expect($rebate->amount)->toBe('1206.00')
-        ->and($rebate->status)->toBe(RebateStatus::Submitted);
-
-    app(RebateService::class)->approve($rebate, $user);
-    app(RebateService::class)->markPaid($rebate->refresh(), 'TRF-REBATE-1', $user);
-
-    expect($rebate->refresh()->status)->toBe(RebateStatus::Paid);
 
     // Final reconciliation.
     expect((float) Invoice::query()->sum('total_amount'))->toBe(100500.0)
