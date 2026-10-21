@@ -303,7 +303,7 @@
             <div class="doc-desc">{{ $catalog->description }}</div>
         @endif
         <div class="doc-rule"></div>
-        <div class="doc-count">{{ $items->count() }} Produk</div>
+        <div class="doc-count">{{ $items->count() }} Produk {{ $catalog->zona !== null ? '· Harga '.$catalog->zona->name : '' }}</div>
     </div>
 
     @foreach ($items as $index => $item)
@@ -341,7 +341,15 @@
                 }
             }
 
+            // The catalog prints the selected zone's price when one is set and
+            // the product has a price for it, otherwise the base price.
             $price = (float) ($product?->price ?? 0);
+            if ($catalog->zona_id !== null && $product !== null) {
+                $zonaPrice = $product->prices->firstWhere('zona_id', $catalog->zona_id);
+                if ($zonaPrice !== null) {
+                    $price = (float) $zonaPrice->price;
+                }
+            }
         @endphp
         <table class="entry">
             <tr>

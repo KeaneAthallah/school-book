@@ -27,6 +27,15 @@
                 <x-field label="Deskripsi" name="description">
                     <x-textarea name="description" rows="2">{{ old('description', $catalog->description ?? '') }}</x-textarea>
                 </x-field>
+
+                <x-field label="Zona Harga" name="zona_id" hint="Harga yang dicetak di katalog untuk setiap produk. Kosong = harga dasar produk.">
+                    <x-select name="zona_id" :invalid="$errors->has('zona_id')">
+                        <option value="">— Harga Dasar —</option>
+                        @foreach ($zonas as $zona)
+                            <option value="{{ $zona['value'] }}" @selected((string) old('zona_id', $catalog->zona_id ?? '') === (string) $zona['value'])>{{ $zona['label'] }}</option>
+                        @endforeach
+                    </x-select>
+                </x-field>
             </div>
         </x-card>
 

@@ -289,6 +289,8 @@ Alpine.data('lineItems', (config = {}) => ({
     products: config.products ?? [],
     productQuery: '',
     zone: config.zone ?? '',
+    discountPercent: config.discountPercent ?? '0',
+    schools: {},
     blank: config.blank ?? {
         product_id: '',
         quantity: 1,
@@ -406,6 +408,21 @@ Alpine.data('lineItems', (config = {}) => ({
                 Number(item.discount_amount || 0),
             0,
         );
+    },
+
+    lineTotal(item) {
+        return (
+            Number(item.unit_price || 0) * Number(item.quantity || 0) -
+            Number(item.discount_amount || 0)
+        );
+    },
+
+    orderDiscount() {
+        return (this.subtotal() * Number(this.discountPercent || 0)) / 100;
+    },
+
+    grandTotal() {
+        return Math.max(0, this.subtotal() - this.orderDiscount());
     },
 
     money(value) {

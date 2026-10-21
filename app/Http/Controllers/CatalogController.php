@@ -6,6 +6,7 @@ use App\Models\BookCategory;
 use App\Models\Product;
 use App\Models\ProductCatalog;
 use App\Models\Publisher;
+use App\Models\Zona;
 use App\Services\PrintHeaderService;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Dompdf\Canvas;
@@ -58,6 +59,7 @@ class CatalogController extends Controller
             'name' => ['required', 'string', 'max:255'],
             'description' => ['nullable', 'string'],
             'type' => ['nullable', 'string', 'max:50'],
+            'zona_id' => ['nullable', 'integer', 'exists:zonas,id'],
             'product_ids' => ['array'],
             'product_ids.*' => ['integer', 'exists:products,id'],
         ]);
@@ -66,6 +68,7 @@ class CatalogController extends Controller
             'name' => $validated['name'],
             'description' => $validated['description'] ?? null,
             'type' => $validated['type'] ?? null,
+            'zona_id' => $validated['zona_id'] ?? null,
         ]);
 
         foreach (array_values($validated['product_ids'] ?? []) as $index => $productId) {
@@ -95,6 +98,7 @@ class CatalogController extends Controller
             'name' => ['required', 'string', 'max:255'],
             'description' => ['nullable', 'string'],
             'type' => ['nullable', 'string', 'max:50'],
+            'zona_id' => ['nullable', 'integer', 'exists:zonas,id'],
             'product_ids' => ['array'],
             'product_ids.*' => ['integer', 'exists:products,id'],
         ]);
@@ -103,6 +107,7 @@ class CatalogController extends Controller
             'name' => $validated['name'],
             'description' => $validated['description'] ?? null,
             'type' => $validated['type'] ?? null,
+            'zona_id' => $validated['zona_id'] ?? null,
         ]);
 
         $catalog->items()->delete();
@@ -126,7 +131,7 @@ class CatalogController extends Controller
     {
         abort_unless($this->userCan($request, 'catalogs.view'), 403);
 
-        $catalog->load(['items.product.book.publisher', 'items.product.book.category', 'items.product.goods']);
+        $catalog->load(['zona', 'items.product.book.publisher', 'items.product.book.category', 'items.product.goods', 'items.product.prices']);
 
         $company = app(PrintHeaderService::class)->resolve();
         $today = now()->format('d/m/Y');
@@ -274,6 +279,9 @@ class CatalogController extends Controller
             'products' => Product::query()->active()->with('book.category')->orderBy('title')->get(['id', 'code', 'title', 'price']),
             'categories' => BookCategory::query()->orderBy('name')->get(['id', 'name']),
             'publishers' => Publisher::query()->active()->orderBy('name')->get(['id', 'name']),
+            'zonas' => Zona::query()->active()->orderBy('code')->get(['id', 'name'])
+                ->map(fn (Zona $zona): array => ['value' => $zona->getKey(), 'label' => $zona->name])
+                ->all(),
         ];
     }
 }

@@ -31,6 +31,14 @@
         method="POST"
         action="{{ $editing ? route('orders.update', $order['id']) : route('orders.store') }}"
         class="space-y-4"
+        x-data="lineItems({{ json_encode([
+            'products' => $products,
+            'items' => $items,
+            'blank' => $blank,
+            'zone' => $zonas[0]['value'] ?? '',
+            'discountPercent' => old('discount_percent', $editing ? ($order['discount_percent'] ?? '0') : '0'),
+        ]) }})"
+        x-init="schools = {{ json_encode(collect($schools)->mapWithKeys(fn ($s) => [(string) $s['value'] => $s['rebate_percent']])->all()) }}"
     >
         @csrf
         @if ($editing)
@@ -40,13 +48,13 @@
         <x-card>
             <x-card-header title="Informasi Pesanan" icon="cart" />
 
-            <div class="grid gap-3 p-4 sm:grid-cols-2 lg:grid-cols-3" x-data="{ schools: {{ json_encode(collect($schools)->mapWithKeys(fn ($s) => [(string) $s['value'] => $s['rebate_percent']])->all()) }}, discount: '{{ old('discount_percent', $editing ? ($order['discount_percent'] ?? '0') : '0') }}' }">
+            <div class="grid gap-3 p-4 sm:grid-cols-2 lg:grid-cols-3">
                 <x-field label="Tanggal" name="order_date" required>
                     <x-input type="date" name="order_date" value="{{ old('order_date', $editing ? $order['order_date'] : $defaultDate) }}" :invalid="$errors->has('order_date')" />
                 </x-field>
 
                 <x-field label="Sekolah" name="school_id" required>
-                    <x-select name="school_id" :invalid="$errors->has('school_id')" x-on:change="if (schools[$event.target.value] !== undefined && schools[$event.target.value] !== null) discount = schools[$event.target.value]">
+                    <x-select name="school_id" :invalid="$errors->has('school_id')" x-on:change="if (schools[$event.target.value] !== undefined && schools[$event.target.value] !== null) discountPercent = schools[$event.target.value]">
                         <option value="">— Pilih Sekolah —</option>
                         @foreach ($schools as $option)
                             <option value="{{ $option['value'] }}" @selected((string) old('school_id', $editing ? $order['school_id'] : '') === (string) $option['value'])>{{ $option['label'] }}</option>
@@ -68,7 +76,7 @@
                 </x-field>
 
                 <x-field label="Diskon Pesanan (%)" name="discount_percent">
-                    <x-input type="number" step="any" min="0" max="100" name="discount_percent" value="{{ old('discount_percent', $editing ? ($order['discount_percent'] ?? '0') : '0') }}" :invalid="$errors->has('discount_percent')" x-model="discount" />
+                    <x-input type="number" step="any" min="0" max="100" name="discount_percent" value="{{ old('discount_percent', $editing ? ($order['discount_percent'] ?? '0') : '0') }}" :invalid="$errors->has('discount_percent')" x-model="discountPercent" />
                 </x-field>
 
                 <x-field label="Catatan" name="notes" class="sm:col-span-2 lg:col-span-3">
@@ -77,7 +85,7 @@
             </div>
         </x-card>
 
-        <x-card x-data="lineItems({{ json_encode(['products' => $products, 'items' => $items, 'blank' => $blank, 'zone' => $zonas[0]['value'] ?? '']) }})">
+        <x-card>
             <x-card-header title="Item Pesanan" icon="boxes">
                 <x-slot:action>
                     <x-button type="button" variant="secondary" size="sm" x-on:click="add()">Tambah Item</x-button>
@@ -100,7 +108,7 @@
                 @enderror
 
                 <template x-for="(item, index) in items" :key="index">
-                    <div class="grid gap-2 rounded-control border border-line p-3 sm:grid-cols-[2fr_1fr_1fr_1fr_auto]">
+                    <div class="grid gap-2 rounded-control border border-line p-3 sm:grid-cols-[2fr_1fr_1fr_1fr_1fr_auto]">
                         <x-field label="Barang">
                             <div class="relative" x-data>
                                 <input
@@ -140,6 +148,10 @@
                             <x-input type="number" step="any" x-model="item.discount_amount" x-bind:name="`items[${index}][discount_amount]`" />
                         </x-field>
 
+                        <x-field label="Jumlah">
+                            <div class="rounded-control border border-line bg-panel-soft px-3 py-2 text-right text-sm font-medium tabular-nums text-ink" x-text="money(lineTotal(item))"></div>
+                        </x-field>
+
                         <div class="flex items-end gap-2">
                             <label class="flex items-center gap-1 text-xs">
                                 <input type="checkbox" :checked="item.availability_status === 'unavailable'" @change="item.availability_status = $event.target.checked ? 'unavailable' : 'available'" />
@@ -155,9 +167,17 @@
 
         <x-card>
             <div class="flex flex-wrap items-center justify-between gap-3 p-4">
-                <p class="text-sm text-ink-soft">
-                    Subtotal: <span class="font-medium text-ink" x-text="money(subtotal())"></span>
-                </p>
+                <div class="grid grid-cols-2 gap-x-8 gap-y-1 text-sm sm:grid-cols-3">
+                    <div class="text-ink-soft">
+                        Subtotal: <span class="font-medium text-ink" x-text="money(subtotal())"></span>
+                    </div>
+                    <div class="text-ink-soft">
+                        Diskon (<span x-text="Number(discountPercent || 0)"></span>%): <span class="font-medium text-ink" x-text="'− ' + money(orderDiscount())"></span>
+                    </div>
+                    <div class="text-ink-soft">
+                        Total: <span class="text-base font-semibold text-ink" x-text="money(grandTotal())"></span>
+                    </div>
+                </div>
                 <div class="flex gap-2">
                     <x-button :href="route('orders.index')" variant="secondary">Batal</x-button>
                     <x-button type="submit">Simpan Pesanan</x-button>
