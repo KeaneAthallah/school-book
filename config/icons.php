@@ -49,6 +49,9 @@ return [
     'monitor' => '<rect x="3" y="4.5" width="18" height="12" rx="2"/><path d="M8 20h8M12 16.5V20"/>',
     'inbox' => '<path d="M3.5 12.5 6 5h12l2.5 7.5v5A1.5 1.5 0 0 1 19 19H5a1.5 1.5 0 0 1-1.5-1.5z"/><path d="M3.5 12.5H9l1 2h4l1-2h5.5"/>',
     'camera' => '<path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z"/><circle cx="12" cy="13" r="3.5"/>',
+    'upload' => '<path d="M12 16V4"/><path d="m7 9 5-5 5 5"/><path d="M4.5 15v3.5A1.5 1.5 0 0 0 6 20h12a1.5 1.5 0 0 0 1.5-1.5V15"/>',
+    'download' => '<path d="M12 4v12"/><path d="m7 11 5 5 5-5"/><path d="M4.5 15v3.5A1.5 1.5 0 0 0 6 20h12a1.5 1.5 0 0 0 1.5-1.5V15"/>',
+    'fileSpreadsheet' => '<path d="M13.5 3H7a1.8 1.8 0 0 0-1.8 1.8v14.4A1.8 1.8 0 0 0 7 21h10a1.8 1.8 0 0 0 1.8-1.8V8.3z"/><path d="M13.5 3v5.3h5.3"/><path d="M8.5 12.5h7M8.5 16h7M12 12.5V18"/>',
 
     // Auth.
     'mail' => '<rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3.5 7 8.5 6 8.5-6"/>',

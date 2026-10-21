@@ -11,6 +11,7 @@ use App\Http\Controllers\HomeController;
 use App\Http\Controllers\IntegrationController;
 use App\Http\Controllers\InvoiceController;
 use App\Http\Controllers\MasterDataController;
+use App\Http\Controllers\MasterImportController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\PaymentController;
@@ -47,6 +48,10 @@ Route::middleware('auth')->group(function (): void {
     Route::post('master/{resource}', [MasterDataController::class, 'store'])->name('master.store');
     Route::put('master/{resource}/{id}', [MasterDataController::class, 'update'])->name('master.update');
     Route::delete('master/{resource}/{id}', [MasterDataController::class, 'destroy'])->name('master.destroy');
+
+    // Excel import + downloadable template for catalog resources (buku & barang lainnya).
+    Route::get('master/{resource}/import/template', [MasterImportController::class, 'template'])->name('master.import.template');
+    Route::post('master/{resource}/import', [MasterImportController::class, 'store'])->name('master.import');
 
     // Orders.
     Route::get('orders', [OrderController::class, 'index'])->name('orders.index');

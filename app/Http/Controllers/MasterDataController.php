@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Services\MasterImportService;
 use App\Support\MasterDataRegistry;
 use BackedEnum;
 use DateTimeInterface;
@@ -265,6 +266,7 @@ class MasterDataController extends Controller
             'title' => $definition['title'],
             'columns' => $definition['columns'],
             'fields' => $fields,
+            'importable' => app(MasterImportService::class)->supports($resource),
             'can' => [
                 'manage' => true,
             ],
