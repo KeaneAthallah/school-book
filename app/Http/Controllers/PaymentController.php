@@ -6,6 +6,7 @@ use App\Models\Invoice;
 use App\Models\Payment;
 use App\Models\PaymentMethod;
 use App\Models\School;
+use App\Support\Money;
 use App\Services\PaymentService;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\RedirectResponse;
@@ -41,6 +42,7 @@ class PaymentController extends Controller
                 'reference' => $payment->reference,
                 'amount' => $payment->amount,
                 'allocated_amount' => (string) ($payment->getAttribute('allocations_sum_amount') ?? '0'),
+                'remaining_amount' => (string) (Money::sub((string) $payment->amount, (string) ($payment->getAttribute('allocations_sum_amount') ?? '0'))),
                 'status' => $payment->status->value,
                 'status_label' => $payment->status->label(),
             ]);
@@ -85,8 +87,16 @@ class PaymentController extends Controller
             'notes' => ['nullable', 'string'],
             'allocations' => ['nullable', 'array'],
             'allocations.*.invoice_id' => ['required_with:allocations', 'integer', 'exists:invoices,id'],
-            'allocations.*.amount' => ['required_with:allocations', 'numeric', 'min:0.01'],
         ]);
+
+        // Jumlah alokasi default = jumlah pembayaran bila tidak diisi.
+        if (! empty($validated['allocations'])) {
+            foreach ($validated['allocations'] as $i => $entry) {
+                if (empty($entry['amount']) && ! empty($entry['invoice_id'])) {
+                    $validated['allocations'][$i]['amount'] = $validated['amount'];
+                }
+            }
+        }
 
         $payment = $service->record($validated, $request->user());
 

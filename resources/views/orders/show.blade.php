@@ -13,6 +13,8 @@
         icon="cart"
     >
         <x-slot:actions>
+            <x-button :href="route('orders.print', $order['id'])" variant="secondary" target="_blank">Cetak Surat Pesanan</x-button>
+
             @if ($can['update'])
                 <x-button :href="route('orders.edit', $order['id'])" variant="secondary">Ubah</x-button>
             @endif
@@ -57,6 +59,8 @@
                 <div>
                     <dt class="text-xs text-ink-soft">Status</dt>
                     <dd class="mt-0.5"><x-status-badge :value="$order['status']" :label="$order['status_label']" /></dd>
+                    <dt class="text-xs text-ink-soft">Status Pembayaran</dt>
+                    <dd class="mt-0.5">{{ $order['payment_status_label'] ?? '-' }}</dd>
                 </div>
                 <div>
                     <dt class="text-xs text-ink-soft">Sumber</dt>

@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 #[Fillable(['backorder_id', 'publisher_id', 'quantity', 'ordered_at', 'number', 'note', 'status', 'created_by'])]
 class BackorderOrder extends Model
@@ -33,6 +34,13 @@ class BackorderOrder extends Model
         return $this->belongsTo(Publisher::class);
     }
 
+    /**
+     * @return HasMany<BackorderOrderItem, $this>
+     */
+    public function items(): HasMany
+    {
+        return $this->hasMany(BackorderOrderItem::class, 'backorder_order_id');
+    }
     /**
      * @return BelongsTo<User, $this>
      */

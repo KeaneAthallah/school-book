@@ -17,7 +17,7 @@ use Illuminate\Database\Eloquent\Relations\MorphTo;
  * @property int $size
  */
 #[Fillable([
-    'attachable_type', 'attachable_id', 'original_name', 'path',
+    'attachable_type', 'attachable_id', 'type', 'original_name', 'path',
     'mime_type', 'size', 'uploaded_by',
 ])]
 class Attachment extends Model

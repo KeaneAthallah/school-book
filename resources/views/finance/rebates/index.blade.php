@@ -63,7 +63,7 @@
                                     <td class="px-4 py-2 text-right">{{ number_format((float) $order['discount_amount'], 2, ',', '.') }}</td>
                                     <td class="px-4 py-2">
                                         @foreach ($order['invoices'] as $inv)
-                                            <span class="mr-1 inline-block rounded bg-panel-soft px-2 py-0.5 text-xs">{{ $inv['number'] }} ({{ $inv['status'] }})</span>
+                                            <a href="{{ route('invoices.show', $inv['id']) }}" class="mr-1 inline-block rounded bg-panel-soft px-2 py-0.5 text-xs text-brand-600 hover:underline dark:text-brand-300">{{ $inv['number'] }} ({{ $inv['status'] }})</a>
                                         @endforeach
                                     </td>
                                     <td class="px-4 py-2">{{ $order['status'] }}</td>

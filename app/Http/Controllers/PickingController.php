@@ -6,6 +6,7 @@ use App\Enums\PickingStatus;
 use App\Models\Order;
 use App\Models\Picking;
 use App\Services\FulfillmentService;
+use App\Services\PrintHeaderService;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -62,7 +63,7 @@ class PickingController extends Controller
     {
         abort_unless($this->userCan($request, 'fulfillment.view'), 403);
 
-        $picking->load(['order:id,number', 'order.school:id,name', 'items.product:id,code,title']);
+        $picking->load(['order:id,number,school_id', 'order.school:id,name', 'items.product:id,code,title']);
 
         return view('inventory.pickings.show', [
             'picking' => [
@@ -85,6 +86,31 @@ class PickingController extends Controller
                 'pack' => ($this->userCan($request, 'fulfillment.pack')) && $picking->status->value === 'picked',
             ],
         ]);
+    }
+
+    public function print(Request $request, Picking $picking, PrintHeaderService $headers): View
+    {
+        abort_unless($this->userCan($request, 'fulfillment.view'), 403);
+
+        $picking->load([
+            'order:id,number,school_id,order_date',
+            'order.school:id,name,npsn,address',
+            'items.product:id,code,title', 'items.product.book.publisher:id,name',
+        ]);
+
+        return view('print.picking-note', [
+            'picking' => $picking,
+            'company' => $headers->resolve(),
+        ]);
+    }
+
+    public function destroy(Request $request, Picking $picking): RedirectResponse
+    {
+        abort_unless($this->userCan($request, 'fulfillment.pick'), 403);
+
+        $picking->delete();
+
+        return redirect()->route('pickings.index')->with('success', 'Picking '.$picking->number.' berhasil dihapus.');
     }
 
     public function record(Request $request, Picking $picking, FulfillmentService $service): RedirectResponse

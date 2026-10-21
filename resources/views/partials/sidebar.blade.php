@@ -46,7 +46,8 @@
         ['kind' => 'group', 'label' => 'Pengadaan', 'icon' => 'boxes', 'permission' => 'procurement.view', 'items' => [
             ['label' => 'Back Order', 'route' => 'backorders.index', 'match' => 'backorders.index', 'permission' => 'procurement.view'],
             ['label' => 'Rekap Item Tidak Tersedia', 'route' => 'backorders.unavailable', 'match' => 'backorders.unavailable', 'permission' => 'procurement.view'],
-            ['label' => 'Penerimaan dari Penerbit', 'route' => 'receipts.index', 'match' => 'receipts.*', 'permission' => 'receipts.view'],
+            ['label' => 'Stok Masuk', 'route' => 'receipts.index', 'match' => 'receipts.*', 'permission' => 'receipts.view'],
+            ['label' => 'Mutasi Stok', 'route' => 'stock-mutations.index', 'match' => 'stock-mutations.*', 'permission' => 'fulfillment.view'],
         ]],
 
         ['kind' => 'group', 'label' => 'Picking & Packing', 'icon' => 'clipboard', 'permission' => 'fulfillment.view', 'items' => [

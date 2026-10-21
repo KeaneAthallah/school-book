@@ -39,6 +39,10 @@
         </ul>
     </x-card>
 
+    @php
+        $groupedInvoices = $invoices->getCollection()->groupBy('school');
+    @endphp
+
     <x-card class="mt-4">
         <x-filter-bar method="get" :action="route('receivables.index')">
             <x-field label="Cari" class="w-56">
@@ -54,23 +58,31 @@
             </x-field>
             <x-button type="submit" variant="secondary">Filter</x-button>
         </x-filter-bar>
-
-        <x-data-table
-            empty="Tidak ada piutang pada filter ini."
-            empty-icon="checkCircle"
-            :rows="$invoices"
-            :columns="[
-                ['key' => 'number', 'label' => 'No. Invoice', 'link' => 'invoices.show'],
-                ['key' => 'school', 'label' => 'Sekolah'],
-                ['key' => 'invoice_date', 'label' => 'Tanggal', 'type' => 'date'],
-                ['key' => 'due_date', 'label' => 'Jatuh Tempo', 'type' => 'date'],
-                ['key' => 'total', 'label' => 'Total', 'type' => 'currency', 'align' => 'right'],
-                ['key' => 'paid', 'label' => 'Dibayar', 'type' => 'currency', 'align' => 'right'],
-                ['label' => 'Sisa', 'view' => 'finance.receivables.partials.outstanding', 'align' => 'right'],
-                ['label' => 'Status', 'view' => 'finance.receivables.partials.state'],
-            ]"
-        />
     </x-card>
+
+    @forelse ($groupedInvoices as $schoolName => $schoolInvoices)
+        <x-card class="mt-4">
+            <x-card-header title="{{ $schoolName ?: 'Tanpa Sekolah' }}" icon="school" subtitle="{{ $schoolInvoices->count() }} invoice" />
+            <x-data-table
+                empty="Tidak ada piutang."
+                empty-icon="checkCircle"
+                :rows="$schoolInvoices->all()"
+                :columns="[
+                    ['key' => 'number', 'label' => 'No. Invoice', 'link' => 'invoices.show'],
+                    ['key' => 'invoice_date', 'label' => 'Tanggal', 'type' => 'date'],
+                    ['key' => 'due_date', 'label' => 'Jatuh Tempo', 'type' => 'date'],
+                    ['key' => 'total', 'label' => 'Total', 'type' => 'currency', 'align' => 'right'],
+                    ['key' => 'paid', 'label' => 'Dibayar', 'type' => 'currency', 'align' => 'right'],
+                    ['label' => 'Sisa', 'view' => 'finance.receivables.partials.outstanding', 'align' => 'right'],
+                    ['label' => 'Status', 'view' => 'finance.receivables.partials.state'],
+                ]"
+            />
+        </x-card>
+    @empty
+        <x-card class="mt-4">
+            <x-empty-state message="Tidak ada piutang pada filter ini." icon="checkCircle" />
+        </x-card>
+    @endforelse
 
     <div class="mt-3">{{ $invoices->links() }}</div>
 @endsection

@@ -156,13 +156,15 @@ class OrderController extends Controller
                     'paid_amount' => $invoice->paid_amount,
                 ])->all(),
                 'backorders' => $backorders->map(fn ($backorder): array => [
-                    'id' => $backorder->getKey(),
-                    'product' => $backorder->product?->title,
-                    'quantity' => $backorder->quantity,
-                    'fulfilled_quantity' => $backorder->fulfilled_quantity,
-                    'status' => $backorder->status->value,
-                    'status_label' => $backorder->status->label(),
-                ])->all(),
+                                'id' => $backorder->getKey(),
+                                'product' => $backorder->product?->title,
+                                'quantity' => $backorder->quantity,
+                                'fulfilled_quantity' => $backorder->fulfilled_quantity,
+                                'status' => $backorder->status->value,
+                                'status_label' => $backorder->status->label(),
+                            ])->all(),
+                            'payment_status' => $this->paymentStatus($order),
+                            'payment_status_label' => $this->paymentStatusLabel($order),
             ],
             'can' => [
                 'update' => ($this->userCan($request, 'orders.manage')) && $order->isEditable(),
@@ -239,14 +241,49 @@ class OrderController extends Controller
         $order->load([
             'school',
             'orderSource:id,name',
-            'items' => fn ($query) => $query->with('product:id,code,title')->orderBy('id'),
-            'invoices',
+            'items' => fn ($query) => $query->with('product:id,code,title', 'product.book.publisher:id,name')->orderBy('id'),
         ]);
 
         return view('print.order-note', [
             'order' => $order,
             'company' => $headers->resolve(),
         ]);
+    }
+
+    private function paymentStatus(Order $order): string
+    {
+        $invoices = $order->invoices;
+
+        if ($invoices->isEmpty()) {
+            return 'no_invoice';
+        }
+
+        $total = (float) $invoices->sum('total_amount');
+        $paid = (float) $invoices->sum('paid_amount');
+
+        if ($total <= 0) {
+            return 'no_invoice';
+        }
+
+        if ($paid >= $total) {
+            return 'paid';
+        }
+
+        if ($paid > 0) {
+            return 'partial';
+        }
+
+        return 'unpaid';
+    }
+
+    private function paymentStatusLabel(Order $order): string
+    {
+        return match ($this->paymentStatus($order)) {
+            'paid' => 'Lunas',
+            'partial' => 'Sebagian',
+            'unpaid' => 'Belum Bayar',
+            default => 'Belum Ada Invoice',
+        };
     }
 
     /**

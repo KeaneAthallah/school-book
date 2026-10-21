@@ -13,6 +13,9 @@
         icon="inbox"
     >
         <x-slot:actions>
+            @if ($receipt['status'] === 'draft')
+                <x-button :href="route('receipts.edit', $receipt['id'])" variant="secondary">Ubah</x-button>
+            @endif
             <x-button :href="route('receipts.index')" variant="secondary">Kembali</x-button>
 
             @if ($can['confirm'])

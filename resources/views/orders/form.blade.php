@@ -86,11 +86,7 @@
         </x-card>
 
         <x-card>
-            <x-card-header title="Item Pesanan" icon="boxes">
-                <x-slot:action>
-                    <x-button type="button" variant="secondary" size="sm" x-on:click="add()">Tambah Item</x-button>
-                </x-slot:action>
-            </x-card-header>
+            <x-card-header title="Item Pesanan" icon="boxes" />
 
             <div class="space-y-3 p-4">
                 <div class="rounded-control border border-line p-3">
@@ -162,6 +158,10 @@
                         </div>
                     </div>
                 </template>
+
+                <div class="flex justify-end pt-2">
+                    <x-button type="button" variant="primary" x-on:click="add()">+ Tambah Item</x-button>
+                </div>
             </div>
         </x-card>
 

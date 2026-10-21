@@ -39,6 +39,7 @@
                 ['key' => 'items_count', 'label' => 'Item', 'align' => 'right', 'class' => 'tabular-nums'],
                 ['key' => 'status', 'label' => 'Status', 'view' => 'components.status-label'],
                 ['key' => 'created_at', 'label' => 'Dibuat', 'type' => 'datetime'],
+                ['label' => 'Aksi', 'view' => 'inventory.pickings.partials.delete-action'],
             ]"
         />
     </x-card>

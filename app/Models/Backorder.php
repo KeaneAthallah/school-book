@@ -52,6 +52,13 @@ class Backorder extends Model
         return $this->belongsTo(Product::class);
     }
 
+    /**
+     * @return HasMany<BackorderOrderItem, $this>
+     */
+    public function orderItems(): HasMany
+    {
+        return $this->hasMany(BackorderOrderItem::class, 'backorder_id');
+    }
     public function outstandingQuantity(): int
     {
         return max(0, $this->quantity - $this->fulfilled_quantity);

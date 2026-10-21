@@ -100,53 +100,100 @@
     </div>
 
     <x-card class="mt-4">
-        <x-card-header title="Bukti Pengiriman" subtitle="Pesanan telah dikirim berikut bukti foto" icon="checkCircle">
+        <x-card-header title="Bukti Pengiriman" subtitle="Bukti kirim & bukti terima barang" icon="checkCircle">
             <x-slot:action>
                 @if ($can['attach'])
-                    <form method="POST" action="{{ route('shipments.attachments.store', $shipment['id']) }}" enctype="multipart/form-data" class="flex flex-col items-stretch gap-2 sm:flex-row sm:items-center">
-                        @csrf
-                        <div x-data="photoPreview" class="flex flex-1 flex-col gap-2 sm:flex-row sm:items-center">
-                            <input type="file" name="photo" accept="image/jpeg,image/png,image/webp" required
-                                aria-label="Tambah bukti foto"
-                                class="w-full rounded-control border border-line bg-canvas px-2.5 py-1.5 text-xs text-ink file:mr-1.5 file:rounded-control file:border-0 file:bg-brand-600 file:px-2 file:py-1 file:text-xs file:font-medium file:text-white"
-                                @change="pick($event)">
-                            <img x-show="preview" :src="preview" alt="Pratinjau bukti foto" class="h-20 w-20 self-start rounded-control border border-line object-cover sm:h-24 sm:w-24" />
-                        </div>
-                        <x-button type="submit" variant="secondary">Tambah Foto</x-button>
-                    </form>
+                    <div class="flex flex-col gap-2 sm:flex-row">
+                        <form method="POST" action="{{ route('shipments.attachments.store', $shipment['id']) }}" enctype="multipart/form-data" class="flex flex-col items-stretch gap-2 sm:flex-row sm:items-center">
+                            @csrf
+                            <input type="hidden" name="type" value="delivery" />
+                            <div x-data="photoPreview" class="flex flex-1 flex-col gap-2 sm:flex-row sm:items-center">
+                                <input type="file" name="photo" accept="image/jpeg,image/png,image/webp" required
+                                    aria-label="Bukti kirim barang"
+                                    class="w-full rounded-control border border-line bg-canvas px-2.5 py-1.5 text-xs text-ink file:mr-1.5 file:rounded-control file:border-0 file:bg-brand-600 file:px-2 file:py-1 file:text-xs file:font-medium file:text-white"
+                                    @change="pick($event)">
+                                <img x-show="preview" :src="preview" alt="Pratinjau" class="h-20 w-20 self-start rounded-control border border-line object-cover sm:h-24 sm:w-24" />
+                            </div>
+                            <x-button type="submit" variant="secondary">Upload Bukti Kirim</x-button>
+                        </form>
+                        <form method="POST" action="{{ route('shipments.attachments.store', $shipment['id']) }}" enctype="multipart/form-data" class="flex flex-col items-stretch gap-2 sm:flex-row sm:items-center">
+                            @csrf
+                            <input type="hidden" name="type" value="receipt" />
+                            <div x-data="photoPreview" class="flex flex-1 flex-col gap-2 sm:flex-row sm:items-center">
+                                <input type="file" name="photo" accept="image/jpeg,image/png,image/webp" required
+                                    aria-label="Bukti terima barang"
+                                    class="w-full rounded-control border border-line bg-canvas px-2.5 py-1.5 text-xs text-ink file:mr-1.5 file:rounded-control file:border-0 file:bg-brand-600 file:px-2 file:py-1 file:text-xs file:font-medium file:text-white"
+                                    @change="pick($event)">
+                                <img x-show="preview" :src="preview" alt="Pratinjau" class="h-20 w-20 self-start rounded-control border border-line object-cover sm:h-24 sm:w-24" />
+                            </div>
+                            <x-button type="submit" variant="secondary">Upload Bukti Terima</x-button>
+                        </form>
+                    </div>
                 @endif
             </x-slot:action>
         </x-card-header>
 
-        <div class="p-4">
-            @if (in_array($shipment['status'], ['shipped', 'delivered'], true))
-                <x-alert tone="success">Pesanan telah dikirim berikut bukti foto.</x-alert>
-            @endif
+        <div class="p-4 space-y-4">
+            @php
+                $delivery = collect($shipment['attachments'])->where('type', 'delivery')->values();
+                $receipt = collect($shipment['attachments'])->where('type', 'receipt')->values();
+            @endphp
 
-            @if (count($shipment['attachments']) > 0)
-                <div class="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
-                    @foreach ($shipment['attachments'] as $attachment)
-                        <figure class="group relative overflow-hidden rounded-control border border-line bg-canvas">
-                            <a href="{{ $attachment['url'] }}" target="_blank" rel="noreferrer">
-                                <img src="{{ $attachment['url'] }}" alt="{{ $attachment['name'] }}" loading="lazy" class="h-36 w-full object-cover">
-                            </a>
-                            <figcaption class="truncate px-2 py-1.5 text-[11px] text-ink-soft">{{ $attachment['name'] }}</figcaption>
-                            @if ($can['manage_attachments'])
-                                <form method="POST" action="{{ route('attachments.destroy', $attachment['id']) }}" class="absolute right-1.5 top-1.5">
-                                    @csrf
-                                    @method('DELETE')
-                                    <button type="submit" aria-label="Hapus bukti foto"
-                                        class="rounded-control bg-rose-600/90 p-1 text-white opacity-0 transition hover:bg-rose-600 group-hover:opacity-100">
-                                        <x-icon name="close" class="h-3.5 w-3.5" />
-                                    </button>
-                                </form>
-                            @endif
-                        </figure>
-                    @endforeach
-                </div>
-            @else
-                <p class="text-sm text-ink-soft">Belum ada bukti foto pengiriman.</p>
-            @endif
+            <div>
+                <p class="mb-2 text-sm font-medium text-ink">Bukti Kirim Barang</p>
+                @if ($delivery->isNotEmpty())
+                    <div class="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
+                        @foreach ($delivery as $attachment)
+                            <figure class="group relative overflow-hidden rounded-control border border-line bg-canvas">
+                                <a href="{{ $attachment['url'] }}" target="_blank" rel="noreferrer">
+                                    <img src="{{ $attachment['url'] }}" alt="{{ $attachment['name'] }}" loading="lazy" class="h-36 w-full object-cover">
+                                </a>
+                                <figcaption class="truncate px-2 py-1.5 text-[11px] text-ink-soft">{{ $attachment['name'] }}</figcaption>
+                                @if ($can['manage_attachments'])
+                                    <form method="POST" action="{{ route('attachments.destroy', $attachment['id']) }}" class="absolute right-1.5 top-1.5">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="submit" aria-label="Hapus bukti foto"
+                                            class="rounded-control bg-rose-600/90 p-1 text-white opacity-0 transition hover:bg-rose-600 group-hover:opacity-100">
+                                            <x-icon name="close" class="h-3.5 w-3.5" />
+                                        </button>
+                                    </form>
+                                @endif
+                            </figure>
+                        @endforeach
+                    </div>
+                @else
+                    <p class="text-sm text-ink-soft">Belum ada bukti kirim.</p>
+                @endif
+            </div>
+
+            <div>
+                <p class="mb-2 text-sm font-medium text-ink">Bukti Terima Barang</p>
+                @if ($receipt->isNotEmpty())
+                    <div class="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
+                        @foreach ($receipt as $attachment)
+                            <figure class="group relative overflow-hidden rounded-control border border-line bg-canvas">
+                                <a href="{{ $attachment['url'] }}" target="_blank" rel="noreferrer">
+                                    <img src="{{ $attachment['url'] }}" alt="{{ $attachment['name'] }}" loading="lazy" class="h-36 w-full object-cover">
+                                </a>
+                                <figcaption class="truncate px-2 py-1.5 text-[11px] text-ink-soft">{{ $attachment['name'] }}</figcaption>
+                                @if ($can['manage_attachments'])
+                                    <form method="POST" action="{{ route('attachments.destroy', $attachment['id']) }}" class="absolute right-1.5 top-1.5">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="submit" aria-label="Hapus bukti foto"
+                                            class="rounded-control bg-rose-600/90 p-1 text-white opacity-0 transition hover:bg-rose-600 group-hover:opacity-100">
+                                            <x-icon name="close" class="h-3.5 w-3.5" />
+                                        </button>
+                                    </form>
+                                @endif
+                            </figure>
+                        @endforeach
+                    </div>
+                @else
+                    <p class="text-sm text-ink-soft">Belum ada bukti terima.</p>
+                @endif
+            </div>
         </div>
     </x-card>
 @endsection

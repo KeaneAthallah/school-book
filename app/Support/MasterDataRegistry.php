@@ -260,7 +260,6 @@ class MasterDataRegistry
                 ['key' => 'publisher.name', 'label' => 'Penerbit'],
                 ['key' => 'category.name', 'label' => 'Kategori'],
                 ['key' => 'grade', 'label' => 'Kelas'],
-                ['key' => 'subject', 'label' => 'Mapel'],
                 ['key' => 'classification', 'label' => 'Klasifikasi'],
                 ['key' => 'product.price', 'label' => 'Harga', 'type' => 'currency'],
                 ['key' => 'product.status', 'label' => 'Status', 'type' => 'status'],

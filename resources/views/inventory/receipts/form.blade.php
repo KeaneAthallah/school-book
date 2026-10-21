@@ -4,11 +4,13 @@
 
 @section('content')
     @php
+        $editing = isset($receipt);
         $blank = ['product_id' => '', 'quantity' => 1, 'unit_cost' => ''];
+        $items = $editing ? $receipt['items'] : [$blank];
     @endphp
 
     <x-page-header
-        title="Tambah Penerimaan"
+        :title="$editing ? 'Ubah Penerimaan' : 'Tambah Penerimaan'"
         subtitle="Catat barang yang diterima dari penerbit. Stok bertambah setelah konfirmasi."
         icon="inbox"
     >
@@ -17,8 +19,9 @@
         </x-slot:actions>
     </x-page-header>
 
-    <form method="POST" action="{{ route('receipts.store') }}" class="space-y-4">
+    <form method="POST" action="{{ $editing ? route('receipts.update', $receipt['id']) : route('receipts.store') }}" class="space-y-4">
         @csrf
+        @if ($editing) @method('PUT') @endif
 
         <x-card>
             <x-card-header title="Informasi" icon="inbox" />
@@ -27,22 +30,22 @@
                     <x-select name="publisher_id" :invalid="$errors->has('publisher_id')">
                         <option value="">— Pilih —</option>
                         @foreach ($publishers as $option)
-                            <option value="{{ $option['value'] }}" @selected(old('publisher_id') == $option['value'])>{{ $option['label'] }}</option>
+                            <option value="{{ $option['value'] }}" @selected(old('publisher_id', $editing ? $receipt['publisher_id'] : '') == $option['value'])>{{ $option['label'] }}</option>
                         @endforeach
                     </x-select>
                 </x-field>
 
                 <x-field label="Tanggal" name="receipt_date" required>
-                    <x-input type="date" name="receipt_date" value="{{ old('receipt_date', $defaultDate) }}" :invalid="$errors->has('receipt_date')" />
+                    <x-input type="date" name="receipt_date" value="{{ old('receipt_date', $editing ? $receipt['receipt_date'] : $defaultDate) }}" :invalid="$errors->has('receipt_date')" />
                 </x-field>
 
                 <x-field label="Catatan" name="notes" class="sm:col-span-3">
-                    <x-textarea name="notes" rows="2">{{ old('notes') }}</x-textarea>
+                    <x-textarea name="notes" rows="2">{{ old('notes', $editing ? $receipt['notes'] : '') }}</x-textarea>
                 </x-field>
             </div>
         </x-card>
 
-        <x-card x-data="lineItems({{ json_encode(['products' => $products, 'items' => [$blank], 'blank' => $blank, 'priceKey' => 'unit_cost', 'bookPriceKey' => 'cost_price']) }})">
+        <x-card x-data="lineItems({{ json_encode(['products' => $products, 'items' => $items, 'blank' => $blank, 'priceKey' => 'unit_cost', 'bookPriceKey' => 'cost_price']) }})">
             <x-card-header title="Item" icon="boxes">
                 <x-slot:action>
                     <x-button type="button" variant="secondary" size="sm" x-on:click="add()">Tambah Item</x-button>

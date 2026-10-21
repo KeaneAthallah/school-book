@@ -26,7 +26,7 @@ class ShipmentController extends Controller
         $status = $request->string('status')->toString();
 
         $shipments = Shipment::query()
-            ->with(['order:id,number', 'order.school:id,name', 'courier:id,name'])
+            ->with(['order:id,number,school_id', 'order.school:id,name', 'courier:id,name'])
             ->when($search !== '', fn (Builder $query) => $query->where(function (Builder $builder) use ($search): void {
                 $builder->where('number', 'like', '%'.$search.'%')
                     ->orWhere('delivery_note_number', 'like', '%'.$search.'%');
@@ -122,7 +122,7 @@ class ShipmentController extends Controller
     {
         abort_unless($this->userCan($request, 'shipments.view'), 403);
 
-        $shipment->load(['order:id,number', 'order.school:id,name,address', 'courier:id,name', 'shippingMethod:id,name', 'items.product:id,code,title']);
+        $shipment->load(['order:id,number,school_id', 'order.school:id,name,address', 'courier:id,name', 'shippingMethod:id,name', 'items.product:id,code,title']);
 
         return view('shipping.show', [
             'shipment' => [
@@ -151,6 +151,7 @@ class ShipmentController extends Controller
                     'name' => $attachment->original_name,
                     'url' => Storage::url($attachment->path),
                     'time' => $attachment->created_at?->toDateTimeString(),
+                    'type' => $attachment->type ?? 'delivery',
                 ])->all(),
             ],
             'can' => [
@@ -187,6 +188,7 @@ class ShipmentController extends Controller
 
         $request->validate([
             'photo' => ['required', 'file', 'image', 'mimes:jpeg,jpg,png,webp', 'max:5120'],
+            'type' => ['nullable', 'string', 'in:delivery,receipt'],
         ], [
             'photo.required' => 'Bukti foto pengiriman wajib dilampirkan.',
             'photo.image' => 'Bukti pengiriman harus berupa gambar (JPEG, PNG, atau WebP).',
@@ -202,6 +204,7 @@ class ShipmentController extends Controller
             'path' => $path,
             'mime_type' => $photo->getMimeType(),
             'size' => $photo->getSize(),
+            'type' => $request->input('type', 'delivery'),
             'uploaded_by' => $request->user()?->getKey(),
         ]);
 
@@ -234,6 +237,11 @@ class ShipmentController extends Controller
      */
     private function shippableOrders(): array
     {
+        $existingPickingOrderIds = \App\Models\Picking::query()
+            ->whereIn('status', [\App\Enums\PickingStatus::Draft->value, \App\Enums\PickingStatus::Picking->value, \App\Enums\PickingStatus::Picked->value])
+            ->pluck('order_id')
+            ->all();
+
         return Order::query()
             ->with('school:id,name')
             ->whereIn('status', [
@@ -241,6 +249,7 @@ class ShipmentController extends Controller
                 OrderStatus::Ready->value,
                 OrderStatus::PartialShipped->value,
             ])
+            ->whereNotIn('id', $existingPickingOrderIds)
             ->orderByDesc('order_date')
             ->limit(50)
             ->get()

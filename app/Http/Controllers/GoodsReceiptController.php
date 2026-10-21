@@ -87,6 +87,38 @@ class GoodsReceiptController extends Controller
         ]);
     }
 
+    public function edit(Request $request, GoodsReceipt $receipt): View
+    {
+        abort_unless($this->userCan($request, 'receipts.manage'), 403);
+        abort_unless($receipt->isDraft(), 403);
+
+        $receipt->load(['publisher:id,name', 'items.product:id,code,title']);
+
+        return view('inventory.receipts.form', array_merge($this->formProps(), [
+            'receipt' => [
+                'id' => $receipt->getKey(),
+                'publisher_id' => $receipt->publisher_id,
+                'receipt_date' => $receipt->receipt_date->toDateString(),
+                'notes' => $receipt->notes,
+                'items' => $receipt->items->map(fn ($item): array => [
+                    'product_id' => $item->product_id,
+                    'product_label' => $item->product?->code.' - '.$item->product?->title,
+                    'quantity' => $item->quantity,
+                    'unit_cost' => $item->unit_cost,
+                ])->all(),
+            ],
+        ]));
+    }
+
+    public function update(StoreGoodsReceiptRequest $request, GoodsReceipt $receipt, GoodsReceiptService $service): RedirectResponse
+    {
+        abort_unless($this->userCan($request, 'receipts.manage'), 403);
+
+        $service->update($receipt, $request->validated(), $request->user());
+
+        return redirect()->route('receipts.show', $receipt)->with('success', 'Penerimaan '.$receipt->number.' diperbarui.');
+    }
+
     public function confirm(Request $request, GoodsReceipt $receipt, GoodsReceiptService $service): RedirectResponse
     {
         abort_unless($this->userCan($request, 'receipts.confirm'), 403);

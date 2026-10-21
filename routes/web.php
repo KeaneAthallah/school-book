@@ -23,6 +23,7 @@ use App\Http\Controllers\RoleController;
 use App\Http\Controllers\SearchController;
 use App\Http\Controllers\SettingsController;
 use App\Http\Controllers\ShipmentController;
+use App\Http\Controllers\StockMutationController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 
@@ -69,6 +70,8 @@ Route::middleware('auth')->group(function (): void {
     Route::get('receipts/create', [GoodsReceiptController::class, 'create'])->name('receipts.create');
     Route::post('receipts', [GoodsReceiptController::class, 'store'])->name('receipts.store');
     Route::get('receipts/{receipt}', [GoodsReceiptController::class, 'show'])->name('receipts.show');
+    Route::get('receipts/{receipt}/edit', [GoodsReceiptController::class, 'edit'])->name('receipts.edit');
+    Route::put('receipts/{receipt}', [GoodsReceiptController::class, 'update'])->name('receipts.update');
     Route::post('receipts/{receipt}/confirm', [GoodsReceiptController::class, 'confirm'])->name('receipts.confirm');
     Route::delete('receipts/{receipt}', [GoodsReceiptController::class, 'destroy'])->name('receipts.destroy');
 
@@ -76,6 +79,8 @@ Route::middleware('auth')->group(function (): void {
     Route::get('pickings', [PickingController::class, 'index'])->name('pickings.index');
     Route::post('pickings', [PickingController::class, 'store'])->name('pickings.store');
     Route::get('pickings/{picking}', [PickingController::class, 'show'])->name('pickings.show');
+    Route::get('pickings/{picking}/print', [PickingController::class, 'print'])->name('pickings.print');
+    Route::delete('pickings/{picking}', [PickingController::class, 'destroy'])->name('pickings.destroy');
     Route::post('pickings/{picking}/record', [PickingController::class, 'record'])->name('pickings.record');
     Route::post('pickings/{picking}/record-and-pack', [PickingController::class, 'recordAndPack'])->name('pickings.recordAndPack');
     Route::post('pickings/{picking}/pack', [PickingController::class, 'pack'])->name('pickings.pack');
@@ -119,9 +124,16 @@ Route::middleware('auth')->group(function (): void {
     Route::put('pinjaman-tunai/{id}', [MasterDataController::class, 'update'])->defaults('resource', 'cash-loans')->name('cash-loans.update');
     Route::delete('pinjaman-tunai/{id}', [MasterDataController::class, 'destroy'])->defaults('resource', 'cash-loans')->name('cash-loans.destroy');
 
-    // Back orders & procurement.
+    Route::get('stock-mutations', [StockMutationController::class, 'index'])->name('stock-mutations.index');
+Route::post('stock-mutations', [StockMutationController::class, 'store'])->name('stock-mutations.store');
+Route::get('stock-mutations/{mutation}/print', [StockMutationController::class, 'print'])->name('stock-mutations.print');
     Route::get('backorders', [BackorderController::class, 'index'])->name('backorders.index');
     Route::post('backorders/order', [BackorderController::class, 'orderStore'])->name('backorders.orderStore');
+    Route::get('backorders/orders/{backorderOrder}', [BackorderController::class, 'orderShow'])->name('backorders.orderShow');
+Route::get('backorders/orders/{backorderOrder}/edit', [BackorderController::class, 'orderEdit'])->name('backorders.orderEdit');
+Route::put('backorders/orders/{backorderOrder}', [BackorderController::class, 'orderUpdate'])->name('backorders.orderUpdate');
+Route::delete('backorders/orders/{backorderOrder}', [BackorderController::class, 'orderDestroy'])->name('backorders.orderDestroy');
+Route::get('backorders/orders/{backorderOrder}/print', [BackorderController::class, 'orderPrint'])->name('backorders.orderPrint');
     Route::get('backorders/unavailable', [BackorderController::class, 'unavailable'])->name('backorders.unavailable');
 
     // Catalogs.

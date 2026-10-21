@@ -52,6 +52,7 @@ class RebateController extends Controller
                     'discount_percent' => $order->discount_percent,
                     'discount_amount' => $order->discount_amount,
                     'invoices' => $order->invoices->map(fn ($invoice): array => [
+                        'id' => $invoice->getKey(),
                         'number' => $invoice->number,
                         'status' => $invoice->status->value,
                         'paid_amount' => $invoice->paid_amount,

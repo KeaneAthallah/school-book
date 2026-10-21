@@ -9,6 +9,11 @@
         icon="clipboard"
     >
         <x-slot:actions>
+            <form method="POST" action="{{ route('pickings.destroy', $picking['id']) }}" x-data x-on:submit="if (! confirm('Hapus picking ini?')) $event.preventDefault()">
+                    @csrf
+                    @method('DELETE')
+                    <x-button type="submit" variant="danger">Hapus</x-button>
+                </form>
             <x-button :href="route('pickings.index')" variant="secondary">Kembali</x-button>
 
             @if ($can['pack'])

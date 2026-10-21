@@ -39,6 +39,7 @@
                 ['key' => 'reference', 'label' => 'Referensi'],
                 ['key' => 'amount', 'label' => 'Jumlah', 'type' => 'currency', 'align' => 'right'],
                 ['key' => 'allocated_amount', 'label' => 'Dialokasikan', 'type' => 'currency', 'align' => 'right'],
+                ['key' => 'remaining_amount', 'label' => 'Sisa', 'type' => 'currency', 'align' => 'right'],
                 ['key' => 'status', 'label' => 'Status', 'view' => 'components.status-label'],
                 ['label' => 'Aksi', 'view' => 'finance.payments.partials.actions', 'align' => 'right'],
             ]"
@@ -49,12 +50,25 @@
 
     @if ($can['manage'])
         <x-modal name="record-payment" title="Catat Pembayaran" wide>
-            <form method="POST" action="{{ route('payments.store') }}" class="space-y-3" x-data="{ useInvoice: false }">
+            <form method="POST" action="{{ route('payments.store') }}" class="space-y-3" x-data="{ useInvoice: false, schoolId: '{{ old('school_id') }}' }">
                 @csrf
 
                 <div class="grid gap-3 sm:grid-cols-2">
+                    <x-field label="Invoice (opsional)" name="allocations.0.invoice_id">
+                        <x-select name="allocations[0][invoice_id]" x-on:change="
+                            const opt = $event.target.selectedOptions[0];
+                            const sid = opt?.dataset?.schoolId;
+                            if (sid) { schoolId = sid; useInvoice = true; }
+                        ">
+                            <option value="">— Pilih Invoice (opsional) —</option>
+                            @foreach ($openInvoices as $option)
+                                <option value="{{ $option['value'] }}" data-school-id="{{ $option['school_id'] }}">{{ $option['label'] }} — sisa {{ Format::idr($option['outstanding']) }}</option>
+                            @endforeach
+                        </x-select>
+                    </x-field>
+
                     <x-field label="Sekolah" name="school_id" required>
-                        <x-select name="school_id" :invalid="$errors->has('school_id')">
+                        <x-select name="school_id" x-model="schoolId" :invalid="$errors->has('school_id')">
                             <option value="">— Pilih —</option>
                             @foreach ($schools as $option)
                                 <option value="{{ $option['value'] }}" @selected(old('school_id') == $option['value'])>{{ $option['label'] }}</option>
@@ -85,26 +99,6 @@
 
                     <x-field label="Catatan" name="notes" class="sm:col-span-2">
                         <x-textarea name="notes" rows="2">{{ old('notes') }}</x-textarea>
-                    </x-field>
-                </div>
-
-                <label class="flex items-center gap-2 text-sm text-ink-soft">
-                    <input type="checkbox" x-model="useInvoice" class="rounded border-line-strong bg-panel text-brand-600 focus:ring-brand-500" />
-                    Alokasikan ke invoice tertentu
-                </label>
-
-                <div x-show="useInvoice" x-cloak class="grid gap-3 sm:grid-cols-2">
-                    <x-field label="Invoice" name="allocations.0.invoice_id">
-                        <x-select name="allocations[0][invoice_id]" x-bind:disabled="! useInvoice">
-                            <option value="">— Pilih Invoice —</option>
-                            @foreach ($openInvoices as $option)
-                                <option value="{{ $option['value'] }}">{{ $option['label'] }} — sisa {{ Format::idr($option['outstanding']) }}</option>
-                            @endforeach
-                        </x-select>
-                    </x-field>
-
-                    <x-field label="Jumlah alokasi" name="allocations.0.amount" hint="Kosongkan untuk memakai jumlah pembayaran.">
-                        <x-input type="number" step="any" name="allocations[0][amount]" x-bind:disabled="! useInvoice" />
                     </x-field>
                 </div>
 

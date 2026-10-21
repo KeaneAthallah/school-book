@@ -2,7 +2,9 @@
 
 namespace App\Services;
 
+use App\Enums\BackorderStatus;
 use App\Enums\PickingStatus;
+use App\Models\Backorder;
 use App\Models\Order;
 use App\Models\OrderItem;
 use App\Models\Picking;
@@ -15,6 +17,7 @@ class FulfillmentService
     public function __construct(
         private readonly DocumentNumberService $numbers,
         private readonly AuditLogger $audit,
+        private readonly OrderStatusResolver $statusResolver,
     ) {}
 
     /**
@@ -25,6 +28,15 @@ class FulfillmentService
         return DB::transaction(function () use ($order, $user): Picking {
             $locked = Order::query()->lockForUpdate()->findOrFail((int) $order->getKey());
             $locked->load('items');
+
+            $existing = Picking::query()
+                ->where('order_id', $locked->getKey())
+                ->whereIn('status', [PickingStatus::Draft->value, PickingStatus::Picking->value, PickingStatus::Picked->value])
+                ->first();
+
+            if ($existing instanceof Picking) {
+                return $existing->refresh();
+            }
 
             $ready = $locked->items->filter(fn (OrderItem $item): bool => $item->reserved_quantity > 0);
 
@@ -82,6 +94,34 @@ class FulfillmentService
                 $quantity = max(0, min($pickingItem->quantity, (int) ($entry['picked_quantity'] ?? 0)));
 
                 $pickingItem->forceFill(['picked_quantity' => $quantity])->save();
+
+                // Stok yang hilang/rusak saat picking: kurangi reserved_quantity
+                // dan kembalikan ke backorder agar dapat diprocure ulang.
+                $missing = max(0, $pickingItem->quantity - $quantity);
+                if ($missing > 0) {
+                    $orderItem = OrderItem::query()->lockForUpdate()->find((int) $pickingItem->order_item_id);
+                    if ($orderItem !== null) {
+                        $orderItem->reserved_quantity = max(0, $orderItem->reserved_quantity - $missing);
+                        $orderItem->backorder_quantity += $missing;
+                        $orderItem->status = $this->statusResolver->resolveItem(
+                            $orderItem->quantity,
+                            $orderItem->reserved_quantity,
+                            $orderItem->shipped_quantity,
+                        );
+                        $orderItem->save();
+
+                        $backorder = Backorder::query()
+                            ->where('order_item_id', $orderItem->getKey())
+                            ->first();
+                        if ($backorder !== null) {
+                            $backorder->fulfilled_quantity = max(0, $backorder->fulfilled_quantity - $missing);
+                            $backorder->status = $backorder->outstandingQuantity() <= 0
+                                ? BackorderStatus::Fulfilled
+                                : ($backorder->fulfilled_quantity > 0 ? BackorderStatus::Partial : BackorderStatus::Open);
+                            $backorder->save();
+                        }
+                    }
+                }
             }
 
             $picking->forceFill([
