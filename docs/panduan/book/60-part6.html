@@ -3,12 +3,12 @@
   <h1 class="judul-bagian" style="border:none;padding:0">Laporan</h1>
   <div class="aturan"></div>
   <p class="deskripsi">
-    Sembilan laporan siap pakai: apa gunanya, kolom apa saja isinya, penyaring
+    Tujuh laporan siap pakai: apa gunanya, kolom apa saja isinya, penyaring
     yang berlaku, dan cara mengekspornya.
   </p>
 </section>
 
-<h1 id="bab-laporan">Bab 7. Sembilan Laporan</h1>
+<h1 id="bab-laporan">Bab 7. Tujuh Laporan</h1>
 
 <h2 id="sec-laporan-umum">7.1 Cara Memakai Modul Laporan</h2>
 
@@ -33,7 +33,7 @@
     Kolom <em>Dari</em> dan <em>Sampai</em> hanya muncul pada empat laporan:
     <strong>Penjualan per Sekolah</strong>, <strong>Penjualan per Penerbit</strong>,
     <strong>Penjualan per Barang</strong>, dan <strong>Ringkasan Pesanan</strong>.
-    Lima laporan lainnya selalu menampilkan kondisi saat ini, sehingga tidak perlu
+    Tiga laporan lainnya selalu menampilkan kondisi saat ini, sehingga tidak perlu
     rentang tanggal.
   </p>
 </div>
@@ -235,66 +235,16 @@
   </p>
 </div>
 
-<h2 id="sec-laporan-stok">7.8 Stok per Barang</h2>
-
-<div class="ringkas-modul">
-  <dl>
-    <dt>Untuk apa</dt><dd>Posisi stok seluruh barang di setiap gudang.</dd>
-    <dt>Penyaring</dt><dd>Tidak ada.</dd>
-  </dl>
-</div>
-
-<figure class="fig" id="fig-reports-stock">
-  <img src="../screens/156-reports-stock.png" alt="Laporan stok per barang">
-  <figcaption>Laporan Stok per Barang.</figcaption>
-</figure>
-
-<table class="tabel-field">
-  <thead><tr><th>Kolom</th><th>Arti</th></tr></thead>
-  <tbody>
-    <tr><td>Kode / Judul</td><td>Identitas barang.</td></tr>
-    <tr><td>Gudang</td><td>Gudang tempat stok berada.</td></tr>
-    <tr><td>Fisik</td><td>Jumlah nyata di gudang.</td></tr>
-    <tr><td>Reservasi</td><td>Jumlah yang sudah dijanjikan ke pesanan.</td></tr>
-    <tr><td>Tersedia</td><td>Fisik dikurangi reservasi.</td></tr>
-  </tbody>
-</table>
-
-<h2 id="sec-laporan-stok-menipis">7.9 Stok Menipis</h2>
-
-<div class="ringkas-modul">
-  <dl>
-    <dt>Untuk apa</dt><dd>Daftar barang yang stoknya sudah menyentuh atau melewati batas minimum.</dd>
-    <dt>Penyaring</dt><dd>Tidak ada.</dd>
-  </dl>
-</div>
-
-<figure class="fig" id="fig-reports-low-stock">
-  <img src="../screens/157-reports-low-stock.png" alt="Laporan stok menipis">
-  <figcaption>Laporan Stok Menipis.</figcaption>
-</figure>
-
-<table class="tabel-field">
-  <thead><tr><th>Kolom</th><th>Arti</th></tr></thead>
-  <tbody>
-    <tr><td>Kode / Judul</td><td>Identitas barang.</td></tr>
-    <tr><td>Gudang</td><td>Gudang tempat stok berada.</td></tr>
-    <tr><td>Fisik</td><td>Jumlah nyata saat ini.</td></tr>
-    <tr><td>Stok Min</td><td>Ambang minimum yang ditetapkan pada data barang.</td></tr>
-  </tbody>
-</table>
-
 <div class="kotak catatan">
-  <span class="judul-kotak">Stok minimum harus diisi lebih dulu</span>
+  <span class="judul-kotak">Posisi stok tidak ada di modul Laporan</span>
   <p>
-    Barang yang kolom <em>Stok Min</em>-nya masih nol tidak akan pernah muncul di
-    laporan ini. Bila laporan terasa kosong padahal jelas ada barang yang hampir
-    habis, periksa apakah nilai stok minimum barang tersebut sudah diisi pada
-    formulir Buku atau Barang Lainnya.
+    Untuk melihat stok terkini, gunakan <strong>Pengadaan &rsaquo; Rangkuman
+    Stok</strong>. Modul Laporan hanya memuat laporan penjualan, pesanan,
+    piutang, jatuh tempo, dan back order.
   </p>
 </div>
 
-<h2 id="sec-laporan-backorder">7.10 Back Order</h2>
+<h2 id="sec-laporan-backorder">7.8 Back Order</h2>
 
 <div class="ringkas-modul">
   <dl>
@@ -324,7 +274,7 @@
   barang yang perlu dipesan ke penerbit.
 </p>
 
-<h2 id="sec-laporan-ringkas">7.11 Ringkasan Sembilan Laporan</h2>
+<h2 id="sec-laporan-ringkas">7.9 Ringkasan Tujuh Laporan</h2>
 
 <table>
   <thead>
@@ -337,8 +287,6 @@
     <tr><td>Ringkasan Pesanan</td><td>Ya</td><td>Pesanan mana yang belum tuntas?</td></tr>
     <tr><td>Piutang per Sekolah</td><td>Tidak</td><td>Berapa utang tiap sekolah sekarang?</td></tr>
     <tr><td>Invoice Jatuh Tempo</td><td>Tidak</td><td>Tagihan mana yang sudah telat?</td></tr>
-    <tr><td>Stok per Barang</td><td>Tidak</td><td>Berapa stok tiap barang sekarang?</td></tr>
-    <tr><td>Stok Menipis</td><td>Tidak</td><td>Barang apa yang perlu segera dipesan?</td></tr>
     <tr><td>Back Order</td><td>Tidak</td><td>Siapa menunggu barang apa?</td></tr>
   </tbody>
 </table>

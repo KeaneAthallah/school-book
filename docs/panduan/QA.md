@@ -1,6 +1,6 @@
 # Laporan QA — Buku Panduan ARKARA PM
 
-Tanggal: 17 Oktober 2026
+Tanggal: 23 Oktober 2026
 Lingkungan: Aplikasi ARKARA PM berjalan di `http://127.0.0.1:8000` (Laravel 13.35, PHP 8.5,
 MySQL 8.4.9, basis data `db_school`), peramban Microsoft Edge melalui Playwright.
 
@@ -14,16 +14,16 @@ Berkas hasil: `docs/Panduan-Pengguna-School-Book-Sales-Monitoring-System.pdf`
 |---|---|---|
 | Aplikasi dapat dijalankan & halaman masuk tampil | `php artisan`, Playwright | Lulus |
 | Aset tampilan termuat (bukan halaman polos) | Playwright (kode status aset) | Lulus — `app-*.css` dan `app-*.js` keduanya `200` |
-| Tangkapan layar terisi (tidak kosong/terpotong) | `scripts/qa_images.py` (Pillow) | Lulus — 89/89 gambar |
+| Tangkapan layar terisi (tidak kosong/terpotong) | `scripts/qa_images.py` (Pillow) | Lulus — 93/93 gambar |
 | Struktur HTML buku seimbang | `scripts/check_html.py` | Lulus — tidak ada tag menggantung |
-| Semua gambar yang dirujuk ada di disk | `build/render.mjs` | Lulus — 96 rujukan, 0 hilang |
-| PDF berukuran A4 | `scripts/qa_pdf.py` (PyMuPDF) | Lulus — 147/147 halaman |
+| Semua gambar yang dirujuk ada di disk | `build/render.mjs` | Lulus — 101 rujukan, 0 hilang |
+| PDF berukuran A4 | `scripts/qa_pdf.py` (PyMuPDF) | Lulus - 155/155 halaman |
 | Tidak ada halaman kosong | `scripts/qa_pdf.py` | Lulus |
 | Teks Indonesia terbaca (tidak ada mojibake) | `scripts/qa_pdf.py` | Lulus |
 | Tidak ada isi keluar dari tepi halaman | `scripts/qa_pdf.py` | Lulus |
 | Nomor halaman Daftar Isi cocok dengan isi | `scripts/qa_pdf.py` | Lulus — 9 judul diuji |
 
-Ukuran berkas akhir: **15,9 MB** untuk 147 halaman, 96 gambar.
+Ukuran berkas akhir: **15,4 MB** untuk 155 halaman, 101 gambar.
 
 ---
 
@@ -34,14 +34,15 @@ Cross-check lengkap ada di `coverage.md`. Ringkasannya:
 - **6 dashboard peran** — semuanya berbagi satu gambar `20-dashboard-admin.png` yang dipakai
   ulang, ditambah lima tangkapan dashboard peran lainnya. Setiap peran masuk dengan akun
   terpisah, jadi navigasi yang tertangkap memang navigasi peran itu.
-- **13 layar data induk** — seluruhnya memiliki bagian di buku dan minimal satu gambar.
+- **11 layar data induk** — seluruhnya memiliki bagian di buku dan minimal satu gambar.
   Lima di antaranya punya tambahan gambar formulir (Sekolah, Penerbit, Buku, Barang Lainnya,
   Pinjaman Tunai).
-- **12 modul operasional** — Pesanan, Penerimaan Barang, Stok, Picking & Packing, Pengiriman,
-  Invoice, Piutang, Pembayaran, Rebate, Laporan, Pengaturan, Integrasi — semuanya memiliki
-  bagian dan gambar.
-- **9 jenis laporan** — masing-masing memiliki bagian dan gambar.
-- **Dokumen cetak** — nota pesanan, surat jalan, dan invoice memiliki gambar halaman cetak.
+- **13 modul operasional** — Pesanan, Penerimaan Barang, Rangkuman & Mutasi Stok, Back Order,
+  Picking & Packing, Pengiriman, Invoice, Piutang, Pembayaran, Rebate, Katalog, Laporan,
+  Pengaturan/Integrasi — semuanya memiliki bagian dan gambar.
+- **7 jenis laporan** — masing-masing memiliki bagian dan gambar.
+- **Dokumen cetak** — nota pesanan, surat pesanan, surat jalan, invoice, kwitansi, dan mutasi
+  stok memiliki gambar halaman cetak.
 
 ### 2.1 Gambar yang Diambil tetapi Tidak Dipakai
 
@@ -60,82 +61,58 @@ Ini daftar jujur hal-hal yang **tidak** ada gambarnya di dalam buku, beserta seb
 | Kotak penegasan bawaan peramban (`confirm()`) | Digambar oleh peramban, di luar halaman web, sehingga tidak dapat dipotret Playwright. | Yang dipotret adalah tombol/baris aksinya; langkah penegasan dijelaskan dalam teks. Bagian VII & Lampiran G. |
 | Picking berstatus **Siap Kirim** (packed) | Tidak ada baris berstatus `packed` pada data contoh. | Status dijelaskan pada tabel status Bagian 5.4. |
 | Pengiriman berstatus **Siap Kirim** dan **Diterima** | Tidak ada baris berstatus `ready_to_ship`/`delivered` pada data contoh. | Dijelaskan pada tabel status Bagian 5.5. |
-| Invoice berstatus **Draft/Sent/Dibatalkan** | Seluruh 17 invoice pada data contoh berstatus `issued`. | Dijelaskan pada tabel status Bagian 5.6. |
+| Invoice berstatus **Draft/Sent/Dibatalkan** | Seluruh 8 invoice pada data contoh berstatus `issued`. | Dijelaskan pada tabel status Bagian 5.6. |
 | Pembayaran berstatus **Dibalik** | Tidak ada baris `reversed` pada data contoh. | Dijelaskan pada Bagian 5.8. |
-| Rebate berstatus **Dibayarkan** | Tidak ada baris `paid` pada data contoh. | Dijelaskan pada tabel status Bagian 5.9. |
+| Back order yang sudah **tuntas** | Seluruh back order pada data contoh masih terbuka atau terpenuhi sebagian. | Dijelaskan pada tabel status Bagian 5.13. |
 | Pesanan berstatus **Diterima / Selesai / Dibatalkan** | Tidak ada variasi status tersebut pada data contoh. | Dijelaskan pada tabel status Bagian 5.1. |
 | Dashboard **Akses Terbatas** (`limited.blade.php`) | Tidak dapat dicapai memakai enam akun demo, karena seluruh peran memegang izin `dashboard.view`. | Tidak diklaim ada; dicatat di sini. |
 | Layar CRUD **Zona** | Tidak ada layar tersebut di aplikasi. | Dinyatakan sebagai keterbatasan pada Bagian 4.5, Lampiran C, dan Lampiran G. |
 | Keadaan form unggah foto setelah berkas dipilih (pratinjau) | Menuntut pemilihan berkas nyata; hanya bentuk kosongnya yang dipotret. | — |
+| Unduhan PDF katalog dan ekspor CSV | Menghasilkan berkas, bukan halaman web. | Dijelaskan pada 4.7 dan 7.1. |
+| Formulir sunting yang identik dengan formulir buat | Tampilannya sama; duplikasi gambar tidak menambah informasi. | Formulir buat dipotret, perilaku sunting dijelaskan dalam teks. |
 
 Semua keadaan di atas **tidak** digambarkan dengan gambar buatan. Yang tidak ada, memang
 tidak ada.
 
 ---
 
-## 4. Mutasi Data Demo
+## 4. Data Demo dan Mutasi
 
-Penangkapan gambar hampir seluruhnya bersifat baca-saja. Satu keadaan menuntut pembuatan
-data baru, karena tidak ada pengiriman berstatus *Draft* pada data contoh, sedangkan itulah
-satu-satunya keadaan yang memunculkan form konfirmasi wajib foto.
+Data demo kini disiapkan oleh dua seeder: `DashboardDemoSeeder` untuk transaksi utama dan
+`FullCoverageSeeder` untuk keadaan tambahan (back order, katalog, pengiriman draft, dan
+pembayaran). Kombinasi keduanya menghasilkan 45 pesanan, 6 picking, 12 pengiriman (satu
+draft), 5 pembayaran (3 terverifikasi, 2 draft), 2 penerimaan, 1 back order, dan 1 katalog.
 
-| Tindakan | Dampak |
-|---|---|
-| Membuat satu pengiriman baru dari pesanan `ORD-20261014-0001` (TK PGRI KECAMATAN TAPALANG) melalui antarmuka aplikasi | Menambah 1 baris pada tabel `shipments`, id 22, status `draft`. Pesanan induk tetap `partial_shipped` (jumlah disiapkan tidak dikurangi sampai pengiriman dikonfirmasi). |
-| Menjalankan `php artisan db:seed --class=MasterDataSeeder` | Menambah 3 baris pada tabel `settings`: `finance.book_tax_rate` (0.5), `finance.goods_tax_rate` (2), `finance.ppn_rate` (12). Seeder bersifat `updateOrCreate`, jadi baris yang sudah ada tidak diduplikasi dan tidak ada data lain yang berubah. |
+Penangkapan gambar bersifat **baca-saja** bila data demo sudah berisi pengiriman draft.
+Pipeline hanya membuat pengiriman baru — dan menuliskan mutasinya — bila tidak ada draft
+sama sekali. Pada penangkapan terakhir, `screens/mutations.md` mencatat:
 
-Catatan lengkap ditulis otomatis ke `screens/mutations.md`.
-
-Perbandingan keadaan basis data sebelum dan sesudah:
-
-| Tabel | Sebelum | Sesudah |
-|---|---|---|
-| `orders` | 45 baris (4 draft, 8 fully_shipped, 5 partial_ready, 13 partial_shipped, 3 processing, 12 ready) | tidak berubah |
-| `shipments` | 21 baris (`shipped`) | 22 baris (21 `shipped`, 1 `draft`) |
-| `pickings` | 10 (5 draft, 5 picked) | tidak berubah |
-| `invoices` | 17 (`issued`) | tidak berubah |
-| `payments` | 12 (2 draft, 10 verified) | tidak berubah |
-| `rebates` | 3 (1 approved, 1 rejected, 1 submitted) | tidak berubah |
-| `goods_receipts` | 2 (1 confirmed, 1 draft) | tidak berubah |
+> Tidak ada perubahan data: seluruh tangkapan layar memakai data demo yang sudah ada.
 
 Tindakan yang sempat dicoba dan **gagal dengan aman** (tidak mengubah apa pun):
 
-- Penyesuaian stok negatif (&minus;100.000) → ditolak validasi. Dipakai sebagai gambar `82-stock-adjust-error.png`.
-- Menghapus penerbit yang masih punya buku → ditolak batasan basis data. Dipakai sebagai gambar `57-master-delete-error.png`.
-- Menghapus akun sendiri → ditolak aplikasi. Dipakai sebagai `57b-user-delete-blocked.png` (tidak dimuat).
+- Menghapus penerbit yang masih punya buku → ditolak batasan basis data. Dipakai sebagai
+  gambar `57-master-delete-error.png`.
+- Menghapus akun sendiri → ditolak aplikasi. Dipakai sebagai `57b-user-delete-blocked.png`
+  (tidak dimuat).
 
-### Cara memulihkan
+### Cara menyiapkan ulang data demo
 
 ```bash
-php artisan db:seed --class=DemoDataResetSeeder
+php artisan migrate:fresh --seed
+php artisan db:seed --class=FullCoverageSeeder
 ```
 
-### Keadaan basis data setelah buku ini dibangun
+Atau, untuk mengembalikan data tanpa membangun ulang skema:
 
-`DemoDataResetSeeder` dijalankan setelah tangkapan layar diambil. Akibatnya data
-transaksi contoh tidak lagi ada pada basis data:
+```bash
+php artisan db:seed --class=DashboardDemoSeeder
+php artisan db:seed --class=FullCoverageSeeder
+```
 
-| Tabel | Saat tangkapan layar diambil | Setelah reset |
-|---|---|---|
-| `orders` | 45 | 0 |
-| `shipments` | 22 | 0 |
-| `pickings` | 10 | 0 |
-| `goods_receipts` | 2 | 0 |
-| `invoices` | 17 | 17 (milik sekolah nyata, tidak ikut terhapus) |
-| `payments` | 12 | 12 |
-| `rebates` | 3 | 3 |
-| `schools`, `books`, `stocks` | 11.280 / 880 / 24 | tidak berubah |
-
-**Gambar yang sudah ada di `screens/` tetap sah** — diambil saat data masih ada.
-Yang berubah hanyalah basis datanya. Karena itu:
-
-- Jangan menjalankan `scripts/capture.mjs` sebelum data contoh diisi ulang; ia akan
-  menimpa gambar daftar yang baik dengan halaman kosong.
-- Dua gambar diperbarui setelah perubahan kode terakhir (formulir pajak dan cetakan
-  invoice) dengan penangkapan terarah, bukan dengan menjalankan ulang seluruh
-  pipeline.
-- Untuk membangun ulang seluruh gambar: jalankan `DashboardDemoSeeder` lebih dulu,
-  seperti dijelaskan pada `README.md` langkah 2.
+**Jangan menjalankan `scripts/capture.mjs` saat data transaksi kosong** — halaman daftar
+akan tertangkap sebagai halaman kosong dan menimpa gambar yang baik. Periksa dulu bahwa
+menu Pesanan, Pengiriman, dan Back Order berisi data.
 
 ---
 
@@ -159,13 +136,20 @@ Yang berubah hanyalah basis datanya. Karena itu:
    Bagian 8.1.
 6. **Satu permintaan 404 saat mencetak PDF** — yaitu `/favicon.ico` yang diminta peramban saat
    memuat halaman. Tidak berpengaruh pada hasil.
+7. **Jam kerja membatasi akun non-Admin.** Middleware `EnsureWorkingHours` menolak akun
+   Operator, Gudang, Keuangan, Sales, dan Pimpinan di luar pukul 08.00–17.00, sehingga
+   tangkapan dashboard peran sempat berisi halaman *Akses Ditolak*. Pada penangkapan
+   terakhir, `work.default_start`/`work.default_end` diperluas sementara agar dashboard
+   peran dapat dipotret, lalu **dikembalikan** ke 08.00–17.00. Jalankan pipeline pada jam
+   kerja agar gambar dashboard peran sah; Admin selalu lolos karena middleware melewati
+   peran Admin.
 
 ---
 
 ## 6. Hasil Pemeriksaan PDF (rinci)
 
 ```
-page count: 147
+page count: 155
 all pages A4
 no blank pages
 no mojibake sequences
@@ -188,8 +172,8 @@ halaman berisi tabel, dan halaman berisi gambar).
 | Kriteria | Status | Bukti |
 |---|---|---|
 | Pembaca non-teknis dapat mengikuti login → pesanan → picking → pengiriman → invoice → pembayaran → rebate hanya dari buku | Terpenuhi | Bagian V menuntun seluruh alur dengan pemeriksaan &ldquo;yang seharusnya berubah&rdquo; di setiap tahap |
-| Seluruh 13 data induk + 12 modul operasional + 9 laporan + 6 dashboard memiliki bagian dengan minimal satu gambar asli | Terpenuhi | `coverage.md`; seluruh baris berstatus lulus pada pemeriksaan build |
-| Semua gambar dalam buku ada di disk dan dirujuk dari teks | Terpenuhi | `render.mjs`: 96 rujukan, 0 gambar hilang; 88 berkas unik dipakai |
+| Seluruh 11 data induk + 13 modul operasional + 7 laporan + 6 dashboard memiliki bagian dengan minimal satu gambar asli | Terpenuhi | `coverage.md`; seluruh baris berstatus lulus pada pemeriksaan build |
+| Semua gambar dalam buku ada di disk dan dirujuk dari teks | Terpenuhi | `render.mjs`: 101 rujukan, 0 gambar hilang; 92 berkas unik dipakai |
 | PDF A4, bernomor halaman, header berjalan, nomor Daftar Isi cocok, teks Indonesia terbaca, tidak ada tabel terpotong, tata buku koheren | Terpenuhi | `qa_pdf.py` seluruhnya lulus |
 | Hanya akun `@sekolah.test` dan data contoh yang tampil; kredensial `.env` tidak pernah ditampilkan | Terpenuhi | Seluruh gambar memakai akun demo; kata sandi hanya disebut sebagai `password` (akun latihan). Tidak ada tangkapan layar berkas `.env`. |
 
@@ -279,7 +263,7 @@ Ketiga hal ini dijaga oleh `tests/Feature/InvoiceTaxDisplayTest.php`.
   `finance.tax_book_rate`, `finance.book_tax`, `finance.pajak_buku`, dan
   sejenisnya) dengan nilai yang sama. Kunci-kunci itu akan tampak pada daftar
   Konfigurasi; buku hanya menyebutkan kunci utamanya.
-- Seluruh 17 invoice pada data contoh hanya berisi buku, sehingga tidak ada
+- Seluruh 8 invoice pada data contoh hanya berisi buku, sehingga tidak ada
   invoice barang lainnya yang dapat dipotret. Perilaku cabang barang lainnya
   diverifikasi melalui pengujian, bukan melalui gambar.
 
@@ -328,8 +312,8 @@ agar tidak hilang tanpa sengaja.
   Zona Harga; bila tidak dipilih, dipakai `products.price`.
 - Kolom `schools.zona_id` tetap ada di basis data tetapi tidak lagi diisi dari
   formulir. Tidak ada sekolah pada data contoh yang memilikinya.
-- Karena data transaksi contoh sudah direset (lihat §4), tidak ada pesanan nyata
-  untuk menguji pemilihan zona secara visual. Perilaku ini dijaga oleh pengujian.
+- Data transaksi contoh kini tersedia kembali (lihat §4), sehingga pemilihan zona
+  dapat diperiksa langsung pada formulir pesanan. Perilaku ini juga dijaga oleh pengujian.
 
 ---
 
@@ -339,14 +323,18 @@ agar tidak hilang tanpa sengaja.
 # 1. jalankan aplikasi
 php artisan serve --host=127.0.0.1 --port=8000
 
-# 2. ambil ulang tangkapan layar (baca-saja) + periksa
+# 2. siapkan data demo bila basis data kosong
+php artisan db:seed --class=DashboardDemoSeeder
+php artisan db:seed --class=FullCoverageSeeder
+
+# 3. ambil ulang tangkapan layar (baca-saja) + periksa
 node docs/panduan/scripts/capture.mjs
 python docs/panduan/scripts/qa_images.py
 
-# 3. bangun PDF
+# 4. bangun PDF
 node docs/panduan/build/render.mjs
 
-# 4. periksa PDF
+# 5. periksa PDF
 python docs/panduan/scripts/check_html.py
 python docs/panduan/scripts/qa_pdf.py
 ```

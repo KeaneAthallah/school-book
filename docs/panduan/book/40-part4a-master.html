@@ -98,6 +98,7 @@
     <tr><td>Nama Sekolah</td><td>Nama sekolah.</td></tr>
     <tr><td>Kecamatan / Kab/Kota</td><td>Wilayah administratif sekolah.</td></tr>
     <tr><td>Sales/PIC</td><td>Petugas yang menangani sekolah ini.</td></tr>
+    <tr><td>Rebate (%)</td><td>Persentase rebate yang otomatis dipotong pada setiap nota pesanan sekolah ini.</td></tr>
     <tr><td>Status</td><td>Aktif atau Nonaktif.</td></tr>
   </tbody>
 </table>
@@ -124,9 +125,20 @@
     <tr><td>Kontak, Telepon, Email</td><td>Data narahubung sekolah.</td></tr>
     <tr><td>Kepala Sekolah</td><td>Nama kepala sekolah, untuk keperluan dokumen.</td></tr>
     <tr><td>Sales/PIC</td><td>Pilih pengguna yang bertanggung jawab atas sekolah ini.</td></tr>
+    <tr><td>Rebate (%)</td><td>Isi angka 0&ndash;100. Nilai ini menjadi diskon otomatis saat nota pesanan sekolah tersebut dibuat. Kosongkan bila sekolah tidak mendapat rebate.</td></tr>
     <tr><td>Status <em>(wajib)</em></td><td>Aktif atau Nonaktif. Sekolah nonaktif tetap tersimpan untuk riwayat.</td></tr>
   </tbody>
 </table>
+
+<div class="kotak catatan">
+  <span class="judul-kotak">Rebate diatur dari data sekolah</span>
+  <p>
+    Tidak ada menu <em>Aturan Rebate</em> tersendiri. Persentase rebate melekat
+    pada masing-masing sekolah dan langsung dipakai saat pesanan dibuat. Rekap
+    nilai rebate dapat dilihat di <strong>Rebate / Cashback</strong>; lihat
+    <a href="#sec-modul-rebate">Bagian 5.9</a>.
+  </p>
+</div>
 
 <h2 id="sec-modul-penerbit">4.3 Penerbit</h2>
 
@@ -343,30 +355,64 @@
   </p>
 </div>
 
-<h2 id="sec-modul-gudang">4.7 Gudang</h2>
+<h2 id="sec-modul-katalog">4.7 Katalog</h2>
 
 <div class="ringkas-modul">
   <dl>
-    <dt>Gambaran</dt><dd>Daftar gudang tempat stok disimpan.</dd>
-    <dt>Cara membuka</dt><dd><strong>Master Data &rsaquo; Gudang</strong></dd>
-    <dt>Izin</dt><dd><code>warehouses.manage</code></dd>
+    <dt>Gambaran</dt><dd>Daftar produk pilihan beserta harganya, disusun untuk dibagikan ke sekolah.</dd>
+    <dt>Cara membuka</dt><dd>Sidebar <strong>Katalog</strong></dd>
+    <dt>Izin</dt><dd>Lihat: <code>catalogs.view</code> &middot; Kelola: <code>catalogs.manage</code></dd>
   </dl>
 </div>
 
-<figure class="fig sempit" id="fig-warehouses">
-  <img src="../screens/40-master-warehouses.png" alt="Daftar gudang">
+<figure class="fig" id="fig-catalogs">
+  <img src="../screens/170-catalogs-index.png" alt="Daftar katalog">
   <figcaption>
-    Daftar gudang. Pada data contoh hanya ada satu gudang, yaitu
-    <em>Gudang Utama</em>.
+    Daftar katalog. Setiap baris menampilkan nama, deskripsi, dan jumlah item
+    yang sudah dimasukkan.
   </figcaption>
 </figure>
 
 <p>
-  Kolomnya hanya <strong>Kode</strong> (wajib), <strong>Nama Gudang</strong>
-  (wajib), <strong>Alamat</strong>, dan <strong>Status</strong> (wajib). Salah
-  satu gudang ditandai sebagai gudang bawaan, dan gudang itulah yang dipakai
-  bila tidak ada gudang lain yang memiliki stok memadai.
+  Katalog bukan master data produk. Ia hanya <em>daftar pilihan</em> yang
+  merujuk ke produk yang sudah ada di <strong>Master Data &rsaquo; Buku</strong>
+  atau <strong>Barang Lainnya</strong>. Satu produk boleh muncul di beberapa
+  katalog, dan perubahan harga produk otomatis terlihat pada katalog.
 </p>
+
+<figure class="fig" id="fig-catalogs-form">
+  <img src="../screens/171-catalogs-create.png" alt="Formulir tambah katalog">
+  <figcaption>
+    Formulir tambah katalog. Pilih <em>Zona Harga</em> bila harga yang ingin
+    dicetak berbeda dari harga dasar produk.
+  </figcaption>
+</figure>
+
+<ol class="langkah">
+  <li>Klik <strong>Buat Katalog</strong>.</li>
+  <li>Isi <strong>Nama</strong> dan, bila perlu, <strong>Deskripsi</strong>.</li>
+  <li>Pilih <strong>Zona Harga</strong>. Bila dikosongkan, katalog memakai harga dasar produk.</li>
+  <li>Cari produk pada kolom pencarian, lalu klik untuk menambahkannya. Gunakan penyaring kategori bila daftar produk panjang.</li>
+  <li>Atur urutan bila perlu, lalu klik <strong>Simpan</strong>.</li>
+  <li>Dari daftar katalog, klik <strong>PDF</strong> untuk mengunduh versi siap cetak.</li>
+</ol>
+
+<figure class="fig" id="fig-catalogs-edit">
+  <img src="../screens/172-catalogs-edit.png" alt="Mengubah katalog">
+  <figcaption>
+    Mengubah katalog. Produk yang sudah dipilih tampil sebagai daftar; klik
+    tanda silang untuk mengeluarkannya dari katalog.
+  </figcaption>
+</figure>
+
+<div class="kotak catatan">
+  <span class="judul-kotak">Katalog memakai harga saat dicetak</span>
+  <p>
+    Harga pada PDF dihitung ketika dokumen dibuat, bukan ketika katalog
+    disusun. Bila harga produk berubah, cetak ulang katalog agar angkanya
+    sesuai.
+  </p>
+</div>
 
 <h2 id="sec-modul-sumber">4.8 Sumber Pesanan</h2>
 
@@ -461,43 +507,60 @@
   <em>Catat Pembayaran</em>.
 </p>
 
-<h2 id="sec-modul-rebate-rule">4.11 Aturan Rebate</h2>
+<h2 id="sec-modul-rebate-sekolah">4.11 Rebate Sekolah</h2>
 
 <div class="ringkas-modul">
   <dl>
-    <dt>Gambaran</dt><dd>Ketentuan pemberian rebate, misalnya &ldquo;2% dari nilai invoice untuk penerbit tertentu&rdquo;.</dd>
-    <dt>Cara membuka</dt><dd><strong>Master Data &rsaquo; Aturan Rebate</strong></dd>
-    <dt>Izin</dt><dd><code>rebate-rules.manage</code></dd>
+    <dt>Gambaran</dt><dd>Rekap rebate per sekolah yang berasal dari persentase rebate pada data sekolah dan diskon nota pesanan.</dd>
+    <dt>Cara membuka</dt><dd>Sidebar <strong>Rebate / Cashback</strong>. Persentasenya diatur di <strong>Master Data &rsaquo; Sekolah</strong>.</dd>
+    <dt>Izin</dt><dd><code>rebates.view</code></dd>
   </dl>
 </div>
 
-<figure class="fig" id="fig-rebate-rules">
-  <img src="../screens/50-master-rebate-rules.png" alt="Daftar aturan rebate">
+<figure class="fig" id="fig-rebates-index">
+  <img src="../screens/140-rebates-index.png" alt="Rekap rebate per sekolah">
   <figcaption>
-    Daftar aturan rebate. Kolom <em>Wajib Lunas</em> menentukan apakah invoice
-    harus lunas lebih dulu.
+    Rekap rebate dikelompokkan per sekolah. Setiap kelompok menampilkan
+    persentase rebate, jumlah nota, subtotal, dan nilai rebate.
   </figcaption>
 </figure>
 
+<p>
+  Rebate tidak lagi diajukan atau disetujui secara manual. Nilainya dihitung
+  otomatis dari kolom <strong>Rebate (%)</strong> pada data sekolah, lalu
+  dipotongkan sebagai diskon ketika nota pesanan dibuat. Karena itu, tidak ada
+  nomor dokumen rebate, status persetujuan, atau pembayaran rebate terpisah.
+</p>
+
 <table class="tabel-field">
-  <thead><tr><th>Kolom formulir</th><th>Keterangan</th></tr></thead>
+  <thead><tr><th>Bagian halaman</th><th>Arti</th></tr></thead>
   <tbody>
-    <tr><td>Nama Aturan <em>(wajib)</em></td><td>Nama pengenal aturan.</td></tr>
-    <tr><td>Penerbit</td><td>Bila diisi, aturan hanya berlaku untuk buku penerbit tersebut.</td></tr>
-    <tr><td>Tipe <em>(wajib)</em></td><td><strong>Persentase (%)</strong> — dihitung dari nilai invoice; atau <strong>Nominal Tetap</strong>.</td></tr>
-    <tr><td>Nilai <em>(wajib)</em></td><td>Angka persentase atau nominal, sesuai tipe.</td></tr>
-    <tr><td>Minimum Invoice</td><td>Bila diisi, invoice di bawah nilai ini tidak memenuhi syarat.</td></tr>
-    <tr><td>Wajib Lunas</td><td>Bila dicentang, rebate hanya boleh diajukan setelah invoice lunas.</td></tr>
-    <tr><td>Status <em>(wajib)</em></td><td>Aktif atau Nonaktif.</td></tr>
+    <tr><td>Dari / Sampai</td><td>Rentang tanggal nota pesanan yang ikut dihitung.</td></tr>
+    <tr><td>Sekolah</td><td>Menyaring rekap untuk satu sekolah saja.</td></tr>
+    <tr><td>Kepala kelompok</td><td>Nama sekolah, persentase rebate terakhir, jumlah nota, subtotal, dan total nilai rebate.</td></tr>
+    <tr><td>No. Nota / Tanggal</td><td>Nota pesanan yang menghasilkan rebate.</td></tr>
+    <tr><td>Diskon % / Nilai Diskon</td><td>Persentase dan nominal rebate yang dipotong pada nota tersebut.</td></tr>
+    <tr><td>Faktur Terkait</td><td>Invoice yang lahir dari nota itu beserta statusnya.</td></tr>
+    <tr><td>Status</td><td>Status nota pesanan, bukan status rebate.</td></tr>
   </tbody>
 </table>
+
+<div class="kotak penting">
+  <span class="judul-kotak">Mengubah persentase tidak mengubah nota lama</span>
+  <p>
+    Nilai rebate disimpan pada nota pesanan saat nota dibuat. Mengubah
+    <strong>Rebate (%)</strong> pada data sekolah hanya memengaruhi nota
+    berikutnya. Nota yang sudah terbit tetap memakai persentase dan nominal yang
+    tersimpan.
+  </p>
+</div>
 
 <h2 id="sec-modul-pinjaman">4.12 Pinjaman Tunai</h2>
 
 <div class="ringkas-modul">
   <dl>
     <dt>Gambaran</dt><dd>Catatan pinjaman tunai kepada perorangan atau sekolah beserta tanggal janji bayar.</dd>
-    <dt>Cara membuka</dt><dd><strong>Master Data &rsaquo; Pinjaman Tunai</strong></dd>
+    <dt>Cara membuka</dt><dd>Sidebar <strong>Pinjaman Tunai</strong></dd>
     <dt>Izin</dt><dd>Lihat: <code>loans.view</code> &middot; Kelola: <code>loans.manage</code></dd>
   </dl>
 </div>
@@ -559,7 +622,6 @@
     <tr><td><code>company.address</code></td><td>Alamat perusahaan untuk dokumen.</td></tr>
     <tr><td><code>company.phone</code></td><td>Telepon perusahaan untuk dokumen.</td></tr>
     <tr><td><code>finance.invoice_due_days</code></td><td><strong>30</strong> — jumlah hari sampai invoice jatuh tempo, dihitung dari tanggal terbit.</td></tr>
-    <tr><td><code>finance.rebate_requires_full_payment</code></td><td><strong>1</strong> (ya) — rebate hanya boleh diajukan untuk invoice yang sudah lunas, kecuali aturan rebate menyatakan lain.</td></tr>
     <tr><td><code>finance.book_tax_rate</code></td><td><strong>0.5</strong> — pajak untuk baris <em>buku</em>. Buku tidak dikenai PPN.</td></tr>
     <tr><td><code>finance.goods_tax_rate</code></td><td><strong>2</strong> — pajak untuk baris <em>barang lainnya</em>, dihitung dari DPP.</td></tr>
     <tr><td><code>finance.ppn_rate</code></td><td><strong>12</strong> — PPN untuk <em>barang lainnya</em>, dihitung dari DPP.</td></tr>

@@ -31,11 +31,11 @@
     <tr><td>PPN</td><td>Pajak Pertambahan Nilai yang ditambahkan. Hanya dikenakan pada barang lainnya, tidak pada buku.</td></tr>
     <tr><td>Pajak buku</td><td>Pajak atas penjualan buku. Buku tidak dikenai PPN.</td></tr>
     <tr><td>Pajak barang lainnya</td><td>Pajak atas penjualan barang non-buku, dihitung dari DPP.</td></tr>
-    <tr><td>Rebate / cashback</td><td>Pengembalian sebagian nilai transaksi kepada sekolah.</td></tr>
+    <tr><td>Rebate / cashback</td><td>Potongan persentase untuk sekolah yang diatur pada data sekolah dan otomatis diterapkan saat nota pesanan dibuat.</td></tr>
     <tr><td>Reservasi</td><td>Jumlah barang yang sudah dijanjikan ke pesanan tetapi belum keluar gudang.</td></tr>
     <tr><td>SKU / kode barang</td><td>Kode unik sebuah barang.</td></tr>
     <tr><td>Surat jalan</td><td>Dokumen pengantar barang saat pengiriman.</td></tr>
-    <tr><td>Tersedia (stok)</td><td>Fisik dikurangi reservasi; jumlah yang masih boleh dijual.</td></tr>
+    <tr><td>Sisa stok</td><td>Barang masuk dikurangi barang keluar dan mutasi; jumlah yang tercatat masih ada di gudang.</td></tr>
     <tr><td>Zona harga</td><td>Pengelompokan wilayah dengan harga jual tersendiri. Harga tiap zona diisi pada data Buku dan dipilih pada pesanan.</td></tr>
   </tbody>
 </table>
@@ -54,7 +54,7 @@
     <tr><td>Surat jalan</td><td><code>SJ-YYYYMMDD-nnnn</code></td><td><code>SJ-20261018-0001</code></td></tr>
     <tr><td>Invoice</td><td><code>INV-YYYYMMDD-nnnn</code></td><td><code>INV-20261018-0001</code></td></tr>
     <tr><td>Pembayaran</td><td><code>PAY-YYYYMMDD-nnnn</code></td><td><code>PAY-20261018-0001</code></td></tr>
-    <tr><td>Rebate</td><td><code>RBT-YYYYMMDD-nnnn</code></td><td><code>RBT-20261018-0001</code></td></tr>
+    <tr><td>Kwitansi</td><td>Nomor kwitansi per alokasi pembayaran</td><td><code>KW-20261018-0001</code></td></tr>
     <tr><td>Pinjaman tunai</td><td><code>PIN-YYYYMMDD-nnnn</code></td><td><code>PIN-20261018-0001</code></td></tr>
   </tbody>
 </table>
@@ -113,7 +113,8 @@
     <tr><td>Invoice</td><td>Draft, Terbit, Terkirim, Dibatalkan</td></tr>
     <tr><td>Pembayaran invoice</td><td>Belum Bayar, Sebagian, Lunas, Jatuh Tempo</td></tr>
     <tr><td>Pembayaran (riwayat)</td><td>Draft, Terverifikasi, Dibalik</td></tr>
-    <tr><td>Rebate</td><td>Draft, Diajukan, Menunggu Persetujuan, Disetujui, Ditolak, Dibayarkan</td></tr>
+    <tr><td>Back order</td><td>Terbuka, Sebagian, Terpenuhi</td></tr>
+    <tr><td>Pesanan ke penerbit</td><td>Menunggu, Sebagian Terpenuhi, Diterima</td></tr>
   </tbody>
 </table>
 
@@ -135,7 +136,7 @@
 
 <p>
   Berikut seluruh izin yang dikenal aplikasi, dikelompokkan menurut modul. Ada
-  <strong>51 izin</strong> yang tersedia; peran Admin memegang seluruhnya.
+  <strong>52 izin</strong> yang tersedia; peran Admin memegang seluruhnya.
 </p>
 
 <table>
@@ -150,8 +151,9 @@
         <code>books.view</code>, <code>books.manage</code>,
         <code>goods.view</code>, <code>goods.manage</code>,
         <code>categories.manage</code>, <code>warehouses.manage</code>,
+        <code>catalogs.view</code>, <code>catalogs.manage</code>,
         <code>order-sources.manage</code>, <code>couriers.manage</code>,
-        <code>payment-methods.manage</code>, <code>rebate-rules.manage</code>,
+        <code>payment-methods.manage</code>,
         <code>settings.manage</code>, <code>zonas.manage</code>
       </td>
     </tr>
@@ -162,7 +164,7 @@
       <td>Inventori</td>
       <td>
         <code>receipts.view</code>, <code>receipts.manage</code>, <code>receipts.confirm</code>,
-        <code>stock.view</code>, <code>stock.adjust</code>,
+        <code>procurement.view</code>, <code>procurement.manage</code>,
         <code>fulfillment.view</code>, <code>fulfillment.pick</code>, <code>fulfillment.pack</code>
       </td>
     </tr>
@@ -173,6 +175,7 @@
         <code>invoices.view</code>, <code>invoices.manage</code>, <code>invoices.issue</code>,
         <code>payments.view</code>, <code>payments.manage</code>, <code>payments.verify</code>,
         <code>rebates.view</code>, <code>rebates.request</code>, <code>rebates.approve</code>, <code>rebates.pay</code>
+        <span class="catatan-kecil">(tiga izin terakhir masih terdaftar tetapi tidak lagi dipakai; rebate hanya memiliki layar rekap)</span>
       </td>
     </tr>
     <tr><td>Laporan</td><td><code>reports.view</code>, <code>audit.view</code></td></tr>
@@ -189,6 +192,11 @@
     <strong>harga</strong> tiap zona, pada formulir Buku. Pemilih
     <em>Zona Harga</em> pada pesanan memakai daftar zona tersebut.
   </p>
+  <p>
+    Izin <code>warehouses.manage</code> juga masih terdaftar, tetapi layar
+    master Gudang sudah tidak ada. Data gudang pada dokumen penerimaan dan
+    pengiriman berasal dari data yang disediakan sistem.
+  </p>
 </div>
 
 <h1 id="lampiran-d">Lampiran D. Daftar Modul dan Alamat Halaman</h1>
@@ -201,8 +209,11 @@
     <tr><td>Pesanan (daftar)</td><td><code>/orders</code></td></tr>
     <tr><td>Pesanan (buat)</td><td><code>/orders/create</code></td></tr>
     <tr><td>Penerimaan barang</td><td><code>/receipts</code></td></tr>
-    <tr><td>Stok barang</td><td><code>/stock</code></td></tr>
-    <tr><td>Mutasi stok</td><td><code>/stock/movements</code></td></tr>
+    <tr><td>Rangkuman stok</td><td><code>/stock-summary</code></td></tr>
+    <tr><td>Mutasi stok</td><td><code>/stock-mutations</code></td></tr>
+    <tr><td>Back order</td><td><code>/backorders</code></td></tr>
+    <tr><td>Barang tidak tersedia</td><td><code>/backorders/unavailable</code></td></tr>
+    <tr><td>Katalog</td><td><code>/catalogs</code></td></tr>
     <tr><td>Picking &amp; packing</td><td><code>/pickings</code></td></tr>
     <tr><td>Pengiriman</td><td><code>/shipments</code></td></tr>
     <tr><td>Invoice</td><td><code>/invoices</code></td></tr>
@@ -213,6 +224,7 @@
     <tr><td>Laporan</td><td><code>/reports</code></td></tr>
     <tr><td>Profil perusahaan</td><td><code>/settings/company</code></td></tr>
     <tr><td>Pengguna</td><td><code>/settings/users</code></td></tr>
+    <tr><td>Jam lembur</td><td><code>/settings/overtimes</code></td></tr>
     <tr><td>Peran &amp; izin</td><td><code>/settings/roles</code></td></tr>
     <tr><td>Audit log</td><td><code>/settings/audit</code></td></tr>
     <tr><td>Integrasi &amp; import</td><td><code>/integrations</code></td></tr>
@@ -262,9 +274,9 @@
 <h2>G.1 Apa yang Sudah Dicakup</h2>
 
 <ul>
-  <li>Seluruh 6 dashboard peran, 13 layar data induk, dan modul transaksi dari pesanan sampai rebate.</li>
+  <li>Seluruh 6 dashboard peran, layar data induk, katalog, pengadaan, dan modul transaksi dari pesanan sampai pembayaran.</li>
   <li>Seluruh 9 jenis laporan beserta catatan ekspor CSV.</li>
-  <li>Seluruh 51 izin dan pemetaannya ke enam peran.</li>
+  <li>Seluruh 52 izin dan pemetaannya ke enam peran.</li>
   <li>Pesan-pesan kesalahan yang benar-benar dihasilkan aplikasi, beserta artinya.</li>
   <li>Rumus pajak, pola penomoran dokumen, dan aturan perpindahan status yang diverifikasi langsung dari kode aplikasi.</li>
 </ul>

@@ -73,10 +73,10 @@
   <tbody>
     <tr><td><strong>Admin</strong></td><td>Mengurus sistem secara keseluruhan</td><td>Akses penuh ke seluruh modul, termasuk pengguna, peran, dan konfigurasi.</td></tr>
     <tr><td><strong>Operator Pesanan</strong></td><td>Menginput dan memvalidasi pesanan</td><td>Membuat, mengubah, dan mengonfirmasi pesanan; melihat stok dan laporan.</td></tr>
-    <tr><td><strong>Gudang</strong></td><td>Mengurus barang fisik</td><td>Penerimaan barang, penyesuaian stok, picking, packing, dan pengiriman.</td></tr>
-    <tr><td><strong>Keuangan</strong></td><td>Mengurus tagihan dan uang masuk</td><td>Invoice, pembayaran, piutang, dan persetujuan/pembayaran rebate.</td></tr>
-    <tr><td><strong>Sales / PIC</strong></td><td>Menangani sekolah yang ditugaskan</td><td>Melihat sekolah dan transaksinya, membuat pesanan, mengajukan rebate.</td></tr>
-    <tr><td><strong>Pimpinan</strong></td><td>Memantau dan menyetujui</td><td>Dashboard manajemen, laporan, audit log, serta menyetujui rebate.</td></tr>
+    <tr><td><strong>Gudang</strong></td><td>Mengurus barang fisik</td><td>Penerimaan barang, mutasi stok, back order, picking, packing, dan pengiriman.</td></tr>
+    <tr><td><strong>Keuangan</strong></td><td>Mengurus tagihan dan uang masuk</td><td>Invoice, pembayaran, piutang, dan melihat rekap rebate.</td></tr>
+    <tr><td><strong>Sales / PIC</strong></td><td>Menangani sekolah yang ditugaskan</td><td>Melihat sekolah dan transaksinya, membuat pesanan, dan melihat rekap rebate.</td></tr>
+    <tr><td><strong>Pimpinan</strong></td><td>Memantau dan mengevaluasi</td><td>Dashboard manajemen, laporan, audit log, dan rekap rebate.</td></tr>
   </tbody>
 </table>
 
@@ -113,7 +113,7 @@
   <li><strong>Pengiriman</strong> mengurangi stok fisik dan menandai pesanan sebagai terkirim. Wajib disertai foto bukti.</li>
   <li><strong>Invoice</strong> menagih jumlah yang benar-benar dikirim, dengan pajak yang dihitung otomatis.</li>
   <li><strong>Pembayaran</strong> menutup invoice. Pembayaran harus diverifikasi lebih dulu sebelum dianggap sah.</li>
-  <li><strong>Rebate</strong> mengembalikan sebagian nilai kepada sekolah sesuai aturan yang berlaku.</li>
+  <li><strong>Rebate</strong> sudah dipotong sebagai diskon pada nota pesanan, lalu direkap per sekolah untuk pemeriksaan.</li>
 </ol>
 
 <figure class="fig" id="fig-dashboard-admin">
@@ -147,7 +147,7 @@
     <tr><td><strong>Invoice</strong></td><td>Tagihan resmi kepada sekolah atas barang yang dikirim.</td></tr>
     <tr><td><strong>Piutang</strong></td><td>Uang yang masih harus dibayar sekolah kepada kita.</td></tr>
     <tr><td><strong>Hutang</strong></td><td>Pada aplikasi ini diartikan sebagai invoice yang <em>sudah dibayar</em> tetapi barangnya belum dikirim.</td></tr>
-    <tr><td><strong>Rebate / cashback</strong></td><td>Pengembalian sebagian nilai transaksi kepada sekolah.</td></tr>
+    <tr><td><strong>Rebate / cashback</strong></td><td>Potongan persentase untuk sekolah yang diatur pada data sekolah dan otomatis diterapkan pada nota pesanan.</td></tr>
     <tr><td><strong>Jatuh tempo</strong></td><td>Tanggal terakhir invoice seharusnya dibayar.</td></tr>
     <tr><td><strong>DPP</strong></td><td>Dasar Pengenaan Pajak — nilai yang menjadi dasar perhitungan pajak.</td></tr>
     <tr><td><strong>PPN / PPh</strong></td><td>Pajak Pertambahan Nilai (ditambahkan) dan Pajak Penghasilan (dipotong).</td></tr>
@@ -175,13 +175,13 @@
   </thead>
   <tbody>
     <tr><td>Dashboard</td><td>Enam tampilan berbeda, satu untuk tiap peran.</td></tr>
-    <tr><td>Master Data (13 layar)</td><td>Sekolah, Penerbit, Buku, Barang Lainnya, Kategori Buku, Gudang, Sumber Pesanan, Kurir, Metode Kirim, Metode Bayar, Aturan Rebate, Pinjaman Tunai, Konfigurasi.</td></tr>
-    <tr><td>Pesanan</td><td>Nota pesanan, pembuatan pesanan, konfirmasi, pembatalan, nota cetak.</td></tr>
-    <tr><td>Stok &amp; Gudang</td><td>Stok barang, penerimaan barang, mutasi stok.</td></tr>
+    <tr><td>Master Data (10 layar)</td><td>Sekolah, Penerbit, Buku, Barang Lainnya, Kategori Buku, Sumber Pesanan, Kurir, Metode Kirim, Metode Bayar, Konfigurasi.</td></tr>
+    <tr><td>Pesanan</td><td>Nota pesanan, pembuatan dan pengubahan pesanan, konfirmasi, pengembalian ke Draft, pembatalan, nota gudang, dan surat pesanan.</td></tr>
+    <tr><td>Stok, Gudang, dan Pengadaan</td><td>Rangkuman stok, mutasi stok, penerimaan barang, back order, serta pesanan ke penerbit.</td></tr>
     <tr><td>Picking &amp; Packing</td><td>Daftar picking, pencatatan hasil picking, penyelesaian packing.</td></tr>
     <tr><td>Pengiriman</td><td>Pembuatan pengiriman, konfirmasi dengan bukti foto, surat jalan.</td></tr>
-    <tr><td>Keuangan</td><td>Invoice, piutang, barang belum dikirim, pembayaran, rebate.</td></tr>
-    <tr><td>Laporan</td><td>Sembilan jenis laporan dengan ekspor CSV.</td></tr>
-    <tr><td>Pengaturan</td><td>Profil perusahaan, pengguna, peran &amp; izin, integrasi &amp; impor, audit log.</td></tr>
+    <tr><td>Keuangan</td><td>Invoice, piutang, barang belum dikirim, pembayaran, dan rekap rebate.</td></tr>
+    <tr><td>Laporan</td><td>Tujuh jenis laporan dengan ekspor CSV.</td></tr>
+    <tr><td>Pengaturan</td><td>Profil perusahaan, pengguna, jam lembur, peran &amp; izin, integrasi &amp; impor, audit log.</td></tr>
   </tbody>
 </table>

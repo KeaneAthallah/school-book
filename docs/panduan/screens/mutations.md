@@ -1,5 +1,4 @@
 # Mutasi Data Demo saat Penangkapan Gambar
 
-- Memakai pengiriman yang belum dikonfirmasi: /shipments/22
+- Tidak ada perubahan data: seluruh tangkapan layar memakai data demo yang sudah ada.
 
-Pulihkan dengan: `php artisan db:seed --class=DemoDataResetSeeder`

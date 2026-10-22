@@ -60,7 +60,7 @@
   <thead><tr><th style="width:30%">Hal</th><th>Keterangan</th></tr></thead>
   <tbody>
     <tr><td>Akun contoh</td><td><code>admin@sekolah.test</code></td></tr>
-    <tr><td>Jumlah izin</td><td>51 izin (seluruhnya)</td></tr>
+    <tr><td>Jumlah izin</td><td>52 izin (seluruhnya)</td></tr>
     <tr><td>Tugas utama</td><td>Mengelola data induk, pengguna, peran, konfigurasi, dan seluruh transaksi.</td></tr>
     <tr><td>Halaman khusus</td><td>Pengguna, Peran &amp; Izin, Profil Perusahaan, Konfigurasi, Integrasi &amp; Impor.</td></tr>
   </tbody>
@@ -109,7 +109,7 @@
     <tr><td>Akun contoh</td><td><code>gudang@sekolah.test</code></td></tr>
     <tr><td>Jumlah izin</td><td>16 izin</td></tr>
     <tr><td>Tugas utama</td><td>Mengurus seluruh barang fisik: penerimaan, stok, picking, packing, pengiriman.</td></tr>
-    <tr><td>Izin yang dipegang</td><td>Lihat dashboard; lihat buku &amp; barang lainnya; lihat pesanan; lihat/kelola/konfirmasi penerimaan; lihat stok &amp; penyesuaian stok; lihat/picking/packing; lihat/kelola/konfirmasi pengiriman; lihat laporan.</td></tr>
+    <tr><td>Izin yang dipegang</td><td>Lihat dashboard; lihat buku &amp; barang lainnya; lihat pesanan; lihat/kelola/konfirmasi penerimaan; lihat/kelola pengadaan dan mutasi stok; lihat/picking/packing; lihat/kelola/konfirmasi pengiriman; lihat laporan.</td></tr>
   </tbody>
 </table>
 
@@ -131,19 +131,18 @@
   <tbody>
     <tr><td>Akun contoh</td><td><code>keuangan@sekolah.test</code></td></tr>
     <tr><td>Jumlah izin</td><td>13 izin</td></tr>
-    <tr><td>Tugas utama</td><td>Menerbitkan invoice, mencatat dan memverifikasi pembayaran, memantau piutang, menyetujui dan membayarkan rebate.</td></tr>
-    <tr><td>Izin yang dipegang</td><td>Lihat dashboard; lihat sekolah &amp; pesanan; lihat/kelola/terbitkan invoice; lihat/kelola/verifikasi pembayaran; lihat/setujui/bayar rebate; lihat laporan.</td></tr>
+    <tr><td>Tugas utama</td><td>Menerbitkan invoice, mencatat dan memverifikasi pembayaran, memantau piutang, dan memeriksa rekap rebate.</td></tr>
+    <tr><td>Izin yang dipegang</td><td>Lihat dashboard; lihat sekolah &amp; pesanan; lihat/kelola/terbitkan invoice; lihat/kelola/verifikasi pembayaran; lihat rekap rebate; lihat laporan.</td></tr>
   </tbody>
 </table>
 
 <div class="kotak catatan">
-  <span class="judul-kotak">Keuangan boleh mengajukan rebate?</span>
+  <span class="judul-kotak">Rebate hanya dibaca di halaman rekap</span>
   <p>
-    Tidak. Izin <code>rebates.request</code> (mengajukan) dipegang oleh
-    <strong>Sales/PIC</strong>, sedangkan Keuangan memegang
-    <code>rebates.approve</code> dan <code>rebates.pay</code>. Jadi yang
-    mengajukan dan yang menyetujui adalah orang yang berbeda — sebuah
-    pengamanan yang lazim.
+    Tidak ada lagi pengajuan, persetujuan, atau pembayaran rebate. Nilai rebate
+    sudah dipotong sebagai diskon saat nota pesanan dibuat, dan halaman
+    <strong>Rebate / Cashback</strong> hanya menampilkan rekapnya. Izin yang
+    relevan cukup <code>rebates.view</code>.
   </p>
 </div>
 
@@ -159,8 +158,8 @@
   <tbody>
     <tr><td>Akun contoh</td><td><code>sales@sekolah.test</code></td></tr>
     <tr><td>Jumlah izin</td><td>11 izin</td></tr>
-    <tr><td>Tugas utama</td><td>Menangani sekolah yang ditugaskan, membuat pesanan, mengajukan rebate.</td></tr>
-    <tr><td>Izin yang dipegang</td><td>Lihat dashboard, sekolah, buku &amp; barang lainnya; lihat &amp; kelola pesanan; lihat invoice, pembayaran, dan rebate; ajukan rebate; lihat laporan.</td></tr>
+    <tr><td>Tugas utama</td><td>Menangani sekolah yang ditugaskan, membuat pesanan, dan memantau rebate sekolahnya.</td></tr>
+    <tr><td>Izin yang dipegang</td><td>Lihat dashboard, sekolah, buku &amp; barang lainnya; lihat &amp; kelola pesanan; lihat invoice, pembayaran, dan rekap rebate; lihat laporan.</td></tr>
   </tbody>
 </table>
 
@@ -186,8 +185,8 @@
   <tbody>
     <tr><td>Akun contoh</td><td><code>pimpinan@sekolah.test</code></td></tr>
     <tr><td>Jumlah izin</td><td>8 izin</td></tr>
-    <tr><td>Tugas utama</td><td>Memantau kinerja dan menyetujui permintaan rebate.</td></tr>
-    <tr><td>Izin yang dipegang</td><td>Lihat dashboard; lihat pesanan, invoice, pembayaran, dan rebate; setujui rebate; lihat laporan; lihat audit log.</td></tr>
+    <tr><td>Tugas utama</td><td>Memantau kinerja penjualan, piutang, dan rekap rebate.</td></tr>
+    <tr><td>Izin yang dipegang</td><td>Lihat dashboard; lihat pesanan, invoice, pembayaran, dan rekap rebate; lihat laporan; lihat audit log.</td></tr>
   </tbody>
 </table>
 
@@ -223,15 +222,14 @@
     <tr><td>Konfirmasi pesanan</td><td class="center">•</td><td class="center">•</td><td class="center">—</td><td class="center">—</td><td class="center">—</td><td class="center">—</td></tr>
     <tr><td>Batalkan pesanan</td><td class="center">•</td><td class="center">—</td><td class="center">—</td><td class="center">—</td><td class="center">—</td><td class="center">—</td></tr>
     <tr><td>Penerimaan barang</td><td class="center">•</td><td class="center">—</td><td class="center">•</td><td class="center">—</td><td class="center">—</td><td class="center">—</td></tr>
-    <tr><td>Penyesuaian stok</td><td class="center">•</td><td class="center">—</td><td class="center">•</td><td class="center">—</td><td class="center">—</td><td class="center">—</td></tr>
+    <tr><td>Rangkuman &amp; mutasi stok</td><td class="center">•</td><td class="center">•</td><td class="center">•</td><td class="center">—</td><td class="center">—</td><td class="center">—</td></tr>
+    <tr><td>Back order &amp; pesanan ke penerbit</td><td class="center">•</td><td class="center">•</td><td class="center">•</td><td class="center">—</td><td class="center">—</td><td class="center">—</td></tr>
     <tr><td>Picking &amp; packing</td><td class="center">•</td><td class="center">—</td><td class="center">•</td><td class="center">—</td><td class="center">—</td><td class="center">—</td></tr>
     <tr><td>Kelola pengiriman</td><td class="center">•</td><td class="center">—</td><td class="center">•</td><td class="center">—</td><td class="center">—</td><td class="center">—</td></tr>
     <tr><td>Kelola invoice</td><td class="center">•</td><td class="center">—</td><td class="center">—</td><td class="center">•</td><td class="center">—</td><td class="center">—</td></tr>
     <tr><td>Kelola pembayaran</td><td class="center">•</td><td class="center">—</td><td class="center">—</td><td class="center">•</td><td class="center">—</td><td class="center">—</td></tr>
     <tr><td>Verifikasi pembayaran</td><td class="center">•</td><td class="center">—</td><td class="center">—</td><td class="center">•</td><td class="center">—</td><td class="center">—</td></tr>
-    <tr><td>Ajukan rebate</td><td class="center">•</td><td class="center">—</td><td class="center">—</td><td class="center">—</td><td class="center">•</td><td class="center">—</td></tr>
-    <tr><td>Setujui rebate</td><td class="center">•</td><td class="center">—</td><td class="center">—</td><td class="center">•</td><td class="center">—</td><td class="center">•</td></tr>
-    <tr><td>Bayarkan rebate</td><td class="center">•</td><td class="center">—</td><td class="center">—</td><td class="center">•</td><td class="center">—</td><td class="center">—</td></tr>
+    <tr><td>Lihat rekap rebate</td><td class="center">•</td><td class="center">—</td><td class="center">—</td><td class="center">•</td><td class="center">•</td><td class="center">•</td></tr>
     <tr><td>Kelola pengguna &amp; peran</td><td class="center">•</td><td class="center">—</td><td class="center">—</td><td class="center">—</td><td class="center">—</td><td class="center">—</td></tr>
     <tr><td>Lihat audit log</td><td class="center">•</td><td class="center">—</td><td class="center">—</td><td class="center">—</td><td class="center">—</td><td class="center">•</td></tr>
   </tbody>

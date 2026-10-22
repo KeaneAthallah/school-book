@@ -46,7 +46,7 @@ class DashboardDemoSeeder extends Seeder
 {
     private const SENTINEL = 'demo.seeded_version';
 
-    private const VERSION = '1';
+    private const VERSION = '2';
 
     private const NPSN_PREFIX = '9990';
 
@@ -80,17 +80,20 @@ class DashboardDemoSeeder extends Seeder
             return;
         }
 
-        // Deterministic output: the same demo data on every fresh run.
-        mt_srand(20260101);
+        // Non-deterministic: vary the demo data on every fresh run.
+        mt_srand();
 
         DB::transaction(function (): void {
             $this->resolveActors();
             $this->seedPublishersAndBooks();
             $this->seedSchools();
-            $this->seedOpeningStock();
+            $this->seedOrders(false); // create orders, no shipping
+            $this->seedOpeningStock(); // allocate stock to backorders
+            $this->seedShipments(); // ship + invoices
             $this->seedDraftReceipt();
-            $this->seedOrders();
             $this->seedPaymentsToVerify();
+            $this->seedTodaysActivity();
+            $this->seedPickings();
 
             Setting::query()->updateOrCreate(
                 ['key' => self::SENTINEL],
@@ -378,7 +381,7 @@ class DashboardDemoSeeder extends Seeder
         ], $this->warehouseUser);
     }
 
-    private function seedOrders(): void
+    private function seedOrders(bool $ship = true): void
     {
         $orders = app(OrderService::class);
         $sources = OrderSource::query()->whereIn('code', ['SIPLAH', 'EKATALOG', 'MANUAL'])->get()->keyBy('code');
@@ -444,11 +447,61 @@ class DashboardDemoSeeder extends Seeder
                     'items' => $lines,
                 ], $this->operator);
 
-                $this->advanceOrder($order, $index, $monthsAgo);
+                $this->advanceOrder($order, $index, $monthsAgo, $ship);
             }
         }
 
-        $this->seedTodaysActivity();
+    }
+
+/**
+     * Ship a handful of already-reserved orders so the shipment, invoice
+     * and receivable pages have data.
+     */
+    private function seedShipments(): void
+    {
+        $orders = Order::query()
+            ->whereIn('status', [
+                OrderStatus::Processing->value,
+                OrderStatus::PartialReady->value,
+                OrderStatus::Ready->value,
+            ])
+            ->orderByDesc('id')
+            ->limit(8)
+            ->get();
+
+        foreach ($orders as $i => $order) {
+            $partial = $i % 3 === 0;
+            $shipDate = $order->order_date->copy()->addDays(2)->min(Carbon::today());
+
+            $shipment = $this->ship($order, $partial, $shipDate);
+
+            if ($shipment === null) {
+                continue;
+            }
+
+            if ($partial) {
+                continue;
+            }
+
+            $invoiceDate = $shipDate->copy()->addDays(1)->min(Carbon::today());
+
+            try {
+                $invoice = app(InvoiceService::class)->generateForShipment($shipment, $this->financeUser);
+            } catch (\Throwable) {
+                continue;
+            }
+
+            $invoice->forceFill([
+                'invoice_date' => $invoiceDate->toDateString(),
+                'due_date' => $invoiceDate->copy()->addDays(30)->toDateString(),
+            ])->save();
+
+            if ($i % 4 === 0) {
+                $this->pay($invoice, 0.45, $invoiceDate->copy()->addDays(6)->min(Carbon::today()));
+            } elseif ($i % 4 === 1) {
+                $this->pay($invoice, 1.0, $invoiceDate->copy()->addDays(9)->min(Carbon::today()));
+            }
+        }
     }
 
     /**
@@ -508,10 +561,53 @@ class DashboardDemoSeeder extends Seeder
     }
 
     /**
+     * Leave some pickings in progress so the picking list has both a queued
+     * (draft) and an already-picked example. Orders are only picked here after
+     * opening stock has been received, otherwise nothing is reservable yet.
+     */
+    private function seedPickings(): void
+    {
+        $candidates = Order::query()
+            ->whereIn('status', [
+                OrderStatus::Processing->value,
+                OrderStatus::PartialReady->value,
+                OrderStatus::Ready->value,
+            ])
+            ->whereHas('items', fn ($query) => $query->where('reserved_quantity', '>', 0))
+            ->orderByDesc('order_date')
+            ->orderByDesc('id')
+            ->limit(6)
+            ->get();
+
+        foreach ($candidates as $position => $order) {
+            try {
+                $picking = app(FulfillmentService::class)->create($order, $this->warehouseUser);
+            } catch (\Throwable) {
+                continue;
+            }
+
+            // Every second picking is finished so the "picked, awaiting packing"
+            // state is visible in the guide.
+            if ($position % 2 === 1) {
+                $picking->load('items');
+
+                app(FulfillmentService::class)->recordPicked(
+                    $picking,
+                    $picking->items->map(fn ($item): array => [
+                        'id' => $item->getKey(),
+                        'picked_quantity' => $item->quantity,
+                    ])->all(),
+                    $this->warehouseUser,
+                );
+            }
+        }
+    }
+
+    /**
      * Drive the order through a deterministic scenario so every status,
      * picking state, shipment state and invoice state is represented.
      */
-    private function advanceOrder(Order $order, int $index, int $monthsAgo): void
+    private function advanceOrder(Order $order, int $index, int $monthsAgo, bool $ship = true): void
     {
         $scenario = $index % 10;
 
@@ -555,6 +651,10 @@ class DashboardDemoSeeder extends Seeder
             );
 
             return; // picked, awaiting packing
+        }
+
+        if (! $ship) {
+            return;
         }
 
         // Scenarios 5-9 ship (partially or fully).

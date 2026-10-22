@@ -86,12 +86,12 @@
   <li>Pilih <strong>Sekolah</strong>. Kolom ini wajib.</li>
   <li>Pilih <strong>Sumber Pesanan</strong>. Kolom ini wajib.</li>
   <li>Isi <strong>Referensi Eksternal</strong> bila pesanan berasal dari sistem luar seperti SIPLah. Referensi yang sama tidak boleh dipakai dua kali untuk sekolah yang sama.</li>
-  <li>Bila perlu, isi <strong>Diskon Pesanan</strong> dan <strong>Catatan</strong>.</li>
-  <li>Pada kartu <strong>Item Pesanan</strong>, pilih <strong>Zona Harga</strong> (Zona 3, 4, atau 5) untuk memakai harga zona tersebut.</li>
+  <li>Periksa <strong>Diskon Pesanan (%)</strong>. Nilainya terisi otomatis dari kolom <em>Rebate (%)</em> sekolah yang dipilih, dan masih dapat diubah bila perlu. Isi <strong>Catatan</strong> bila ada.</li>
+  <li>Pada kartu <strong>Item Pesanan</strong>, pilih <strong>Zona Harga</strong> (misalnya Zona 3, 4, atau 5) untuk memakai harga zona tersebut. Bila dikosongkan, harga dasar produk yang dipakai.</li>
   <li>Klik kolom <strong>Cari/pilih barang…</strong> lalu ketik sebagian judul atau kode. Pilih barang dari daftar yang muncul.</li>
-  <li>Isi <strong>Qty</strong> dan periksa <strong>Harga</strong>. Harga terisi otomatis dari data barang; sesuaikan hanya bila memang perlu.</li>
-  <li>Klik <strong>Tambah Item</strong> untuk menambah baris barang lain.</li>
-  <li>Klik <strong>Simpan Pesanan</strong>. Bila berhasil, Anda dibawa ke halaman detail pesanan yang baru dibuat.</li>
+  <li>Isi <strong>Qty</strong> dan periksa <strong>Harga</strong>. Harga terisi otomatis dari data barang atau zona; sesuaikan hanya bila memang perlu.</li>
+  <li>Isi <strong>Diskon (%)</strong> per baris bila barang tertentu mendapat potongan tambahan. Centang <strong>Kosong</strong> bila barang sedang tidak tersedia.</li>
+  <li>Klik <strong>Tambah Item</strong> untuk menambah baris barang lain, lalu <strong>Simpan Pesanan</strong>. Bila berhasil, Anda dibawa ke halaman detail pesanan yang baru dibuat.</li>
 </ol>
 
 <figure class="fig" id="fig-orders-item-picker">
@@ -109,12 +109,14 @@
     <tr><td>Sekolah</td><td>Ya</td><td>Menentukan data pelanggan dan alamat kirim.</td></tr>
     <tr><td>Sumber Pesanan</td><td>Ya</td><td>Asal pesanan.</td></tr>
     <tr><td>Referensi Eksternal</td><td>Tidak</td><td>Nomor pesanan dari sistem asal. Harus unik per sekolah.</td></tr>
-    <tr><td>Diskon Pesanan</td><td>Tidak</td><td>Potongan atas keseluruhan pesanan.</td></tr>
+    <tr><td>Diskon Pesanan (%)</td><td>Tidak</td><td>Potongan persentase atas keseluruhan pesanan. Terisi otomatis dari rebate sekolah.</td></tr>
     <tr><td>Catatan</td><td>Tidak</td><td>Keterangan tambahan.</td></tr>
-    <tr><td>Barang (per baris)</td><td>Ya</td><td>Harus dipilih dari katalog.</td></tr>
+    <tr><td>Zona Harga</td><td>Tidak</td><td>Menentukan daftar harga yang dipakai untuk seluruh baris.</td></tr>
+    <tr><td>Barang (per baris)</td><td>Ya</td><td>Harus dipilih dari daftar produk.</td></tr>
     <tr><td>Qty (per baris)</td><td>Ya</td><td>Minimal 1.</td></tr>
     <tr><td>Harga (per baris)</td><td>Ya</td><td>Terisi otomatis; boleh disesuaikan.</td></tr>
-    <tr><td>Diskon (per baris)</td><td>Tidak</td><td>Potongan per baris barang.</td></tr>
+    <tr><td>Diskon (%) per baris</td><td>Tidak</td><td>Potongan persentase khusus untuk baris barang tersebut.</td></tr>
+    <tr><td>Kosong</td><td>Tidak</td><td>Menandai baris yang barangnya sedang tidak tersedia.</td></tr>
   </tbody>
 </table>
 
@@ -215,6 +217,24 @@
   </p>
 </div>
 
+<h3>Mengembalikan pesanan ke Draft</h3>
+
+<p>
+  Pesanan berstatus <em>Diproses</em> dapat dikembalikan ke <em>Draft</em> agar
+  isinya bisa diperbaiki. Pada halaman detail pesanan, klik
+  <strong>Kembalikan ke Draft</strong> lalu setujui penegasan.
+</p>
+
+<div class="kotak peringatan">
+  <span class="judul-kotak">Pengembalian melepas reservasi dan menghapus back order</span>
+  <p>
+    Saat pesanan dikembalikan ke Draft, seluruh jumlah <em>Ready</em> direset,
+    reservasi stok dilepas, dan back order pesanan tersebut dihapus. Setelah
+    diperbaiki, konfirmasi ulang pesanan agar stok dan back order dihitung lagi.
+    Tombol ini hanya muncul untuk pesanan berstatus <em>Diproses</em>.
+  </p>
+</div>
+
 <h3>Membatalkan pesanan</h3>
 
 <ol class="langkah">
@@ -247,7 +267,20 @@
 
 <figure class="fig" id="fig-orders-print">
   <img src="../screens/69-orders-print.png" alt="Nota pesanan siap cetak">
-  <figcaption>Nota pesanan dalam bentuk siap cetak.</figcaption>
+  <figcaption>
+    <strong>Cetak ke Gudang</strong>: nota pesanan dalam bentuk siap cetak,
+    dipakai sebagai lembar kerja gudang.
+  </figcaption>
+</figure>
+
+<p>
+  Tombol kedua, <strong>Cetak Surat Pesanan</strong>, menghasilkan surat resmi
+  kepada sekolah dengan susunan yang berbeda dari nota gudang.
+</p>
+
+<figure class="fig" id="fig-orders-print-surat">
+  <img src="../screens/69b-orders-print-surat.png" alt="Surat pesanan siap cetak">
+  <figcaption>Surat pesanan untuk sekolah, siap dicetak atau disimpan sebagai PDF.</figcaption>
 </figure>
 
 <h2 id="sec-modul-penerimaan">5.2 Penerimaan Barang</h2>
@@ -255,7 +288,7 @@
 <div class="ringkas-modul">
   <dl>
     <dt>Gambaran</dt><dd>Mencatat barang yang datang dari penerbit, lalu menambahkannya ke stok.</dd>
-    <dt>Cara membuka</dt><dd><strong>Stok &amp; Gudang &rsaquo; Barang Masuk</strong></dd>
+    <dt>Cara membuka</dt><dd><strong>Pengadaan &rsaquo; Stok Masuk</strong></dd>
     <dt>Izin</dt><dd>Lihat: <code>receipts.view</code> &middot; Kelola: <code>receipts.manage</code> &middot; Konfirmasi: <code>receipts.confirm</code></dd>
   </dl>
 </div>
@@ -338,111 +371,110 @@
   </p>
 </div>
 
-<h2 id="sec-modul-stok">5.3 Stok dan Mutasi Stok</h2>
+<h2 id="sec-modul-stok">5.3 Rangkuman Stok dan Mutasi Stok</h2>
 
 <div class="ringkas-modul">
   <dl>
-    <dt>Gambaran</dt><dd>Melihat saldo stok per barang per gudang, menyesuaikannya bila perlu, dan menelusuri riwayat perubahannya.</dd>
-    <dt>Cara membuka</dt><dd><strong>Stok &amp; Gudang &rsaquo; Stok Barang</strong> dan <strong>Stok &amp; Gudang &rsaquo; Mutasi Stok</strong></dd>
-    <dt>Izin</dt><dd>Lihat: <code>stock.view</code> &middot; Sesuaikan: <code>stock.adjust</code></dd>
+    <dt>Gambaran</dt><dd>Melihat arus barang masuk, barang keluar, mutasi, dan sisa stok gudang, serta mencatat barang hilang, rusak, atau dipinjam.</dd>
+    <dt>Cara membuka</dt><dd>Sidebar <strong>Rangkuman Stok</strong> dan <strong>Mutasi Stok</strong></dd>
+    <dt>Izin</dt><dd>Rangkuman: <code>procurement.view</code> &middot; Mutasi: lihat <code>fulfillment.view</code>, catat <code>fulfillment.pick</code></dd>
   </dl>
 </div>
 
-<h3>Membaca halaman stok</h3>
+<h3>Membaca Rangkuman Stok</h3>
 
-<figure class="fig" id="fig-stock-index">
-  <img src="../screens/80-stock-index.png" alt="Halaman stok barang">
+<figure class="fig" id="fig-stock-summary">
+  <img src="../screens/80-stock-summary.png" alt="Halaman rangkuman stok">
   <figcaption>
-    Halaman stok barang. Perhatikan tiga kolom angka: Fisik, Reservasi, dan
-    Tersedia.
+    Rangkuman Stok. Empat kartu di atas meringkas barang masuk, barang keluar,
+    mutasi, dan sisa stok beserta nilainya.
   </figcaption>
 </figure>
+
+<p>
+  Halaman ini tidak menyimpan angka stok tersendiri. Angkanya dihitung dari
+  dokumen yang benar-benar terjadi: penerimaan yang sudah dikonfirmasi sebagai
+  barang masuk, pengiriman yang sudah dikirim sebagai barang keluar, dan
+  mutasi sebagai pengurang.
+</p>
 
 <table class="tabel-field">
   <thead><tr><th>Kolom</th><th>Arti</th></tr></thead>
   <tbody>
-    <tr><td>Fisik</td><td>Jumlah barang yang benar-benar ada di gudang.</td></tr>
-    <tr><td>Reservasi</td><td>Jumlah yang sudah dijanjikan ke pesanan.</td></tr>
-    <tr><td>Tersedia</td><td><strong>Fisik dikurangi Reservasi.</strong> Inilah yang masih boleh dijual.</td></tr>
-    <tr><td>Stok Min</td><td>Ambang peringatan untuk barang ini.</td></tr>
-    <tr><td>Status</td><td>Menandai barang yang stoknya di bawah atau sama dengan stok minimum.</td></tr>
+    <tr><td>Masuk</td><td>Jumlah barang dari penerimaan yang sudah dikonfirmasi.</td></tr>
+    <tr><td>Keluar</td><td>Jumlah barang dari pengiriman berstatus <em>Terkirim</em> atau <em>Diterima</em>.</td></tr>
+    <tr><td>Mutasi</td><td>Jumlah barang yang dicatat hilang, rusak, atau dipinjam.</td></tr>
+    <tr><td>Sisa Stok</td><td><strong>Masuk dikurangi Keluar dan Mutasi.</strong> Baris yang sisanya nol atau minus ditandai merah.</td></tr>
+    <tr><td>Nilai Sisa</td><td>Sisa stok dikalikan harga pokok barang.</td></tr>
   </tbody>
 </table>
 
+<p>
+  Gunakan kolom <strong>Cari</strong> untuk mencari kode atau nama barang, dan
+  penyaring <strong>Sisa Stok</strong> untuk menampilkan hanya barang yang masih
+  tersedia atau hanya yang habis/minus.
+</p>
+
 <div class="kotak catatan">
-  <span class="judul-kotak">Mengapa &ldquo;Fisik&rdquo; tidak sama dengan &ldquo;Tersedia&rdquo;</span>
+  <span class="judul-kotak">Sisa stok adalah hasil hitung, bukan angka yang diketik</span>
   <p>
-    Ini pertanyaan yang paling sering muncul. Barang yang sudah dijanjikan ke
-    sekolah lain secara fisik masih ada di rak, tetapi sudah bukan milik siapa
-    pun lagi untuk dijual. Karena itu yang menentukan ketersediaan adalah kolom
-    <strong>Tersedia</strong>, bukan Fisik.
+    Karena sisa stok dihitung dari dokumen, memperbaiki stok berarti
+    memperbaiki dokumennya: konfirmasi penerimaan yang belum dikonfirmasi,
+    periksa pengiriman yang sudah berangkat, atau catat mutasi bila barang
+    memang hilang atau rusak.
   </p>
 </div>
 
-<h3>Menyesuaikan stok</h3>
+<h3>Mencatat mutasi stok</h3>
 
 <p>
-  Penyesuaian stok dipakai bila ada selisih antara catatan dan kenyataan —
-  misalnya barang rusak, hilang, atau hasil hitung ulang. Setiap penyesuaian
-  <strong>wajib disertai alasan</strong>, dan alasannya akan tersimpan di riwayat.
+  Mutasi dipakai untuk barang yang berkurang bukan karena penjualan — misalnya
+  hilang, rusak, atau dipinjam. Setiap catatan mutasi langsung mengurangi sisa
+  stok pada Rangkuman Stok.
 </p>
 
 <ol class="langkah">
-  <li>Pada halaman Stok Barang, klik tombol <strong>Penyesuaian Stok</strong>.</li>
-  <li>Pilih <strong>Barang</strong> dan <strong>Gudang</strong>.</li>
-  <li>Isi <strong>Jumlah</strong>. Angka positif menambah stok; angka negatif menguranginya.</li>
-  <li>Isi <strong>Alasan</strong>, misalnya &ldquo;barang rusak&rdquo; atau &ldquo;hasil stok opname&rdquo;.</li>
-  <li>Klik <strong>Simpan</strong>.</li>
+  <li>Buka <strong>Mutasi Stok</strong>.</li>
+  <li>Pada kartu <strong>Catat Mutasi</strong>, pilih <strong>Barang</strong>.</li>
+  <li>Pilih <strong>Jenis</strong>: Hilang, Rusak, atau Dipinjam.</li>
+  <li>Isi <strong>Jumlah</strong> (minimal 1).</li>
+  <li>Isi <strong>Alasan</strong> bila perlu, lalu klik <strong>Simpan</strong>.</li>
 </ol>
 
-<figure class="fig" id="fig-stock-adjust">
-  <img src="../screens/81-stock-adjust.png" alt="Modal penyesuaian stok">
+<figure class="fig" id="fig-stock-mutations">
+  <img src="../screens/81-stock-mutations.png" alt="Halaman mutasi stok">
   <figcaption>
-    Modal Penyesuaian Stok. Kolom Jumlah menerima angka positif maupun negatif.
+    Mutasi Stok. Formulir pencatatan berada di atas, riwayat mutasi di bawahnya.
+  </figcaption>
+</figure>
+
+<table class="tabel-field">
+  <thead><tr><th>Kolom riwayat</th><th>Arti</th></tr></thead>
+  <tbody>
+    <tr><td>Kode / Barang</td><td>Barang yang mengalami mutasi.</td></tr>
+    <tr><td>Jenis</td><td>Hilang, Rusak, atau Dipinjam.</td></tr>
+    <tr><td>Jumlah</td><td>Banyaknya barang yang dikurangi dari stok.</td></tr>
+    <tr><td>Alasan</td><td>Keterangan yang diisi saat mencatat.</td></tr>
+    <tr><td>Dicatat oleh / Tanggal</td><td>Pengguna dan waktu pencatatan.</td></tr>
+    <tr><td>Aksi</td><td>Tombol cetak untuk membuat bukti mutasi.</td></tr>
+  </tbody>
+</table>
+
+<figure class="fig" id="fig-stock-mutation-print">
+  <img src="../screens/82-stock-mutation-print.png" alt="Bukti mutasi stok siap cetak">
+  <figcaption>
+    Bukti mutasi stok siap cetak, berguna sebagai lampiran berita acara barang
+    hilang atau rusak.
   </figcaption>
 </figure>
 
 <div class="kotak peringatan">
-  <span class="judul-kotak">Stok tidak boleh menjadi negatif</span>
+  <span class="judul-kotak">Mutasi tidak dapat diubah atau dihapus</span>
   <p>
-    Bila penyesuaian akan membuat stok fisik kurang dari nol, aplikasi menolak
-    dan menampilkan pesan kesalahan pada kolom Jumlah. Periksa kembali angka
-    yang Anda masukkan — mungkin ada kelebihan angka nol, atau barang yang
-    dimaksud berbeda.
+    Riwayat mutasi bersifat tetap. Bila salah mencatat, buat catatan pembetulan
+    sesuai kebijakan internal — jangan mengandalkan perubahan pada baris lama.
   </p>
 </div>
-
-<figure class="fig" id="fig-stock-adjust-error">
-  <img src="../screens/82-stock-adjust-error.png" alt="Pesan kesalahan penyesuaian stok">
-  <figcaption>
-    Contoh penolakan: penyesuaian sebesar &minus;100.000 ditolak karena akan
-    membuat stok fisik menjadi negatif.
-  </figcaption>
-</figure>
-
-<h3>Menelusuri mutasi stok</h3>
-
-<figure class="fig" id="fig-stock-movements">
-  <img src="../screens/83-stock-movements.png" alt="Halaman mutasi stok">
-  <figcaption>
-    Mutasi stok. Setiap baris mencatat satu perubahan beserta saldo setelah
-    perubahan tersebut.
-  </figcaption>
-</figure>
-
-<table class="tabel-field">
-  <thead><tr><th>Kolom</th><th>Arti</th></tr></thead>
-  <tbody>
-    <tr><td>Waktu</td><td>Kapan perubahan terjadi.</td></tr>
-    <tr><td>Tipe</td><td>Jenis perubahan: Penerimaan, Penyesuaian Masuk/Keluar, Reservasi, Pelepasan Reservasi, atau Pengiriman.</td></tr>
-    <tr><td>Perubahan</td><td>Angka perubahan; negatif berarti berkurang.</td></tr>
-    <tr><td>Saldo</td><td>Saldo setelah perubahan. Untuk reservasi, saldo yang dimaksud adalah jumlah reservasi.</td></tr>
-    <tr><td>Catatan</td><td>Keterangan, misalnya nomor pesanan atau alasan penyesuaian.</td></tr>
-    <tr><td>Oleh</td><td>Pengguna yang memicu perubahan.</td></tr>
-  </tbody>
-</table>
-
-<p>Halaman ini dapat disaring menurut tipe perubahan dan rentang tanggal.</p>
 
 <h2 id="sec-modul-picking">5.4 Picking dan Packing</h2>
 
@@ -584,8 +616,11 @@
 </figure>
 
 <figure class="fig" id="fig-shipments-create-2b">
-  <img src="../screens/102b-shipments-create-2-filled.png" alt="Formulir pengiriman terisi">
-  <figcaption>Contoh formulir langkah kedua setelah pesanan dipilih.</figcaption>
+  <img src="../screens/102b-shipments-create-2-filled.png" alt="Formulir pengiriman yang sudah diisi">
+  <figcaption>
+    Contoh formulir langkah kedua yang sudah diisi: kurir, metode kirim, resi,
+    penerima, alamat, dan jumlah kirim sebagian.
+  </figcaption>
 </figure>
 
 <h3>Konfirmasi pengiriman — bukti foto wajib</h3>
@@ -1027,84 +1062,110 @@
   untuk keperluan audit.
 </p>
 
+<h3>Mengubah pembayaran Draft</h3>
+
+<p>
+  Selama pembayaran masih berstatus <em>Draft</em>, isinya dapat diperbaiki
+  melalui tautan <strong>Ubah</strong> pada kolom Aksi. Formulirnya sama dengan
+  formulir pencatatan, sehingga sekolah, tanggal, jumlah, metode, referensi,
+  dan alokasi invoice dapat diubah.
+</p>
+
+<figure class="fig" id="fig-payments-edit">
+  <img src="../screens/132-payments-edit.png" alt="Formulir ubah pembayaran">
+  <figcaption>
+    Formulir Ubah Pembayaran. Setelah pembayaran diverifikasi atau dibalik,
+    tautan ini tidak tersedia lagi.
+  </figcaption>
+</figure>
+
+<h3>Mencetak kwitansi</h3>
+
+<p>
+  Setiap alokasi pembayaran memiliki kwitansi sendiri. Klik
+  <strong>Kwitansi</strong> pada kolom Aksi. Bila satu pembayaran dialokasikan
+  ke beberapa invoice, tombol tersebut menampilkan daftar kwitansi yang dapat
+  dipilih.
+</p>
+
+<figure class="fig" id="fig-payments-receipt">
+  <img src="../screens/133-payments-receipt.png" alt="Kwitansi pembayaran">
+  <figcaption>
+    Kwitansi pembayaran: nomor kwitansi, jumlah, terbilang, rincian pembayaran
+    saat ini, dan sisa hutang berjalan.
+  </figcaption>
+</figure>
+
+<div class="kotak catatan">
+  <span class="judul-kotak">Sisa hutang pada kwitansi mengikuti saat pembayaran</span>
+  <p>
+    Untuk pembayaran bertahap, kwitansi setiap cicilan menampilkan sisa hutang
+    pada saat pembayaran itu dibuat — bukan sisa terakhir. Dengan begitu,
+    kwitansi lama tetap menggambarkan keadaan ketika ia diterbitkan.
+  </p>
+</div>
+
 <h2 id="sec-modul-rebate">5.9 Rebate / Cashback</h2>
 
 <div class="ringkas-modul">
   <dl>
-    <dt>Gambaran</dt><dd>Pengembalian sebagian nilai transaksi kepada sekolah, dengan alur pengajuan, persetujuan, dan pembayaran.</dd>
-    <dt>Cara membuka</dt><dd>Sidebar <strong>Rebate / Cashback</strong>.</dd>
-    <dt>Izin</dt><dd>Lihat: <code>rebates.view</code> &middot; Ajukan: <code>rebates.request</code> &middot; Setujui: <code>rebates.approve</code> &middot; Bayarkan: <code>rebates.pay</code></dd>
+    <dt>Gambaran</dt><dd>Rekap rebate otomatis per sekolah berdasarkan persentase rebate pada data sekolah dan diskon yang sudah dipotong pada nota pesanan.</dd>
+    <dt>Cara membuka</dt><dd>Sidebar <strong>Rebate / Cashback</strong></dd>
+    <dt>Izin</dt><dd><code>rebates.view</code></dd>
   </dl>
 </div>
 
+<p>
+  Rebate bukan lagi dokumen yang diajukan, disetujui, lalu dibayarkan. Nilainya
+  sudah ditentukan di <strong>Master Data &rsaquo; Sekolah</strong> (kolom
+  <em>Rebate (%)</em>) dan otomatis menjadi diskon saat nota pesanan dibuat.
+  Halaman ini hanya <strong>merekap</strong> diskon tersebut agar mudah
+  diperiksa dan dihitung.
+</p>
+
 <figure class="fig" id="fig-rebates-index">
-  <img src="../screens/140-rebates-index.png" alt="Daftar rebate">
+  <img src="../screens/140-rebates-index.png" alt="Rekap rebate per sekolah">
   <figcaption>
-    Daftar rebate. Nomor rebate berformat <code>RBT-YYYYMMDD-nnnn</code>. Kolom
-    Aksi menyesuaikan status masing-masing baris.
+    Rekap rebate per sekolah. Setiap kelompok menampilkan persentase rebate,
+    jumlah nota, subtotal, dan total nilai rebate.
   </figcaption>
 </figure>
 
-<table>
-  <thead><tr><th style="width:30%">Status</th><th>Arti &amp; langkah berikutnya</th></tr></thead>
+<ol class="langkah">
+  <li>Isi <strong>Dari</strong> dan <strong>Sampai</strong> untuk membatasi rentang tanggal nota.</li>
+  <li>Pilih <strong>Sekolah</strong> bila hanya ingin melihat satu sekolah.</li>
+  <li>Klik <strong>Filter</strong>. Rekap langsung dikelompokkan per sekolah.</li>
+  <li>Periksa baris nota: tanggal, subtotal, diskon persen, nilai diskon, faktur terkait, dan status nota.</li>
+</ol>
+
+<table class="tabel-field">
+  <thead><tr><th>Bagian</th><th>Arti</th></tr></thead>
   <tbody>
-    <tr><td>Draft</td><td>Belum diajukan.</td></tr>
-    <tr><td>Diajukan</td><td>Sudah diajukan, menunggu persetujuan.</td></tr>
-    <tr><td>Menunggu Persetujuan</td><td>Masih dalam proses persetujuan.</td></tr>
-    <tr><td>Disetujui</td><td>Disetujui; berikutnya <strong>dibayarkan</strong>.</td></tr>
-    <tr><td>Ditolak</td><td>Ditolak, disertai alasan penolakan.</td></tr>
-    <tr><td>Dibayarkan</td><td>Selesai; pembayarannya sudah dilakukan.</td></tr>
+    <tr><td>Kepala kelompok</td><td>Nama sekolah, persentase rebate terakhir, jumlah nota, subtotal, dan nilai rebate.</td></tr>
+    <tr><td>No. Nota / Tanggal</td><td>Nota pesanan sumber rebate.</td></tr>
+    <tr><td>Diskon % / Nilai Diskon</td><td>Persentase dan nominal rebate yang dipotong pada nota.</td></tr>
+    <tr><td>Faktur Terkait</td><td>Invoice yang lahir dari nota tersebut beserta statusnya.</td></tr>
+    <tr><td>Status</td><td>Status nota pesanan, bukan status rebate.</td></tr>
   </tbody>
 </table>
 
-<h3>Mengajukan rebate</h3>
+<div class="kotak penting">
+  <span class="judul-kotak">Tidak ada pengajuan, persetujuan, atau pembayaran rebate</span>
+  <p>
+    Halaman ini tidak memiliki tombol Ajukan, Setujui, Tolak, atau Bayar, dan
+    tidak menerbitkan nomor <code>RBT</code>. Bila persentase rebate sebuah
+    sekolah perlu diubah, ubah kolom <em>Rebate (%)</em> pada data sekolah.
+    Perubahan itu hanya berlaku untuk nota berikutnya.
+  </p>
+</div>
 
-<figure class="fig" id="fig-rebates-request">
-  <img src="../screens/141-rebates-request.png" alt="Modal ajukan rebate">
-  <figcaption>Modal Ajukan Rebate. Pilih invoice dan aturan rebate yang berlaku.</figcaption>
-</figure>
-
-<ol class="langkah">
-  <li>Klik <strong>Ajukan Rebate</strong>.</li>
-  <li>Pilih <strong>Invoice</strong> yang menjadi dasar rebate.</li>
-  <li>Pilih <strong>Aturan Rebate</strong> yang berlaku. Bila dikosongkan, nilai rebate diisi manual.</li>
-  <li>Tambahkan <strong>Catatan</strong> bila perlu.</li>
-  <li>Klik <strong>Simpan</strong>. Rebate tersimpan berstatus <em>Diajukan</em>.</li>
-</ol>
-
-<p>Syarat pengajuan yang diperiksa aplikasi:</p>
-
-<ul>
-  <li><strong>Invoice sudah lunas.</strong> Bila aturan mewajibkan lunas, pengajuan untuk invoice yang belum lunas ditolak. Pada data contoh, konfigurasi <code>finance.rebate_requires_full_payment</code> bernilai <em>ya</em>, sehingga syarat ini berlaku umum.</li>
-  <li><strong>Nilai invoice memenuhi minimum</strong> bila aturan mencantumkan minimum.</li>
-  <li><strong>Tidak ada pengajuan ganda.</strong> Satu invoice tidak boleh mengajukan rebate dua kali untuk aturan yang sama, kecuali pengajuan sebelumnya sudah ditolak.</li>
-</ul>
-
-<h3>Menyetujui dan membayarkan</h3>
-
-<figure class="fig" id="fig-rebates-actions">
-  <img src="../screens/142-rebates-actions.png" alt="Kolom aksi pada daftar rebate">
-  <figcaption>
-    Kolom Aksi pada daftar rebate. Tombol yang muncul bergantung pada status
-    baris dan izin Anda.
-  </figcaption>
-</figure>
-
-<ol class="langkah">
-  <li>Pada baris berstatus <em>Diajukan</em>, klik <strong>Setujui</strong> (atau <strong>Tolak</strong> disertai alasan).</li>
-  <li>Untuk rebate yang sudah disetujui, klik <strong>Bayar</strong>.</li>
-  <li>Isi <strong>Referensi</strong> pembayaran — kolom ini wajib.</li>
-  <li>Lampirkan <strong>Bukti foto</strong> pembayaran — berkas ini juga wajib.</li>
-  <li>Klik <strong>Simpan</strong>.</li>
-</ol>
-
-<div class="kotak peringatan">
-  <span class="judul-kotak">Aturan status yang kaku</span>
-  <ul>
-    <li>Hanya rebate berstatus <em>Disetujui</em> yang dapat dibayarkan.</li>
-    <li>Rebate yang sudah <em>Dibayarkan</em> tidak dapat ditolak lagi.</li>
-    <li>Persetujuan hanya berlaku untuk rebate berstatus <em>Diajukan</em>, <em>Menunggu Persetujuan</em>, atau <em>Draft</em>.</li>
-  </ul>
+<div class="kotak catatan">
+  <span class="judul-kotak">Rebate mengurangi nilai nota, bukan kas keluar</span>
+  <p>
+    Karena rebate diberikan sebagai diskon pada nota, nilainya sudah tercermin
+    pada subtotal dan total pesanan. Tidak ada pembayaran kas terpisah yang
+    perlu dicatat di modul Pembayaran.
+  </p>
 </div>
 
 <h2 id="sec-modul-pengaturan">5.10 Pengaturan</h2>
@@ -1217,6 +1278,39 @@
   </p>
 </div>
 
+<h3>Jam Lembur</h3>
+
+<div class="ringkas-modul">
+  <dl>
+    <dt>Gambaran</dt><dd>Mencatat tambahan jam kerja pengguna di luar jam kerja biasa.</dd>
+    <dt>Cara membuka</dt><dd><strong>Pengaturan &rsaquo; Pengguna</strong>, lalu tombol <strong>Jam Lembur</strong></dd>
+    <dt>Izin</dt><dd><code>users.manage</code></dd>
+  </dl>
+</div>
+
+<figure class="fig" id="fig-settings-overtimes">
+  <img src="../screens/167-settings-overtimes.png" alt="Halaman jam lembur">
+  <figcaption>
+    Jam Lembur. Formulir tambah lembur berada di atas, daftar lembur di
+    bawahnya.
+  </figcaption>
+</figure>
+
+<table class="tabel-field">
+  <thead><tr><th>Kolom</th><th>Keterangan</th></tr></thead>
+  <tbody>
+    <tr><td>Pengguna <em>(wajib)</em></td><td>Akun yang lembur. Akun Admin tidak muncul di pilihan.</td></tr>
+    <tr><td>Tanggal <em>(wajib)</em></td><td>Tanggal lembur.</td></tr>
+    <tr><td>Mulai / Selesai <em>(wajib)</em></td><td>Jam mulai dan jam selesai lembur.</td></tr>
+    <tr><td>Alasan</td><td>Keterangan singkat, misalnya pekerjaan yang dikejar.</td></tr>
+  </tbody>
+</table>
+
+<p>
+  Untuk menghapus catatan lembur, gunakan tombol hapus pada kolom Aksi di
+  daftar lembur.
+</p>
+
 <h3>Audit Log</h3>
 
 <div class="ringkas-modul">
@@ -1294,6 +1388,103 @@
 
 <p>
   Modul laporan dibahas tersendiri di <a href="#bagian-6">Bagian VI</a>, karena
-  cakupannya cukup luas: sembilan jenis laporan, penyaring tanggal, dan ekspor
+  cakupannya cukup luas: tujuh jenis laporan, penyaring tanggal, dan ekspor
   CSV.
 </p>
+
+<h2 id="sec-modul-backorder">5.13 Back Order</h2>
+
+<div class="ringkas-modul">
+  <dl>
+    <dt>Gambaran</dt><dd>Daftar kekurangan stok dari nota pesanan dan pemesanan ulang barang tersebut ke penerbit.</dd>
+    <dt>Cara membuka</dt><dd>Sidebar <strong>Back Order</strong> dan <strong>Back Order &rsaquo; Barang Tidak Tersedia</strong></dd>
+    <dt>Izin</dt><dd>Lihat: <code>procurement.view</code> &middot; Kelola pesanan ke penerbit: <code>procurement.manage</code></dd>
+  </dl>
+</div>
+
+<p>
+  Back order lahir saat pesanan dikonfirmasi tetapi stok tidak mencukupi.
+  Kekurangannya tidak dianggap gagal — ia dicatat agar bisa dipesan ke penerbit
+  dan dipenuhi kemudian. Bila penerimaan barang datang, stok baru otomatis
+  dialokasikan ke back order dengan urutan tanggal pesanan terlama.
+</p>
+
+<h3>Daftar back order</h3>
+
+<figure class="fig" id="fig-backorders-index">
+  <img src="../screens/85-backorders-index.png" alt="Halaman back order">
+  <figcaption>
+    Halaman Back Order terdiri dari tiga bagian: daftar kekurangan stok,
+    formulir pesan ke penerbit, dan riwayat pesanan ke penerbit.
+  </figcaption>
+</figure>
+
+<table class="tabel-field">
+  <thead><tr><th>Kolom</th><th>Arti</th></tr></thead>
+  <tbody>
+    <tr><td>Barang</td><td>Produk yang stoknya kurang.</td></tr>
+    <tr><td>No. Pesanan / Sekolah</td><td>Nota pesanan dan sekolah yang menunggu barang tersebut.</td></tr>
+    <tr><td>Qty</td><td>Jumlah awal yang masuk back order.</td></tr>
+    <tr><td>Terpenuhi</td><td>Jumlah yang sudah berhasil dipenuhi.</td></tr>
+    <tr><td>Sisa</td><td><strong>Qty dikurangi Terpenuhi.</strong> Inilah yang masih harus dipesan atau ditunggu.</td></tr>
+    <tr><td>Status</td><td>Terbuka, Sebagian, atau Terpenuhi.</td></tr>
+  </tbody>
+</table>
+
+<h3>Melihat barang yang tidak tersedia</h3>
+
+<p>
+  Halaman <strong>Barang Tidak Tersedia</strong> mengelompokkan baris pesanan
+  yang ditandai tidak tersedia menurut produk. Gunakan halaman ini untuk
+  memutuskan barang mana yang perlu dipesan lebih dulu.
+</p>
+
+<figure class="fig" id="fig-backorders-unavailable">
+  <img src="../screens/86-backorders-unavailable.png" alt="Daftar barang tidak tersedia">
+  <figcaption>
+    Barang tidak tersedia, dikelompokkan per produk beserta rincian pesanan dan
+    sekolah yang menunggu.
+  </figcaption>
+</figure>
+
+<h3>Memesan ke penerbit</h3>
+
+<ol class="langkah">
+  <li>Pada kartu <strong>Pesan ke Penerbit</strong>, pilih <strong>Penerbit</strong>.</li>
+  <li>Isi <strong>No. Pesanan Penerbit</strong> dan <strong>Catatan</strong> bila ada.</li>
+  <li>Centang satu atau beberapa back order yang akan dipesan.</li>
+  <li>Sesuaikan <strong>Qty Order</strong> untuk setiap baris. Beberapa back order dapat digabung dalam satu pesanan.</li>
+  <li>Klik <strong>Simpan</strong>. Back order yang dipilih pindah ke riwayat pesanan ke penerbit.</li>
+</ol>
+
+<figure class="fig" id="fig-backorders-order">
+  <img src="../screens/87-backorders-order.png" alt="Detail pesanan ke penerbit">
+  <figcaption>
+    Detail pesanan ke penerbit: identitas penerbit, daftar back order yang
+    dipesan, dan tautan ke nota pesanan asal.
+  </figcaption>
+</figure>
+
+<h3>Riwayat dan cetak pesanan</h3>
+
+<p>
+  Bagian bawah halaman Back Order memuat riwayat pesanan ke penerbit. Kolom
+  Aksi menyediakan tautan untuk melihat detail, mengubah, mencetak, atau
+  menghapus pesanan. Menghapus pesanan ke penerbit tidak menghapus back
+  order-nya — back order kembali ke daftar untuk dipesan ulang.
+</p>
+
+<figure class="fig" id="fig-backorders-print">
+  <img src="../screens/88-backorders-print.png" alt="Pesanan ke penerbit siap cetak">
+  <figcaption>Pesanan ke penerbit dalam bentuk siap cetak atau PDF.</figcaption>
+</figure>
+
+<div class="kotak penting">
+  <span class="judul-kotak">Back order terpenuhi lewat penerimaan barang</span>
+  <p>
+    Menandai back order sebagai dipesan ke penerbit belum menambah stok.
+    Stok baru bertambah setelah <strong>Penerimaan Barang</strong> dikonfirmasi,
+    dan pada saat itulah back order yang menunggu dipenuhi secara otomatis.
+    Lihat <a href="#sec-modul-penerimaan">Bagian 5.2</a>.
+  </p>
+</div>

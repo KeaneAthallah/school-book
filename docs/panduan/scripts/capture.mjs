@@ -81,6 +81,71 @@ async function openModal(page, name) {
   await page.waitForTimeout(400);
 }
 
+/**
+ * Find the first record link for a resource on a list page. Record IDs depend
+ * on the demo data, so the guide must never hard-code them.
+ */
+async function findRecord(page, listPath, segment) {
+  await go(page, listPath);
+  const href = await page.evaluate((seg) => {
+    const pattern = new RegExp(`/${seg}/\\d+`);
+    const link = [...document.querySelectorAll('a[href]')]
+      .find((anchor) => pattern.test(anchor.getAttribute('href') || ''));
+    return link ? link.getAttribute('href') : null;
+  }, segment);
+
+  return href ? href.replace(/^https?:\/\/[^/]+/, '') : null;
+}
+
+async function gotoRecord(page, listPath, segment) {
+  const href = await findRecord(page, listPath, segment);
+  if (!href) throw new Error(`Tidak ada tautan /${segment}/… pada ${listPath}`);
+  await go(page, href);
+  return href;
+}
+
+/**
+ * Like findRecord(), but only looks inside the first table row whose text
+ * contains a given label. Used when a list has no status filter and the
+ * wanted record is not simply the first row (for example, receipts).
+ */
+async function findRecordByText(page, listPath, segment, needle) {
+  await go(page, listPath);
+  const href = await page.evaluate(({ seg, text }) => {
+    const pattern = new RegExp(`/${seg}/\\d+`);
+    const row = [...document.querySelectorAll('tr')]
+      .find((tr) => (tr.textContent || '').includes(text));
+    if (!row) return null;
+    const link = [...row.querySelectorAll('a[href]')]
+      .find((anchor) => pattern.test(anchor.getAttribute('href') || ''));
+    return link ? link.getAttribute('href') : null;
+  }, { seg: segment, text: needle });
+
+  return href ? href.replace(/^https?:\/\/[^/]+/, '') : null;
+}
+
+/**
+ * Bounding box for the shipment page header plus its confirm form, so the
+ * "proof photo is mandatory" figure shows the title and action together
+ * instead of a 40px-tall strip containing only the form controls.
+ */
+async function confirmBandBox(page) {
+  return page.evaluate(() => {
+    const form = document.querySelector('form[action$="/confirm"]');
+    const title = document.querySelector('h1');
+    if (!form || !title) return null;
+
+    const f = form.getBoundingClientRect();
+    const t = title.getBoundingClientRect();
+    const left = Math.max(0, t.left - 56);
+    const top = Math.max(0, t.top - 16);
+    const right = Math.min(window.innerWidth, Math.max(f.right, t.right) + 16);
+    const bottom = Math.max(f.bottom, t.bottom) + 16;
+
+    return { x: left, y: top, width: right - left, height: bottom - top };
+  });
+}
+
 const browser = await chromium.launch({ channel: 'msedge', headless: true });
 
 // ─────────────────────────────────────────────────────────────── A. Auth (public)
@@ -102,6 +167,10 @@ const browser = await chromium.launch({ channel: 'msedge', headless: true });
 }
 
 // ─────────────────────────────────────────────────────────────── B. Role dashboards (6 logins)
+// Non-Admin accounts are blocked outside working hours by EnsureWorkingHours.
+// Run this pipeline between 08:00 and 17:00, or temporarily widen the
+// work.default_start / work.default_end settings, otherwise those dashboards
+// are captured as the 403 "Akses Ditolak" page.
 const ROLES = [
   { key: 'admin', email: 'admin@sekolah.test', file: '20-dashboard-admin' },
   { key: 'operator', email: 'operator@sekolah.test', file: '21-dashboard-operator' },
@@ -127,9 +196,25 @@ for (const role of ROLES) {
         return el ? Math.round(el.getBoundingClientRect().width) : 272;
       });
 
+      // Open one navigation group so the shell/sidebar figures show how a
+      // grouped menu looks. The dashboard itself (20-dashboard-admin) keeps
+      // every group closed, so the two figures no longer show the same pixels.
+      const ordersGroup = page.locator('nav[aria-label="Navigasi utama"] button:has-text("Pesanan")').first();
+      const openedGroup = await ordersGroup.count() > 0;
+      if (openedGroup) {
+        await ordersGroup.click();
+        await page.waitForTimeout(250);
+      }
+
       // Full shell (sidebar + topbar) and the sidebar alone.
       await shot(page, '10-shell', { section: 'Bagian I/II — Kerangka aplikasi', route: 'GET /dashboard', role: role.key }, { full: false });
       await shot(page, '10-sidebar', { section: 'Bagian I/II — Sidebar', route: 'partials/sidebar.blade.php', role: role.key }, { clip: { x: 0, y: 0, width: sidebarWidth, height: VIEWPORT.height } });
+
+      if (openedGroup) {
+        await ordersGroup.click();
+        await page.waitForTimeout(200);
+      }
+
       await shot(page, '11-topbar', { section: 'Bagian II — Topbar', route: 'partials/topbar.blade.php', role: role.key }, { clip: { x: sidebarWidth, y: 0, width: VIEWPORT.width - sidebarWidth, height: 64 } });
 
       // Global search (Ctrl+K) with live results.
@@ -174,19 +259,17 @@ await login(page, 'admin@sekolah.test');
 
 const ADMIN = { role: 'admin' };
 
-// C1. Master data — all 13 indexes
+// C1. Master data — every resource currently registered in the sidebar.
 const MASTER = [
   ['schools', '30-master-schools'],
   ['publishers', '32-master-publishers'],
   ['categories', '34-master-categories'],
   ['books', '36-master-books'],
   ['barang-lainnya', '38-master-goods'],
-  ['warehouses', '40-master-warehouses'],
   ['order-sources', '42-master-order-sources'],
   ['couriers', '44-master-couriers'],
   ['shipping-methods', '46-master-shipping-methods'],
   ['payment-methods', '48-master-payment-methods'],
-  ['rebate-rules', '50-master-rebate-rules'],
   ['settings', '52-master-settings'],
   ['cash-loans', '54-master-cash-loans'],
 ];
@@ -211,16 +294,39 @@ for (const [resource, file] of FORMS) {
   await shot(page, file, { section: 'Bagian IV — Master Data', route: `GET /master/${resource}/create`, ...ADMIN });
 }
 
-// C2b. Delete blocked because the record is referenced (publisher 1 has books; FK RESTRICT).
+// C2b. Delete blocked because the record is referenced (publisher that still
+// has books; the FK is RESTRICT). Never hard-code the publisher id — pick the
+// publisher of the first book, so a reseed or an extra publisher cannot turn
+// this into a real deletion.
 try {
-  await go(page, '/master/publishers');
-  await page.evaluate(() => {
-    const form = [...document.querySelectorAll('form')].find((f) => /\/master\/publishers\/1$/.test(f.getAttribute('action') || ''));
-    if (form) form.submit();
+  await go(page, '/master/books');
+  const publisherName = await page.evaluate(() => {
+    const names = [...document.querySelectorAll('table tbody tr')]
+      .map((row) => (row.cells[2]?.textContent || '').trim())
+      .filter(Boolean);
+    return names[0] || null;
   });
+  if (!publisherName) throw new Error('Tidak ada penerbit pada daftar buku.');
+
+  await go(page, '/master/publishers');
+  const deleteAction = await page.evaluate((name) => {
+    const row = [...document.querySelectorAll('table tbody tr')]
+      .find((tr) => (tr.textContent || '').includes(name));
+    if (!row) return null;
+    const form = row.querySelector('form[action*="/master/publishers/"]');
+    if (!form) return null;
+    const action = form.getAttribute('action') || '';
+    form.submit();
+    return action.replace(/^https?:\/\/[^/]+/, '');
+  }, publisherName);
+  if (!deleteAction) throw new Error(`Baris penerbit "${publisherName}" tidak ditemukan.`);
+
   await page.waitForLoadState('networkidle').catch(() => {});
   await page.waitForTimeout(500);
-  await shot(page, '57-master-delete-error', { section: 'Bagian IV, VII — Master Data', route: 'DELETE /master/publishers/1', ...ADMIN }, { full: false });
+  const rejected = (await page.locator('body').innerText()).includes('tidak dapat dihapus');
+  if (!rejected) throw new Error('Pesan penolakan penghapusan tidak muncul.');
+
+  await shot(page, '57-master-delete-error', { section: 'Bagian IV, VII — Master Data', route: `DELETE ${deleteAction}`, ...ADMIN }, { full: false });
 } catch (error) {
   failures.push({ file: '57-master-delete-error.png', reason: error.message });
 }
@@ -256,14 +362,33 @@ try {
   failures.push({ file: '64-orders-validation.png', reason: error.message });
 }
 
-await go(page, '/orders/1');
-await shot(page, '65-orders-show', { section: 'Bagian IV — Pesanan', route: 'GET /orders/{order}', ...ADMIN });
+try {
+  const orderShow = await gotoRecord(page, '/orders', 'orders');
+  await shot(page, '65-orders-show', { section: 'Bagian IV — Pesanan', route: 'GET /orders/{order}', ...ADMIN });
+  await go(page, `${orderShow.replace(/\/$/, '')}/print`);
+  await shot(page, '69-orders-print', { section: 'Bagian V — Dokumen cetak', route: 'GET /orders/{order}/print', ...ADMIN });
+  await go(page, `${orderShow.replace(/\/$/, '')}/print-surat`);
+  await shot(page, '69b-orders-print-surat', { section: 'Bagian V — Dokumen cetak', route: 'GET /orders/{order}/print-surat', ...ADMIN });
+} catch (error) {
+  failures.push({ file: '65-orders-show.png', reason: error.message });
+}
 
-await go(page, '/orders/9');
-await shot(page, '66-orders-show-shipped', { section: 'Bagian IV — Pesanan', route: 'GET /orders/{order}', ...ADMIN });
-
-await go(page, '/orders/1/print');
-await shot(page, '69-orders-print', { section: 'Bagian V — Dokumen cetak', route: 'GET /orders/{order}/print', ...ADMIN });
+try {
+  await go(page, '/orders?status=fully_shipped');
+  const shipped = await page.evaluate(() => {
+    const link = [...document.querySelectorAll('a[href]')]
+      .find((anchor) => /\/orders\/\d+$/.test(anchor.getAttribute('href') || ''));
+    return link ? link.getAttribute('href').replace(/^https?:\/\/[^/]+/, '') : null;
+  });
+  if (shipped) {
+    await go(page, shipped);
+    await shot(page, '66-orders-show-shipped', { section: 'Bagian IV — Pesanan', route: 'GET /orders/{order}', ...ADMIN });
+  } else {
+    failures.push({ file: '66-orders-show-shipped.png', reason: 'Tidak ada pesanan berstatus terkirim penuh pada data demo.' });
+  }
+} catch (error) {
+  failures.push({ file: '66-orders-show-shipped.png', reason: error.message });
+}
 
 // C4. Goods receipts
 await go(page, '/receipts');
@@ -272,46 +397,97 @@ await shot(page, '70-receipts-index', { section: 'Bagian IV — Penerimaan Baran
 await go(page, '/receipts/create');
 await shot(page, '71-receipts-create', { section: 'Bagian IV — Penerimaan Barang', route: 'GET /receipts/create', ...ADMIN });
 
-await go(page, '/receipts/5');
-await shot(page, '72-receipts-show', { section: 'Bagian IV — Penerimaan Barang', route: 'GET /receipts/{receipt}', ...ADMIN });
-
-await go(page, '/receipts/6');
-await shot(page, '72b-receipts-show-draft', { section: 'Bagian IV — Penerimaan Barang', route: 'GET /receipts/{receipt}', ...ADMIN });
-
-// C5. Stock
-await go(page, '/stock');
-await shot(page, '80-stock-index', { section: 'Bagian IV — Stok', route: 'GET /stock', ...ADMIN });
-
-await openModal(page, 'adjust-stock');
-await shot(page, '81-stock-adjust', { section: 'Bagian IV — Stok', route: 'POST /stock/adjust', ...ADMIN }, { full: false });
-
-// Negative stock guard: product 3 has 386 units in warehouse 3.
 try {
-  await page.selectOption('select[name=product_id]', '3');
-  await page.selectOption('select[name=warehouse_id]', { index: 0 });
-  await page.fill('input[name=quantity]', '-100000');
-  await page.fill('input[name=reason]', 'Contoh penyesuaian keliru');
-  await page.click('form[action$="/stock/adjust"] button[type=submit]');
-  await page.waitForLoadState('networkidle').catch(() => {});
-  await page.waitForTimeout(500);
-  await openModal(page, 'adjust-stock');
-  await shot(page, '82-stock-adjust-error', { section: 'Bagian IV, VII — Stok', route: 'POST /stock/adjust', ...ADMIN }, { full: false });
+  const confirmedReceipt = await findRecordByText(page, '/receipts', 'receipts', 'Dikonfirmasi');
+  if (!confirmedReceipt) throw new Error('Tidak ada penerimaan berstatus Dikonfirmasi pada data demo.');
+  await go(page, confirmedReceipt);
+  await shot(page, '72-receipts-show', { section: 'Bagian IV — Penerimaan Barang', route: 'GET /receipts/{receipt}', ...ADMIN });
+
+  const draftReceipt = await findRecordByText(page, '/receipts', 'receipts', 'Draft');
+  if (!draftReceipt) throw new Error('Tidak ada penerimaan berstatus Draft pada data demo.');
+  await go(page, draftReceipt);
+  await shot(page, '72b-receipts-show-draft', { section: 'Bagian IV — Penerimaan Barang', route: 'GET /receipts/{receipt}', ...ADMIN });
 } catch (error) {
-  failures.push({ file: '82-stock-adjust-error.png', reason: error.message });
+  failures.push({ file: '72-receipts-show.png', reason: error.message });
 }
 
-await go(page, '/stock/movements');
-await shot(page, '83-stock-movements', { section: 'Bagian IV — Stok', route: 'GET /stock/movements', ...ADMIN });
+// C5. Stock
+await go(page, '/stock-summary');
+await shot(page, '80-stock-summary', { section: 'Bagian IV — Stok', route: 'GET /stock-summary', ...ADMIN });
+
+await go(page, '/stock-mutations');
+await shot(page, '81-stock-mutations', { section: 'Bagian IV — Stok', route: 'GET /stock-mutations', ...ADMIN });
+
+try {
+  const mutationPrint = await page.evaluate(() => {
+    const link = [...document.querySelectorAll('a[href]')]
+      .find((anchor) => /\/stock-mutations\/\d+\/print$/.test(anchor.getAttribute('href') || ''));
+    return link ? link.getAttribute('href').replace(/^https?:\/\/[^/]+/, '') : null;
+  });
+  if (mutationPrint) {
+    await go(page, mutationPrint);
+    await shot(page, '82-stock-mutation-print', { section: 'Bagian IV/V — Stok', route: 'GET /stock-mutations/{mutation}/print', ...ADMIN });
+  } else {
+    failures.push({ file: '82-stock-mutation-print.png', reason: 'Tidak ada mutasi stok untuk dicetak pada data demo.' });
+  }
+} catch (error) {
+  failures.push({ file: '82-stock-mutation-print.png', reason: error.message });
+}
 
 // C6. Picking & packing
 await go(page, '/pickings');
 await shot(page, '90-pickings-index', { section: 'Bagian IV — Picking', route: 'GET /pickings', ...ADMIN });
 
-await go(page, '/pickings/1');
-await shot(page, '91-pickings-show-draft', { section: 'Bagian IV — Picking', route: 'GET /pickings/{picking}', ...ADMIN });
+try {
+  await go(page, '/pickings?status=draft');
+  const draftPicking = await page.evaluate(() => {
+    const link = [...document.querySelectorAll('a[href]')]
+      .find((anchor) => /\/pickings\/\d+$/.test(anchor.getAttribute('href') || ''));
+    return link ? link.getAttribute('href').replace(/^https?:\/\/[^/]+/, '') : null;
+  });
+  if (draftPicking) {
+    await go(page, draftPicking);
+    await shot(page, '91-pickings-show-draft', { section: 'Bagian IV — Picking', route: 'GET /pickings/{picking}', ...ADMIN });
+  } else {
+    failures.push({ file: '91-pickings-show-draft.png', reason: 'Tidak ada picking berstatus draft pada data demo.' });
+  }
 
-await go(page, '/pickings/2');
-await shot(page, '92-pickings-show-picked', { section: 'Bagian IV — Picking', route: 'GET /pickings/{picking}', ...ADMIN });
+  await go(page, '/pickings?status=picked');
+  const pickedPicking = await page.evaluate(() => {
+    const link = [...document.querySelectorAll('a[href]')]
+      .find((anchor) => /\/pickings\/\d+$/.test(anchor.getAttribute('href') || ''));
+    return link ? link.getAttribute('href').replace(/^https?:\/\/[^/]+/, '') : null;
+  });
+  if (pickedPicking) {
+    await go(page, pickedPicking);
+    await shot(page, '92-pickings-show-picked', { section: 'Bagian IV — Picking', route: 'GET /pickings/{picking}', ...ADMIN });
+  } else {
+    failures.push({ file: '92-pickings-show-picked.png', reason: 'Tidak ada picking berstatus picked pada data demo.' });
+  }
+} catch (error) {
+  failures.push({ file: '91-pickings-show-draft.png', reason: error.message });
+}
+
+// C6b. Back orders (Pengadaan)
+await go(page, '/backorders');
+await shot(page, '85-backorders-index', { section: 'Bagian IV — Pengadaan', route: 'GET /backorders', ...ADMIN });
+
+await go(page, '/backorders/unavailable');
+await shot(page, '86-backorders-unavailable', { section: 'Bagian IV — Pengadaan', route: 'GET /backorders/unavailable', ...ADMIN });
+
+try {
+  const backorderOrder = await findRecord(page, '/backorders', 'backorders/orders');
+  if (backorderOrder) {
+    await go(page, backorderOrder);
+    await shot(page, '87-backorders-order', { section: 'Bagian IV — Pengadaan', route: 'GET /backorders/orders/{backorderOrder}', ...ADMIN });
+    await go(page, `${backorderOrder.replace(/\/$/, '')}/print`);
+    await shot(page, '88-backorders-print', { section: 'Bagian IV/V — Pengadaan', route: 'GET /backorders/orders/{backorderOrder}/print', ...ADMIN });
+  } else {
+    failures.push({ file: '87-backorders-order.png', reason: 'Belum ada pesanan ke penerbit pada data demo.' });
+  }
+} catch (error) {
+  failures.push({ file: '87-backorders-order.png', reason: error.message });
+}
 
 // C7. Shipments
 await go(page, '/shipments');
@@ -326,39 +502,90 @@ try {
   await page.waitForLoadState('networkidle').catch(() => {});
   await page.waitForTimeout(400);
   await shot(page, '102-shipments-create-2', { section: 'Bagian IV — Pengiriman', route: 'GET /shipments/create?order_id=', ...ADMIN });
+
+  // Filled example of the same step (nothing is submitted). The form is
+  // intentionally completed so this figure differs from the blank step above.
+  const courier = page.locator('select[name=courier_id]');
+  const method = page.locator('select[name=shipping_method_id]');
+  for (const select of [courier, method]) {
+    if (await select.count()) {
+      const value = await select.locator('option').nth(1).getAttribute('value');
+      if (value) await select.selectOption(value);
+    }
+  }
+
+  const fill = async (selector, value) => {
+    const field = page.locator(selector);
+    if (await field.count()) await field.fill(value);
+  };
+  await fill('input[name=tracking_number]', 'JNE-2026-001234');
+  await fill('input[name=recipient_name]', 'Petugas Sekolah');
+  await fill('input[name=address]', 'Jl. Pendidikan No. 1, Makassar');
+  await fill('textarea[name=notes]', 'Dikirim pagi, mohon diterima petugas sekolah.');
+
+  // Send only half of the first line to show a partial shipment example.
+  const firstQty = page.locator('input[name^="items["][name$="[quantity]"]').first();
+  if (await firstQty.count()) {
+    const max = Number(await firstQty.getAttribute('max'));
+    if (Number.isFinite(max) && max > 1) await firstQty.fill(String(Math.max(1, Math.floor(max / 2))));
+  }
+
+  await shot(page, '102b-shipments-create-2-filled', { section: 'Bagian IV — Pengiriman', route: 'GET /shipments/create?order_id=', ...ADMIN });
 } catch (error) {
   failures.push({ file: '102-shipments-create-2.png', reason: error.message });
 }
 
-await go(page, '/shipments/1');
-await shot(page, '103-shipments-show', { section: 'Bagian IV — Pengiriman', route: 'GET /shipments/{shipment}', ...ADMIN });
-
-// Mandatory proof-photo confirm form (only present while a shipment is unconfirmed).
+let shipmentShow = null;
 try {
-  const confirmForm = page.locator('form[action$="/confirm"]').first();
-  if (await confirmForm.count()) {
-    await confirmForm.screenshot({ path: join(OUT, '104-shipments-confirm-form.png') });
-    record('104-shipments-confirm-form', { section: 'Bagian IV — Pengiriman', route: 'POST /shipments/{shipment}/confirm', ...ADMIN });
-    console.log('  ok   104-shipments-confirm-form');
-  } else {
-    failures.push({ file: '104-shipments-confirm-form.png', reason: 'Tidak ada pengiriman yang belum dikonfirmasi pada data demo (confirmed_at terisi untuk semua baris).' });
-  }
+  const shipped = await findRecord(page, '/shipments?status=shipped', 'shipments');
+  if (!shipped) throw new Error('Tidak ada pengiriman berstatus Terkirim pada data demo.');
+  await go(page, shipped);
+  shipmentShow = shipped;
+  await shot(page, '103-shipments-show', { section: 'Bagian IV — Pengiriman', route: 'GET /shipments/{shipment}', ...ADMIN });
 } catch (error) {
-  failures.push({ file: '104-shipments-confirm-form.png', reason: error.message });
+  failures.push({ file: '103-shipments-show.png', reason: error.message });
 }
 
-await go(page, '/shipments/1/print');
-await shot(page, '105-shipments-print', { section: 'Bagian IV/V — Dokumen cetak', route: 'GET /shipments/{shipment}/print', ...ADMIN });
+// Draft detail plus the mandatory proof-photo confirm form.
+let draftShipmentCaptured = false;
+try {
+  const draftShipment = await findRecord(page, '/shipments?status=draft', 'shipments');
+  if (!draftShipment) throw new Error('Tidak ada pengiriman berstatus Draft pada data demo.');
+  await go(page, draftShipment);
+  await shot(page, '103b-shipments-show-unconfirmed', { section: 'Bagian IV — Pengiriman', route: 'GET /shipments/{shipment}', ...ADMIN });
+
+  const confirmForm = page.locator('form[action$="/confirm"]').first();
+  if (await confirmForm.count()) {
+    const band = await confirmBandBox(page);
+    if (!band) throw new Error('Bilah judul pengiriman tidak dapat diukur.');
+    await page.screenshot({ path: join(OUT, '104-shipments-confirm-form.png'), clip: band });
+    record('104-shipments-confirm-form', { section: 'Bagian IV — Pengiriman', route: 'POST /shipments/{shipment}/confirm', ...ADMIN });
+    console.log('  ok   104-shipments-confirm-form');
+    draftShipmentCaptured = true;
+  } else {
+    failures.push({ file: '104-shipments-confirm-form.png', reason: 'Pengiriman draft tidak menampilkan form konfirmasi.' });
+  }
+} catch (error) {
+  failures.push({ file: '103b-shipments-show-unconfirmed.png', reason: error.message });
+}
+
+if (shipmentShow) {
+  await go(page, `${shipmentShow.replace(/\/$/, '')}/print`);
+  await shot(page, '105-shipments-print', { section: 'Bagian IV/V — Dokumen cetak', route: 'GET /shipments/{shipment}/print', ...ADMIN });
+}
 
 // C8. Invoices
 await go(page, '/invoices');
 await shot(page, '110-invoices-index', { section: 'Bagian IV — Invoice', route: 'GET /invoices', ...ADMIN });
 
-await go(page, '/invoices/1');
-await shot(page, '111-invoices-show', { section: 'Bagian IV — Invoice', route: 'GET /invoices/{invoice}', ...ADMIN });
-
-await go(page, '/invoices/1/print');
-await shot(page, '112-invoices-print', { section: 'Bagian IV/VI — Dokumen cetak', route: 'GET /invoices/{invoice}/print', ...ADMIN });
+try {
+  const invoiceShow = await gotoRecord(page, '/invoices', 'invoices');
+  await shot(page, '111-invoices-show', { section: 'Bagian IV — Invoice', route: 'GET /invoices/{invoice}', ...ADMIN });
+  await go(page, `${invoiceShow.replace(/\/$/, '')}/print`);
+  await shot(page, '112-invoices-print', { section: 'Bagian IV/VI — Dokumen cetak', route: 'GET /invoices/{invoice}/print', ...ADMIN });
+} catch (error) {
+  failures.push({ file: '111-invoices-show.png', reason: error.message });
+}
 
 // C9. Receivables / hutang
 await go(page, '/receivables');
@@ -374,31 +601,38 @@ await shot(page, '130-payments-index', { section: 'Bagian IV — Pembayaran', ro
 await openModal(page, 'record-payment');
 await shot(page, '131-payments-record', { section: 'Bagian IV — Pembayaran', route: 'POST /payments', ...ADMIN }, { full: false });
 
-// C11. Rebates
-await go(page, '/rebates');
-await shot(page, '140-rebates-index', { section: 'Bagian IV — Rebate', route: 'GET /rebates', ...ADMIN });
-
-await openModal(page, 'request-rebate');
-await shot(page, '141-rebates-request', { section: 'Bagian IV — Rebate', route: 'POST /rebates', ...ADMIN }, { full: false });
-
-// Inline row actions (Setujui / Tolak / Bayar) live in the right-hand column.
 try {
-  const table = page.locator('table').first();
-  const box = await table.boundingBox();
-  if (box) {
-    const width = 280;
-    await page.screenshot({
-      path: join(OUT, '142-rebates-actions.png'),
-      clip: { x: Math.max(0, box.x + box.width - width), y: box.y, width, height: Math.min(box.height, VIEWPORT.height - Math.max(0, box.y)) },
-    });
-    record('142-rebates-actions', { section: 'Bagian IV — Rebate', route: 'finance/rebates/partials/actions.blade.php', ...ADMIN });
-    console.log('  ok   142-rebates-actions');
+  const editHref = await page.evaluate(() => {
+    const link = [...document.querySelectorAll('a[href*="/payments/"]')]
+      .find((anchor) => /\/payments\/\d+\/edit$/.test(anchor.getAttribute('href') || ''));
+    return link ? link.getAttribute('href').replace(/^https?:\/\/[^/]+/, '') : null;
+  });
+  if (editHref) {
+    await go(page, editHref);
+    await shot(page, '132-payments-edit', { section: 'Bagian IV — Pembayaran', route: 'GET /payments/{payment}/edit', ...ADMIN });
   } else {
-    throw new Error('tabel rebate tidak ditemukan');
+    failures.push({ file: '132-payments-edit.png', reason: 'Tidak ada pembayaran draft untuk diubah pada data demo.' });
+  }
+
+  await go(page, '/payments');
+  const receiptHref = await page.evaluate(() => {
+    const link = [...document.querySelectorAll('a[href*="/receipt"]')]
+      .find((anchor) => /\/payments\/\d+\/allocations\/\d+\/receipt$/.test(anchor.getAttribute('href') || ''));
+    return link ? link.getAttribute('href').replace(/^https?:\/\/[^/]+/, '') : null;
+  });
+  if (receiptHref) {
+    await go(page, receiptHref);
+    await shot(page, '133-payments-receipt', { section: 'Bagian IV/V — Pembayaran', route: 'GET /payments/{payment}/allocations/{allocation}/receipt', ...ADMIN });
+  } else {
+    failures.push({ file: '133-payments-receipt.png', reason: 'Tidak ada kwitansi pembayaran pada data demo.' });
   }
 } catch (error) {
-  failures.push({ file: '142-rebates-actions.png', reason: error.message });
+  failures.push({ file: '132-payments-edit.png', reason: error.message });
 }
+
+// C11. Rebates — a recap of the automatic school rebate, no manual approval.
+await go(page, '/rebates');
+await shot(page, '140-rebates-index', { section: 'Bagian IV — Rebate', route: 'GET /rebates', ...ADMIN });
 
 // C12. Reports
 await go(page, '/reports');
@@ -411,8 +645,6 @@ const REPORTS = [
   ['order_summary', '153-reports-orders-summary'],
   ['receivables', '154-reports-receivables'],
   ['overdue_invoices', '155-reports-overdue'],
-  ['stock', '156-reports-stock'],
-  ['low_stock', '157-reports-low-stock'],
   ['backorders', '158-reports-backorders'],
 ];
 
@@ -445,21 +677,51 @@ try {
 await go(page, '/settings/audit');
 await shot(page, '165-settings-audit', { section: 'Bagian IV/VIII — Audit Log', route: 'GET /settings/audit', ...ADMIN });
 
+await go(page, '/settings/overtimes');
+await shot(page, '167-settings-overtimes', { section: 'Bagian IV — Pengaturan', route: 'GET /settings/overtimes', ...ADMIN });
+
 await go(page, '/integrations');
 await shot(page, '166-integrations', { section: 'Bagian IV — Integrasi', route: 'GET /integrations', ...ADMIN });
+
+// C14. Catalog
+await go(page, '/catalogs');
+await shot(page, '170-catalogs-index', { section: 'Bagian IV — Katalog', route: 'GET /catalogs', ...ADMIN });
+
+await go(page, '/catalogs/create');
+await shot(page, '171-catalogs-create', { section: 'Bagian IV — Katalog', route: 'GET /catalogs/create', ...ADMIN });
+
+try {
+  await go(page, '/catalogs');
+  const catalogEdit = await page.evaluate(() => {
+    const link = [...document.querySelectorAll('a[href]')]
+      .find((anchor) => /\/catalogs\/\d+\/edit$/.test(anchor.getAttribute('href') || ''));
+    return link ? link.getAttribute('href').replace(/^https?:\/\/[^/]+/, '') : null;
+  });
+  if (catalogEdit) {
+    await go(page, catalogEdit);
+    await shot(page, '172-catalogs-edit', { section: 'Bagian IV — Katalog', route: 'GET /catalogs/{catalog}/edit', ...ADMIN });
+  } else {
+    failures.push({ file: '172-catalogs-edit.png', reason: 'Tidak ada katalog pada data demo.' });
+  }
+} catch (error) {
+  failures.push({ file: '172-catalogs-edit.png', reason: error.message });
+}
 
 // Delete blocked — admin cannot delete their own account (403, non-destructive).
 try {
   await go(page, '/settings/users');
-  const blocked = await page.evaluate(async () => {
-    const form = [...document.querySelectorAll('form')].find((f) => /\/settings\/users\/1$/.test(f.getAttribute('action') || ''));
+  const blocked = await page.evaluate(() => {
+    const row = [...document.querySelectorAll('table tbody tr')]
+      .find((tr) => (tr.textContent || '').includes('admin@sekolah.test'));
+    if (!row) return false;
+    const form = row.querySelector('form[action*="/settings/users/"]');
     if (!form) return false;
     form.submit();
     return true;
   });
   await page.waitForLoadState('networkidle').catch(() => {});
   await page.waitForTimeout(400);
-  if (blocked) await shot(page, '57b-user-delete-blocked', { section: 'Bagian IV, VII — Pengaturan', route: 'DELETE /settings/users/1', ...ADMIN }, { full: false });
+  if (blocked) await shot(page, '57b-user-delete-blocked', { section: 'Bagian IV, VII — Pengaturan', route: 'DELETE /settings/users/{user}', ...ADMIN }, { full: false });
 } catch (error) {
   failures.push({ file: '57b-user-delete-blocked.png', reason: error.message });
 }
@@ -472,15 +734,15 @@ const mutations = [];
 
 if (process.env.CAPTURE_MUTATIONS === '1') {
   try {
-    // Prefer an unconfirmed shipment that already exists so re-runs stay
-    // idempotent; only create one when the demo data has none.
+    // Prefer a draft shipment that already exists so re-runs stay idempotent;
+    // only create one when the demo data has none. 103b/104 were already
+    // captured above when a draft existed.
     let target = null;
     await go(page, '/shipments?status=draft');
     const existing = page.locator('table tbody tr a[href*="/shipments/"]').first();
     if (await existing.count()) {
       // Hrefs may be absolute (app URL); reduce to a path before navigating.
       target = (await existing.getAttribute('href')).replace(/^https?:\/\/[^/]+/, '');
-      mutations.push(`Memakai pengiriman yang belum dikonfirmasi: ${target}`);
     }
 
     if (!target) {
@@ -493,7 +755,6 @@ if (process.env.CAPTURE_MUTATIONS === '1') {
         await page.click('button[type=submit]:has-text("Lanjutkan")');
         await page.waitForLoadState('networkidle').catch(() => {});
         await page.waitForTimeout(400);
-        await shot(page, '102b-shipments-create-2-filled', { section: 'Bagian IV — Pengiriman', route: 'GET /shipments/create?order_id=', ...ADMIN });
 
         const submit = page.locator('button[type=submit]:has-text("Simpan Pengiriman")');
         if ((await submit.count()) && (await submit.isEnabled())) {
@@ -505,16 +766,20 @@ if (process.env.CAPTURE_MUTATIONS === '1') {
       }
     }
 
-    if (target) {
+    if (target && !draftShipmentCaptured) {
       await go(page, target);
       await shot(page, '103b-shipments-show-unconfirmed', { section: 'Bagian IV — Pengiriman', route: 'GET /shipments/{shipment}', ...ADMIN });
 
       const confirmForm = page.locator('form[action$="/confirm"]').first();
       if (await confirmForm.count()) {
-        // Page-header band: title + mandatory proof-photo input + Konfirmasi Kirim.
-        await page.screenshot({ path: join(OUT, '104-shipments-confirm-form.png'), clip: { x: 0, y: 0, width: VIEWPORT.width, height: 210 } });
-        record('104-shipments-confirm-form', { section: 'Bagian IV — Pengiriman', route: 'POST /shipments/{shipment}/confirm', ...ADMIN });
-        console.log('  ok   104-shipments-confirm-form');
+        const band = await confirmBandBox(page);
+        if (band) {
+          await page.screenshot({ path: join(OUT, '104-shipments-confirm-form.png'), clip: band });
+          record('104-shipments-confirm-form', { section: 'Bagian IV — Pengiriman', route: 'POST /shipments/{shipment}/confirm', ...ADMIN });
+          console.log('  ok   104-shipments-confirm-form');
+        } else {
+          failures.push({ file: '104-shipments-confirm-form.png', reason: 'Bilah judul pengiriman tidak dapat diukur.' });
+        }
       } else {
         failures.push({ file: '104-shipments-confirm-form.png', reason: 'Pengiriman tidak menampilkan form konfirmasi (sudah dikonfirmasi).' });
       }
@@ -526,7 +791,15 @@ if (process.env.CAPTURE_MUTATIONS === '1') {
 
   writeFileSync(
     join(OUT, 'mutations.md'),
-    ['# Mutasi Data Demo saat Penangkapan Gambar', '', ...mutations.map((m) => `- ${m}`), '', 'Pulihkan dengan: `php artisan db:seed --class=DemoDataResetSeeder`', ''].join('\n'),
+    [
+      '# Mutasi Data Demo saat Penangkapan Gambar',
+      '',
+      ...(mutations.length
+        ? mutations.map((m) => `- ${m}`)
+        : ['- Tidak ada perubahan data: seluruh tangkapan layar memakai data demo yang sudah ada.']),
+      '',
+      ...(mutations.length ? ['Pulihkan dengan: `php artisan db:seed --class=DemoDataResetSeeder`', ''] : ['']),
+    ].join('\n'),
   );
 }
 
@@ -534,7 +807,14 @@ await client.close();
 await browser.close();
 
 // ─────────────────────────────────────────────────────────────── Inventory
-const now = new Date().toISOString().slice(0, 10);
+// Inventory date uses the local calendar day (the capture runs during the
+// workday in Asia/Makassar), not the UTC day, so it matches the QA report.
+const today = new Date();
+const now = [
+  today.getFullYear(),
+  String(today.getMonth() + 1).padStart(2, '0'),
+  String(today.getDate()).padStart(2, '0'),
+].join('-');
 const lines = [
   '# Inventaris Screenshot — ARKARA PM',
   '',

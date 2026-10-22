@@ -141,20 +141,27 @@
 <h2 id="sec-masalah-stok">8.5 Masalah Stok</h2>
 
 <figure class="fig" id="fig-trouble-stock">
-  <img src="../screens/82-stock-adjust-error.png" alt="Penolakan penyesuaian stok">
-  <figcaption>Penyesuaian stok ditolak karena akan membuat stok menjadi negatif.</figcaption>
+  <img src="../screens/80-stock-summary.png" alt="Rangkuman stok dengan sisa minus">
+  <figcaption>
+    Sisa stok dihitung dari barang masuk, barang keluar, dan mutasi. Baris
+    dengan sisa nol atau minus ditandai merah.
+  </figcaption>
 </figure>
 
 <table>
-  <thead><tr><th style="width:46%">Pesan yang muncul</th><th>Arti &amp; tindakan</th></tr></thead>
+  <thead><tr><th style="width:46%">Yang Anda lihat</th><th>Arti &amp; tindakan</th></tr></thead>
   <tbody>
     <tr>
-      <td><em>Penyesuaian akan membuat stok fisik menjadi negatif.</em></td>
-      <td>Angka pengurangan melebihi stok yang ada. Periksa jumlahnya; mungkin ada kelebihan angka nol, atau barang yang dipilih berbeda.</td>
+      <td><em>Sisa stok minus pada Rangkuman Stok.</em></td>
+      <td>Barang keluar atau mutasi melebihi barang masuk. Periksa penerimaan yang belum dikonfirmasi, pengiriman yang tercatat, dan mutasi yang salah jumlah.</td>
     </tr>
     <tr>
-      <td><em>Jumlah penyesuaian tidak boleh nol.</em></td>
-      <td>Isi angka selain nol, positif maupun negatif.</td>
+      <td><em>Stok tidak bertambah setelah penerimaan disimpan.</em></td>
+      <td>Penerimaan berstatus Draft belum menambah stok. Buka dokumennya dan klik <strong>Konfirmasi</strong>.</td>
+    </tr>
+    <tr>
+      <td><em>Mutasi tidak dapat diubah atau dihapus.</em></td>
+      <td>Riwayat mutasi bersifat tetap. Buat catatan pembetulan sesuai kebijakan internal, bukan mengubah baris lama.</td>
     </tr>
     <tr>
       <td><em>Penerimaan barang ini sudah dikonfirmasi sebelumnya.</em></td>
@@ -168,12 +175,14 @@
 </table>
 
 <div class="kotak penting">
-  <span class="judul-kotak">&ldquo;Tersedia&rdquo; nol, tetapi &ldquo;Fisik&rdquo; ada</span>
+  <span class="judul-kotak">&ldquo;Sisa Stok&rdquo; masih ada, tetapi pesanan tetap back order</span>
   <p>
-    Ini bukan kerusakan. Semua barang fisik sudah dijanjikan ke pesanan lain,
-    sehingga tidak ada yang tersisa untuk dijual. Lihat kolom <em>Reservasi</em>
-    untuk memastikan. Solusinya: tambah stok lewat penerimaan barang, atau
-    selesaikan pengiriman pesanan yang menahan stok tersebut.
+    Ini bukan kerusakan. Angka pada <strong>Rangkuman Stok</strong> adalah selisih
+    barang masuk dan keluar, sedangkan pesanan yang sudah dikonfirmasi memesan
+    stok lebih dulu. Bila pesanan lain sudah memesan barang tersebut, sisa yang
+    terlihat belum tentu bebas untuk pesanan baru. Periksa menu
+    <strong>Back Order &rsaquo; Barang Tidak Tersedia</strong>, lalu tambah stok
+    lewat penerimaan barang atau selesaikan pengiriman yang menahan stok.
   </p>
 </div>
 
@@ -310,32 +319,31 @@
 
 <h2 id="sec-masalah-rebate">8.10 Masalah Rebate</h2>
 
+<p>
+  Rebate tidak lagi memiliki alur pengajuan, persetujuan, atau pembayaran.
+  Nilainya otomatis menjadi diskon pada nota pesanan berdasarkan kolom
+  <strong>Rebate (%)</strong> di data sekolah. Bila rekap terasa tidak sesuai,
+  periksa hal-hal berikut.
+</p>
+
 <table>
-  <thead><tr><th style="width:46%">Pesan yang muncul</th><th>Arti &amp; tindakan</th></tr></thead>
+  <thead><tr><th style="width:46%">Yang Anda lihat</th><th>Arti &amp; tindakan</th></tr></thead>
   <tbody>
     <tr>
-      <td><em>Invoice harus lunas sebelum rebate dapat diajukan.</em></td>
-      <td>Selesaikan pembayaran invoice tersebut sampai lunas, baru ajukan rebate.</td>
+      <td><em>Rekap rebate kosong.</em></td>
+      <td>Tidak ada nota dengan diskon lebih dari nol pada rentang tanggal itu. Periksa apakah sekolah memiliki <strong>Rebate (%)</strong> dan apakah notanya sudah dibuat setelah nilai itu diisi.</td>
     </tr>
     <tr>
-      <td><em>Nilai invoice di bawah minimum aturan rebate.</em></td>
-      <td>Nilai tagihan belum memenuhi minimum yang disyaratkan aturan. Pilih aturan lain, atau ajukan setelah ada tagihan berikutnya.</td>
+      <td><em>Nilai rebate berbeda dari persentase sekolah saat ini.</em></td>
+      <td>Nilai rebate disimpan pada nota saat nota dibuat. Perubahan persentase hanya berlaku untuk nota berikutnya.</td>
     </tr>
     <tr>
-      <td><em>Rebate untuk invoice dan aturan ini sudah pernah diajukan.</em></td>
-      <td>Pengajuan ganda ditolak. Periksa daftar rebate untuk invoice tersebut.</td>
+      <td><em>Tidak ada tombol Ajukan, Setujui, atau Bayar.</em></td>
+      <td>Memang tidak ada. Halaman Rebate / Cashback hanya menampilkan rekap. Untuk mengubah besaran rebate, ubah data sekolah.</td>
     </tr>
     <tr>
-      <td><em>Rebate ini tidak dapat disetujui pada status saat ini.</em></td>
-      <td>Rebate sudah disetujui, ditolak, atau dibayarkan. Lihat kolom Status.</td>
-    </tr>
-    <tr>
-      <td><em>Hanya rebate yang disetujui yang dapat dibayarkan.</em></td>
-      <td>Setujui rebate lebih dulu, baru bayarkan.</td>
-    </tr>
-    <tr>
-      <td><em>Rebate yang sudah dibayarkan tidak dapat ditolak.</em></td>
-      <td>Sudah selesai. Tidak ada langkah lanjutan.</td>
+      <td><em>Diskon pada nota tidak sama dengan total rebate di rekap.</em></td>
+      <td>Diskon nota dapat diubah manual saat pesanan dibuat. Rekap mengikuti nilai diskon yang benar-benar tersimpan pada nota, bukan hanya persentase sekolah.</td>
     </tr>
   </tbody>
 </table>

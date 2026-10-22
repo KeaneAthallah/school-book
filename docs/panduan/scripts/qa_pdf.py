@@ -34,7 +34,7 @@ HEADINGS = [
     "Bab 4. Dashboard dan Data Induk",
     "Bab 5. Transaksi dan Keuangan",
     "Bab 6. Dari Barang Datang sampai Uang Masuk",
-    "Bab 7. Sembilan Laporan",
+    "Bab 7. Tujuh Laporan",
     "Bab 8. Bila Ada yang Tidak Berjalan",
     "Lampiran C. Daftar Izin Lengkap",
 ]

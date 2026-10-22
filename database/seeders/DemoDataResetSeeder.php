@@ -6,6 +6,7 @@ use App\Models\Setting;
 use Illuminate\Console\Command;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 use RuntimeException;
 
 /**
@@ -60,22 +61,44 @@ class DemoDataResetSeeder extends Seeder
         $receiptIds = DB::table('goods_receipts')->whereIn('notes', self::RECEIPT_NOTES)->pluck('id')->all();
         $publisherIds = DB::table('publishers')->where('email', self::PUBLISHER_EMAIL)->pluck('id')->all();
 
+        // Demo orders may point at real schools (the seeder prefers existing
+        // master data), so invoices and payments cannot be found through the
+        // demo-school marker alone. Resolve them through the demo orders too.
+        $invoiceIds = DB::table('invoices')
+            ->whereIn('school_id', $schoolIds)
+            ->orWhereIn('order_id', $orderIds)
+            ->pluck('id')
+            ->all();
+
+        $paymentIds = DB::table('payments')
+            ->whereIn('school_id', $schoolIds)
+            ->orWhere('reference', 'like', 'DEMO-%')
+            ->orWhereIn('id', fn ($query) => $query
+                ->select('payment_id')
+                ->from('payment_allocations')
+                ->whereIn('invoice_id', $invoiceIds))
+            ->pluck('id')
+            ->all();
+
         $deleted = [];
 
-        DB::transaction(function () use ($schoolIds, $productIds, $orderIds, $receiptIds, &$deleted): void {
+        DB::transaction(function () use ($schoolIds, $productIds, $orderIds, $receiptIds, $invoiceIds, $paymentIds, &$deleted): void {
             $step = function (string $table, callable $query) use (&$deleted): void {
+                if (! Schema::hasTable($table)) {
+                    return;
+                }
                 $count = $query()->delete();
                 $deleted[$table] = ($deleted[$table] ?? 0) + $count;
             };
 
             // Financial records first (child -> parent).
-            $step('payment_allocations', fn () => DB::table('payment_allocations')
-                ->whereIn('payment_id', fn ($q) => $q->select('id')->from('payments')->whereIn('school_id', $schoolIds)));
-            $step('payments', fn () => DB::table('payments')->whereIn('school_id', $schoolIds));
-            $step('rebates', fn () => DB::table('rebates')->whereIn('school_id', $schoolIds));
-            $step('invoice_items', fn () => DB::table('invoice_items')
-                ->whereIn('invoice_id', fn ($q) => $q->select('id')->from('invoices')->whereIn('school_id', $schoolIds)));
-            $step('invoices', fn () => DB::table('invoices')->whereIn('school_id', $schoolIds));
+            $step('payment_allocations', fn () => DB::table('payment_allocations')->whereIn('payment_id', $paymentIds));
+            $step('payments', fn () => DB::table('payments')->whereIn('id', $paymentIds));
+            if (Schema::hasTable('rebates')) {
+                $step('rebates', fn () => DB::table('rebates')->whereIn('school_id', $schoolIds));
+            }
+            $step('invoice_items', fn () => DB::table('invoice_items')->whereIn('invoice_id', $invoiceIds));
+            $step('invoices', fn () => DB::table('invoices')->whereIn('id', $invoiceIds));
 
             // Fulfilment.
             $step('shipment_items', fn () => DB::table('shipment_items')

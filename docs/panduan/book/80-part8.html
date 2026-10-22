@@ -31,7 +31,7 @@
   <thead><tr><th style="width:34%">Pemisahan yang sudah dibangun</th><th>Manfaatnya</th></tr></thead>
   <tbody>
     <tr><td>Yang menginput pesanan berbeda dari yang membatalkan</td><td>Mengurangi risiko pesanan dihapus untuk menutupi kekeliruan.</td></tr>
-    <tr><td>Yang mengajukan rebate berbeda dari yang menyetujui</td><td>Mencegah pengajuan dana yang disetujui sendiri.</td></tr>
+    <tr><td>Persentase rebate diubah oleh Admin</td><td>Mencegah perubahan potongan harga sepihak oleh pengguna transaksi.</td></tr>
     <tr><td>Gudang mengurus barang, Keuangan mengurus uang</td><td>Tidak ada satu orang yang menguasai barang sekaligus tagihannya.</td></tr>
     <tr><td>Pembayaran harus diverifikasi terpisah dari pencatatannya</td><td>Angka piutang tidak berubah sebelum uang benar-benar dipastikan masuk.</td></tr>
   </tbody>
@@ -73,10 +73,10 @@
 
 <p>
   Contoh tindakan yang tercatat antara lain: pembuatan pesanan, konfirmasi
-  pesanan, pembatalannya, konfirmasi penerimaan barang, penyesuaian stok,
+  pesanan, pembatalannya, konfirmasi penerimaan barang, mutasi stok,
   pembuatan picking, penyelesaian picking dan packing, pembuatan dan konfirmasi
   pengiriman, penerbitan dan pembatalan invoice, pencatatan/verifikasi/pembalikan
-  pembayaran, serta seluruh tahapan rebate.
+  pembayaran, perubahan persentase rebate sekolah, serta pemesanan back order ke penerbit.
 </p>
 
 <h2 id="sec-aman-praktik">9.5 Sepuluh Kebiasaan Baik</h2>
@@ -85,7 +85,7 @@
   <li>Periksa dashboard pada awal dan akhir hari kerja.</li>
   <li>Konfirmasi pesanan segera setelah divalidasi, agar stok terkunci dan tidak direbut pesanan lain.</li>
   <li>Konfirmasi penerimaan barang pada hari yang sama, agar back order terisi cepat.</li>
-  <li>Isi kolom <em>Alasan</em> pada setiap penyesuaian stok dengan keterangan yang jelas dan jujur.</li>
+  <li>Isi kolom <em>Alasan</em> pada setiap mutasi stok dengan keterangan yang jelas dan jujur.</li>
   <li>Jangan pernah mengakali stok agar sebuah pesanan terlihat siap.</li>
   <li>Verifikasi pembayaran hanya setelah dana dipastikan masuk ke rekening.</li>
   <li>Gunakan penyaring pencarian, jangan menggulir ribuan baris.</li>
@@ -104,7 +104,7 @@
     <tr><td>Menekan tombol penyimpanan berulang kali saat lambat</td><td>Berisiko menggandakan data.</td></tr>
     <tr><td>Mengubah konfigurasi tanpa memahami dampaknya</td><td>Perubahan berlaku menyeluruh dan sulit ditelusuri.</td></tr>
     <tr><td>Membatalkan invoice yang sudah dibayar tanpa membalik pembayarannya</td><td>Aplikasi akan menolak, dan upaya memaksanya merusak keterkaitan data.</td></tr>
-    <tr><td>Membiarkan stok minimum bernilai nol untuk semua barang</td><td>Laporan <em>Stok Menipis</em> tidak akan pernah memberi peringatan.</td></tr>
+    <tr><td>Membiarkan back order menumpuk tanpa ditindaklanjuti</td><td>Sekolah menunggu lebih lama, dan laporan <em>Back Order</em> menjadi daftar tunggu yang tidak pernah selesai.</td></tr>
   </tbody>
 </table>
 
