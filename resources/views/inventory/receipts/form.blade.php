@@ -5,8 +5,15 @@
 @section('content')
     @php
         $editing = isset($receipt);
-        $blank = ['product_id' => '', 'quantity' => 1, 'unit_cost' => ''];
-        $items = $editing ? $receipt['items'] : [$blank];
+        $blank = ['product_id' => '', 'product_label' => '', 'product_search' => '', 'ordered' => '', 'quantity' => 1, 'unit_cost' => ''];
+$backorderMode = ! empty($prefillItems ?? []);
+        if ($editing) {
+            $items = $receipt['items'];
+        } elseif (! empty($prefillItems ?? [])) {
+            $items = $prefillItems;
+        } else {
+            $items = [$blank];
+        }
     @endphp
 
     <x-page-header
@@ -26,11 +33,22 @@
         <x-card>
             <x-card-header title="Informasi" icon="inbox" />
             <div class="grid gap-3 p-4 sm:grid-cols-3">
+                @if (! $editing)
+                    <x-field label="Berdasarkan Back Order (opsional)" class="sm:col-span-3">
+                        <x-select onchange="if (this.value) window.location = '{{ route('receipts.create') }}?backorder_order_id=' + this.value;">
+                            <option value="">— Pilih back order (opsional) —</option>
+                            @foreach ($backorderOrders ?? [] as $bo)
+                                <option value="{{ $bo['value'] }}" @selected(($selectedBackorderId ?? 0) == $bo['value'])>{{ $bo['label'] }}</option>
+                            @endforeach
+                        </x-select>
+                    </x-field>
+                @endif
+
                 <x-field label="Penerbit" name="publisher_id" required>
                     <x-select name="publisher_id" :invalid="$errors->has('publisher_id')">
                         <option value="">— Pilih —</option>
                         @foreach ($publishers as $option)
-                            <option value="{{ $option['value'] }}" @selected(old('publisher_id', $editing ? $receipt['publisher_id'] : '') == $option['value'])>{{ $option['label'] }}</option>
+                            <option value="{{ $option['value'] }}" @selected(old('publisher_id', $editing ? $receipt['publisher_id'] : ($prefillPublisherId ?? '')) == $option['value'])>{{ $option['label'] }}</option>
                         @endforeach
                     </x-select>
                 </x-field>
@@ -48,7 +66,9 @@
         <x-card x-data="lineItems({{ json_encode(['products' => $products, 'items' => $items, 'blank' => $blank, 'priceKey' => 'unit_cost', 'bookPriceKey' => 'cost_price']) }})">
             <x-card-header title="Item" icon="boxes">
                 <x-slot:action>
-                    <x-button type="button" variant="secondary" size="sm" x-on:click="add()">Tambah Item</x-button>
+                    @if (! $backorderMode)
+                        <x-button type="button" variant="secondary" size="sm" x-on:click="add()">Tambah Item</x-button>
+                    @endif
                 </x-slot:action>
             </x-card-header>
 
@@ -58,16 +78,16 @@
                 @enderror
 
                 <template x-for="(item, index) in items" :key="index">
-                    <div class="grid gap-2 rounded-control border border-line p-3 sm:grid-cols-[2fr_1fr_1fr_auto]">
+                    <div class="grid gap-2 rounded-control border border-line p-3 {{ $backorderMode ? 'sm:grid-cols-[2fr_1fr_1fr_1fr_auto]' : 'sm:grid-cols-[2fr_1fr_1fr_auto]' }}">
                         <x-field label="Barang">
                             <div class="relative" x-data>
                                 <input
                                     type="text"
                                     x-model="item.product_search"
-                                    @focus="item.showDropdown = true"
-                                    @input="item.showDropdown = true; item.product_id = ''"
+                                    @if (! $backorderMode) @focus="item.showDropdown = true" @input="item.showDropdown = true; item.product_id = ''" @endif
                                     placeholder="Cari/pilih barang..."
                                     class="w-full rounded-control border border-line-strong bg-panel px-3 py-2 text-sm text-ink outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-100 dark:focus:ring-brand-500/25"
+                                    @if ($backorderMode) disabled @endif
                                 />
                                 <input type="hidden" x-bind:name="`items[${index}][product_id]`" x-model="item.product_id" />
                                 <div
@@ -86,16 +106,30 @@
                             </div>
                         </x-field>
 
-                        <x-field label="Qty">
+@if ($backorderMode)
+                            <x-field label="Jumlah Dipesan">
+                                <x-input type="number" x-model="item.ordered" x-bind:name="`items[${index}][ordered]`" disabled />
+                                <input type="hidden" x-bind:name="`items[${index}][ordered]`" x-model="item.ordered" />
+                            </x-field>
+                        @endif
+
+                        <x-field label="Jumlah Diterima">
                             <x-input type="number" min="1" x-model="item.quantity" x-bind:name="`items[${index}][quantity]`" />
                         </x-field>
 
                         <x-field label="Harga Pokok">
-                            <x-input type="number" step="any" x-model="item.unit_cost" x-bind:name="`items[${index}][unit_cost]`" />
+                            @if ($backorderMode)
+                                <div class="rounded-control border border-line-strong bg-panel px-3 py-2 text-sm text-ink">@{{ item.unit_cost }}</div>
+                                <input type="hidden" x-bind:name="`items[${index}][unit_cost]`" x-model="item.unit_cost" />
+                            @else
+                                <x-input type="number" step="any" x-model="item.unit_cost" x-bind:name="`items[${index}][unit_cost]`" />
+                            @endif
                         </x-field>
 
                         <div class="flex items-end">
-                            <x-button type="button" variant="ghost" size="sm" x-on:click="remove(index)" x-bind:disabled="items.length === 1">Hapus</x-button>
+                            @if (! $backorderMode)
+                                <x-button type="button" variant="ghost" size="sm" x-on:click="remove(index)" x-bind:disabled="items.length === 1">Hapus</x-button>
+                            @endif
                         </div>
                     </div>
                 </template>

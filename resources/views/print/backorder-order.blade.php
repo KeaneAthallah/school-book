@@ -97,7 +97,7 @@
         <div style="text-align: center; width: 220px;">
             <div>Palu, Tgl. ...............</div>
             <div style="margin-top: 8px;">Petugas Pengadaan</div>
-            <div style="margin-top: 60px;">( Nama )</div>
+            <div style="margin-top: 60px;">( .............................. )</div>
         </div>
     </div>
 </body>

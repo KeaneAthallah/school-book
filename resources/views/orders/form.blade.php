@@ -15,7 +15,21 @@
                 'discount_amount' => $item['discount_amount'] ?? '0',
                 'availability_status' => $item['availability_status'] ?? 'available',
             ])->all()
-            : [$blank];
+            : (old('items') ? collect(old('items'))->map(function (array $item) use ($products): array {
+                $label = '';
+                foreach ($products as $p) {
+                    if ((string) $p['value'] === (string) ($item['product_id'] ?? '')) { $label = $p['label']; break; }
+                }
+                return [
+                    'product_id' => (string) ($item['product_id'] ?? ''),
+                    'product_search' => $label,
+                    'quantity' => $item['quantity'] ?? 1,
+                    'unit_price' => $item['unit_price'] ?? '',
+                    'discount_percent' => $item['discount_percent'] ?? '0',
+                    'discount_amount' => $item['discount_amount'] ?? '0',
+                    'availability_status' => $item['availability_status'] ?? 'available',
+                ];
+            })->all() : [$blank]);
     @endphp
 
     <x-page-header

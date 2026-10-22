@@ -33,6 +33,7 @@
             :rows="$payments"
             :columns="[
                 ['key' => 'number', 'label' => 'No. Pembayaran'],
+                ['key' => 'invoice', 'label' => 'Invoice', 'link' => 'invoices.show', 'linkKey' => 'invoice_id'],
                 ['key' => 'payment_date', 'label' => 'Tanggal', 'type' => 'date'],
                 ['key' => 'school', 'label' => 'Sekolah'],
                 ['key' => 'method', 'label' => 'Metode'],

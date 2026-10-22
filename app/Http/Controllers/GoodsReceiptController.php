@@ -2,7 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\BackorderStatus;
 use App\Http\Requests\StoreGoodsReceiptRequest;
+use App\Models\BackorderOrder;
 use App\Models\GoodsReceipt;
 use App\Models\Product;
 use App\Models\Publisher;
@@ -49,7 +51,40 @@ class GoodsReceiptController extends Controller
     {
         abort_unless($this->userCan($request, 'receipts.manage'), 403);
 
-        return view('inventory.receipts.form', $this->formProps());
+        $props = $this->formProps();
+
+        $backorderId = (int) $request->query('backorder_order_id', 0);
+        if ($backorderId > 0) {
+            $bo = BackorderOrder::query()
+                ->with(['items.backorder.product:id,code,title,cost_price', 'publisher:id,name'])
+                ->find($backorderId);
+            if ($bo !== null) {
+                $props['selectedBackorderId'] = $bo->getKey();
+                $props['prefillPublisherId'] = $bo->publisher_id;
+                $props['prefillItems'] = $bo->items->map(fn ($item): array => [
+                                'product_id' => $item->backorder?->product_id,
+                                'product_label' => ($item->backorder?->product?->code ?? '').' - '.($item->backorder?->product?->title ?? ''),
+                                'product_search' => ($item->backorder?->product?->code ?? '').' - '.($item->backorder?->product?->title ?? ''),
+                                'ordered' => $item->quantity,
+                                'quantity' => $item->quantity,
+                                'unit_cost' => $item->backorder?->product?->cost_price,
+                            ])->values()->all();
+            }
+        }
+
+        // pending backorder orders for the selector
+        $props['backorderOrders'] = BackorderOrder::query()
+                ->with(['publisher:id,name', 'items.backorder'])
+                ->whereIn('status', ['pending'])
+                ->orderByDesc('id')
+                ->get(['id', 'number', 'publisher_id', 'status'])
+                ->filter(fn ($o) => ! ($o->items->isNotEmpty() && $o->items->every(fn ($i) => $i->backorder?->status === \App\Enums\BackorderStatus::Fulfilled)))
+                ->map(fn ($o): array => [
+                    'value' => $o->getKey(),
+                    'label' => ($o->number ?? ('BO-'.$o->getKey())).' - '.($o->publisher?->name ?? '-'),
+                ])->values()->all();
+
+        return view('inventory.receipts.form', $props);
     }
 
     public function store(StoreGoodsReceiptRequest $request, GoodsReceiptService $service): RedirectResponse

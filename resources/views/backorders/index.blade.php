@@ -89,6 +89,7 @@
             :columns="[
                 ['key' => 'publisher', 'label' => 'Penerbit'],
                 ['key' => 'number', 'label' => 'No. Pesanan Penerbit'],
+                ['key' => 'ordered_at', 'label' => 'Tanggal'],
                 ['key' => 'status', 'label' => 'Status', 'view' => 'components.status-label'],
                 ['label' => 'Aksi', 'view' => 'backorders.partials.actions'],
             ]"

@@ -101,6 +101,18 @@
         </x-card>
 
         <x-card>
+            <x-card-header title="Jam Kerja Default" icon="clock" />
+            <div class="grid gap-3 p-4 sm:grid-cols-2">
+                <x-field label="Jam Mulai Default" name="work_default_start">
+                    <x-input type="time" name="work_default_start" :value="$value('work_default_start')" :invalid="$errors->has('work_default_start')" />
+                </x-field>
+                <x-field label="Jam Selesai Default" name="work_default_end">
+                    <x-input type="time" name="work_default_end" :value="$value('work_default_end')" :invalid="$errors->has('work_default_end')" />
+                </x-field>
+            </div>
+        </x-card>
+
+        <x-card>
             <x-card-header title="Keuangan" icon="percent" />
             <div class="grid gap-3 p-4 sm:grid-cols-2">
                 <x-field label="Pajak Buku (%)" name="book_tax_rate" hint="Pajak untuk buku">

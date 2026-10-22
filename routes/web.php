@@ -14,6 +14,7 @@ use App\Http\Controllers\MasterDataController;
 use App\Http\Controllers\MasterImportController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\OrderController;
+use App\Http\Controllers\OvertimeController;
 use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\PickingController;
 use App\Http\Controllers\RebateController;
@@ -166,6 +167,9 @@ Route::middleware('auth')->group(function (): void {
     Route::post('settings/users', [UserController::class, 'store'])->name('users.store');
     Route::put('settings/users/{user}', [UserController::class, 'update'])->name('users.update');
     Route::delete('settings/users/{user}', [UserController::class, 'destroy'])->name('users.destroy');
+    Route::get('settings/overtimes', [OvertimeController::class, 'index'])->name('overtimes.index');
+    Route::post('settings/overtimes', [OvertimeController::class, 'store'])->name('overtimes.store');
+    Route::delete('settings/overtimes/{overtime}', [OvertimeController::class, 'destroy'])->name('overtimes.destroy');
     Route::get('settings/roles', [RoleController::class, 'index'])->name('roles.index');
     Route::put('settings/roles/{role}', [RoleController::class, 'update'])->name('roles.update');
     Route::get('settings/audit', [AuditLogController::class, 'index'])->name('audit.index');

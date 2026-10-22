@@ -20,6 +20,7 @@ class BackorderController extends Controller
         abort_unless($this->userCan($request, 'procurement.view'), 403);
 
         $backorders = Backorder::query()
+            ->whereIn('status', [BackorderStatus::Open->value, BackorderStatus::Partial->value])
             ->with(['product:id,title', 'orderItem.order:id,number,school_id,order_date', 'orderItem.order.school:id,name', 'orders.publisher:id,name'])
             ->orderByDesc('id')
             ->paginate(15)
@@ -46,9 +47,13 @@ class BackorderController extends Controller
                 'id' => $order->getKey(),
                 'publisher' => $order->publisher?->name,
                 'number' => $order->number,
-                'status' => $order->status,
-                'status_label' => $order->status === 'received' ? 'Diterima' : 'Menunggu',
-                'ordered_at' => $order->ordered_at !== null ? (string) $order->ordered_at : null,
+                'status' => $order->items->isNotEmpty() && $order->items->every(fn ($i) => $i->backorder?->status === BackorderStatus::Fulfilled)
+                    ? 'received'
+                    : ($order->items->contains(fn ($i) => $i->backorder?->status === BackorderStatus::Fulfilled || $i->backorder?->status === BackorderStatus::Partial) ? 'partial' : $order->status),
+                'status_label' => $order->items->isNotEmpty() && $order->items->every(fn ($i) => $i->backorder?->status === BackorderStatus::Fulfilled)
+                    ? 'Diterima'
+                    : ($order->items->contains(fn ($i) => $i->backorder?->status === BackorderStatus::Fulfilled || $i->backorder?->status === BackorderStatus::Partial) ? 'Sebagian Terpenuhi' : ($order->status === 'received' ? 'Diterima' : 'Menunggu')),
+                'ordered_at' => $order->ordered_at?->format('d/m/Y'),
                 'items_count' => $order->items->count(),
             ]);
 

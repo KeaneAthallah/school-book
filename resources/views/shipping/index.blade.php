@@ -47,7 +47,7 @@
             :columns="[
                 ['key' => 'number', 'label' => 'No. Pengiriman', 'link' => 'shipments.show'],
                 ['key' => 'delivery_note_number', 'label' => 'Surat Jalan'],
-                ['key' => 'order', 'label' => 'Pesanan'],
+                ['key' => 'order', 'label' => 'Pesanan', 'link' => 'orders.show', 'linkKey' => 'order_id'],
                 ['key' => 'school', 'label' => 'Sekolah'],
                 ['key' => 'courier', 'label' => 'Kurir'],
                 ['key' => 'ship_date', 'label' => 'Tgl Kirim', 'type' => 'date'],

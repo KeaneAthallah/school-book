@@ -16,6 +16,7 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withMiddleware(function (Middleware $middleware): void {
         $middleware->web(append: [
             AddLinkHeadersForPreloadedAssets::class,
+            \App\Http\Middleware\EnsureWorkingHours::class,
         ]);
 
         $middleware->alias([

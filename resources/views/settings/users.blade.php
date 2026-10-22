@@ -6,6 +6,7 @@
     <x-page-header title="Pengguna" subtitle="Akun pengguna dan peran yang dimilikinya." icon="users">
         <x-slot:actions>
             @if ($can['manage'])
+                <x-button :href="route('overtimes.index')" variant="secondary">Jam Lembur</x-button>
                 <x-button x-on:click="$dispatch('open-modal', 'create-user')">
                     <x-icon name="plus" class="h-4 w-4" />
                     Tambah Pengguna
@@ -54,6 +55,15 @@
                     <x-input type="password" name="password" :invalid="$errors->has('password')" />
                 </x-field>
 
+                <div class="grid grid-cols-2 gap-2">
+                    <x-field label="Jam Mulai Kerja (opsional)" name="work_start_time">
+                        <x-input type="time" name="work_start_time" value="{{ old('work_start_time') }}" :invalid="$errors->has('work_start_time')" />
+                    </x-field>
+                    <x-field label="Jam Selesai Kerja (opsional)" name="work_end_time">
+                        <x-input type="time" name="work_end_time" value="{{ old('work_end_time') }}" :invalid="$errors->has('work_end_time')" />
+                    </x-field>
+                </div>
+
                 <fieldset>
                     <legend class="text-xs font-medium text-ink-soft">Peran</legend>
                     <div class="mt-1 grid grid-cols-2 gap-2">
@@ -93,6 +103,15 @@
                     <x-field label="Kata Sandi" name="password" hint="Kosongkan bila tidak diubah.">
                         <x-input type="password" name="password" :invalid="$errors->has('password')" />
                     </x-field>
+
+                    <div class="grid grid-cols-2 gap-2">
+                        <x-field label="Jam Mulai Kerja (opsional)" name="work_start_time">
+                            <x-input type="time" name="work_start_time" value="{{ old('work_start_time', $user['work_start_time'] ?? '') }}" :invalid="$errors->has('work_start_time')" />
+                        </x-field>
+                        <x-field label="Jam Selesai Kerja (opsional)" name="work_end_time">
+                            <x-input type="time" name="work_end_time" value="{{ old('work_end_time', $user['work_end_time'] ?? '') }}" :invalid="$errors->has('work_end_time')" />
+                        </x-field>
+                    </div>
 
                     <fieldset>
                         <legend class="text-xs font-medium text-ink-soft">Peran</legend>

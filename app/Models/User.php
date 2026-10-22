@@ -22,7 +22,7 @@ use Illuminate\Support\Carbon;
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
  */
-#[Fillable(['name', 'email', 'password'])]
+#[Fillable(['name', 'email', 'password', 'work_start_time', 'work_end_time'])]
 #[Hidden(['password', 'remember_token'])]
 class User extends Authenticatable
 {
@@ -37,6 +37,8 @@ class User extends Authenticatable
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
+            'work_start_time' => 'datetime:H:i',
+            'work_end_time' => 'datetime:H:i',
         ];
     }
 
@@ -54,6 +56,11 @@ class User extends Authenticatable
     public function assignedSchools(): HasMany
     {
         return $this->hasMany(School::class, 'sales_user_id');
+    }
+
+    public function overtimes(): HasMany
+    {
+        return $this->hasMany(UserOvertime::class);
     }
 
     public function hasRole(string $slug): bool

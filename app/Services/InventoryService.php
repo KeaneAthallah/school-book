@@ -112,29 +112,20 @@ class InventoryService
                 : BackorderStatus::Partial;
             $backorder->save();
 
-            // Mark pending backorder_orders as received (FIFO) up to $take.
-            $remaining = $take;
+            // Mark backorder_orders as received when all their backorders are fulfilled.
             $pendingOrders = BackorderOrder::query()
-                ->where('backorder_id', $backorder->getKey())
                 ->where('status', 'pending')
-                ->orderBy('id')
+                ->whereHas('items', fn ($q) => $q->where('backorder_id', $backorder->getKey()))
                 ->lockForUpdate()
                 ->get();
 
             foreach ($pendingOrders as $bo) {
-                if ($remaining <= 0) {
-                    break;
-                }
-                $consume = min($remaining, (int) $bo->quantity);
-                if ($consume >= (int) $bo->quantity) {
+                $bo->load('items.backorder');
+                $allFulfilled = $bo->items->every(fn ($item) => $item->backorder?->status === BackorderStatus::Fulfilled);
+                if ($allFulfilled) {
                     $bo->status = 'received';
                     $bo->save();
-                } else {
-                    // partial receive: reduce quantity? keep simple: mark received when fully consumed
-                    $bo->quantity -= $consume;
-                    $bo->save();
                 }
-                $remaining -= $consume;
             }
 
             $available -= $take;

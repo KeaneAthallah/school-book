@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Role;
 use App\Models\User;
+use App\Models\UserOvertime;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -33,6 +34,8 @@ class UserController extends Controller
                 'email' => $user->email,
                 'roles' => $user->roles->pluck('name')->all(),
                 'role_ids' => $user->roles->pluck('id')->all(),
+                'work_start_time' => $user->work_start_time?->format('H:i'),
+                'work_end_time' => $user->work_end_time?->format('H:i'),
             ]);
 
         return view('settings.users', [
@@ -54,12 +57,16 @@ class UserController extends Controller
             'password' => ['required', 'string', Password::defaults()],
             'roles' => ['required', 'array', 'min:1'],
             'roles.*' => ['integer', 'exists:roles,id'],
+            'work_start_time' => ['nullable', 'date_format:H:i'],
+            'work_end_time' => ['nullable', 'date_format:H:i'],
         ]);
 
         $user = User::query()->create([
             'name' => $validated['name'],
             'email' => $validated['email'],
             'password' => $validated['password'],
+            'work_start_time' => $validated['work_start_time'] ?? null,
+            'work_end_time' => $validated['work_end_time'] ?? null,
         ]);
 
         $user->roles()->sync($validated['roles']);
@@ -77,11 +84,15 @@ class UserController extends Controller
             'password' => ['nullable', 'string', Password::defaults()],
             'roles' => ['required', 'array', 'min:1'],
             'roles.*' => ['integer', 'exists:roles,id'],
+            'work_start_time' => ['nullable', 'date_format:H:i'],
+            'work_end_time' => ['nullable', 'date_format:H:i'],
         ]);
 
         $user->fill([
             'name' => $validated['name'],
             'email' => $validated['email'],
+            'work_start_time' => $validated['work_start_time'] ?? null,
+            'work_end_time' => $validated['work_end_time'] ?? null,
         ]);
 
         if (! empty($validated['password'])) {

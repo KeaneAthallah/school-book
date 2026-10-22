@@ -31,7 +31,7 @@ class PaymentController extends Controller
             : null;
 
         $payments = Payment::query()
-            ->with(['school:id,name', 'paymentMethod:id,name', 'allocations:id,payment_id,invoice_id,amount,receipt_number'])
+            ->with(['school:id,name', 'paymentMethod:id,name', 'allocations' => fn ($q) => $q->select('id', 'payment_id', 'invoice_id', 'amount', 'receipt_number')->with('invoice:id,number')])
             ->withSum(
                 ['allocations as allocations_sum_amount' => fn (Builder $query): Builder => $query->whereHas(
                     'payment',
@@ -63,8 +63,11 @@ class PaymentController extends Controller
                 'allocations' => $payment->allocations->map(fn (PaymentAllocation $allocation): array => [
                     'id' => $allocation->getKey(),
                     'invoice_id' => $allocation->invoice_id,
+                    'invoice_number' => $allocation->invoice?->number,
                     'receipt_number' => $allocation->receipt_number,
                 ])->all(),
+                'invoice_id' => $payment->allocations->first()?->invoice_id,
+                'invoice' => $payment->allocations->first()?->invoice?->number,
             ]);
 
         return view('finance.payments.index', [
