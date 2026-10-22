@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Enums\InvoicePaymentStatus;
+use App\Enums\PaymentStatus;
 use App\Models\Invoice;
 use App\Models\Order;
 use App\Models\Shipment;
@@ -98,13 +99,16 @@ class InvoiceController extends Controller
                     'unit_price' => $item->unit_price,
                     'subtotal' => $item->subtotal,
                 ])->all(),
-                'payments' => $invoice->allocations->map(fn ($allocation): array => [
-                    'number' => $allocation->payment?->number,
-                    'date' => $allocation->payment?->payment_date?->toDateString(),
-                    'amount' => $allocation->amount,
-                    'status' => $allocation->payment?->status->value,
-                    'status_label' => $allocation->payment?->status->label(),
-                ])->all(),
+                'payments' => $invoice->allocations
+                    ->filter(fn ($allocation): bool => $allocation->payment?->status !== PaymentStatus::Reversed)
+                    ->map(fn ($allocation): array => [
+                        'id' => $allocation->payment?->getKey(),
+                        'number' => $allocation->payment?->number,
+                        'date' => $allocation->payment?->payment_date?->toDateString(),
+                        'amount' => $allocation->amount,
+                        'status' => $allocation->payment?->status->value,
+                        'status_label' => $allocation->payment?->status->label(),
+                    ])->values()->all(),
                 'attachments' => $invoice->attachments()->orderByDesc('id')->get()->map(fn ($attachment): array => [
                     'id' => $attachment->getKey(),
                     'name' => $attachment->original_name,

@@ -19,6 +19,7 @@ class StoreOrderRequest extends FormRequest
         return [
             'order_date' => ['required', 'date'],
             'school_id' => ['required', 'integer', 'exists:schools,id'],
+            'zona_id' => ['nullable', 'integer', 'exists:zonas,id'],
             'order_source_id' => ['required', 'integer', 'exists:order_sources,id'],
             'notes' => ['nullable', 'string'],
             'external_reference' => ['nullable', 'string', 'max:255'],
@@ -29,7 +30,7 @@ class StoreOrderRequest extends FormRequest
             'items' => ['required', 'array', 'min:1'],
             'items.*.product_id' => ['required', 'integer', 'exists:products,id'],
             'items.*.quantity' => ['required', 'integer', 'min:1'],
-            'items.*.unit_price' => ['required', 'numeric', 'min:0'],
+            'items.*.unit_price' => ['nullable', 'numeric', 'min:0'],
             'items.*.discount_percent' => ['nullable', 'numeric', 'min:0', 'max:100'],
             'items.*.discount_amount' => ['nullable', 'numeric', 'min:0'],
             'items.*.availability_status' => ['nullable', 'string', 'in:available,unavailable'],

@@ -15,6 +15,8 @@
     <span class="tabular-nums">{{ Format::idr($value) }}</span>
 @elseif ($type === 'number')
     <span class="tabular-nums">{{ Format::number($value) }}</span>
+@elseif ($type === 'percent')
+    <span class="tabular-nums">{{ Format::percent($value) }}</span>
 @elseif ($type === 'boolean')
     {{ Format::bool($value) }}
 @elseif ($type === 'date')

@@ -48,6 +48,7 @@
             ['label' => 'Rekap Item Tidak Tersedia', 'route' => 'backorders.unavailable', 'match' => 'backorders.unavailable', 'permission' => 'procurement.view'],
             ['label' => 'Stok Masuk', 'route' => 'receipts.index', 'match' => 'receipts.*', 'permission' => 'receipts.view'],
             ['label' => 'Mutasi Stok', 'route' => 'stock-mutations.index', 'match' => 'stock-mutations.*', 'permission' => 'fulfillment.view'],
+            ['label' => 'Rangkuman Stok', 'route' => 'stock-summary.index', 'match' => 'stock-summary.*', 'permission' => 'procurement.view'],
         ]],
 
         ['kind' => 'group', 'label' => 'Picking & Packing', 'icon' => 'clipboard', 'permission' => 'fulfillment.view', 'items' => [

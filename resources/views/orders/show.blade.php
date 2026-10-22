@@ -96,7 +96,10 @@
             <x-card-header title="Nilai" icon="wallet" />
             <dl class="divide-y divide-line text-sm">
                 <div class="flex justify-between px-4 py-2"><dt class="text-ink-soft">Subtotal</dt><dd class="text-ink tabular-nums">{{ Format::idr($order['subtotal']) }}</dd></div>
-                <div class="flex justify-between px-4 py-2"><dt class="text-ink-soft">Diskon</dt><dd class="text-ink tabular-nums">{{ Format::idr($order['discount_amount']) }}</dd></div>
+                @if ((float) $order['item_discount_amount'] > 0)
+                    <div class="flex justify-between px-4 py-2"><dt class="text-ink-soft">Diskon Item</dt><dd class="text-ink tabular-nums">− {{ Format::idr($order['item_discount_amount']) }}</dd></div>
+                @endif
+                <div class="flex justify-between px-4 py-2"><dt class="text-ink-soft">Diskon Pesanan</dt><dd class="text-ink tabular-nums">{{ Format::idr($order['discount_amount']) }}</dd></div>
                 <div class="flex justify-between px-4 py-2"><dt class="text-ink-soft">Pajak</dt><dd class="text-ink tabular-nums">{{ Format::idr($order['tax_amount']) }}</dd></div>
                 <div class="flex justify-between px-4 py-2 font-semibold"><dt class="text-ink">Total</dt><dd class="text-ink tabular-nums">{{ Format::idr($order['total_amount']) }}</dd></div>
             </dl>
@@ -116,6 +119,9 @@
                     ['key' => 'reserved_quantity', 'label' => 'Ready', 'align' => 'right', 'class' => 'tabular-nums'],
                     ['key' => 'shipped_quantity', 'label' => 'Terkirim', 'align' => 'right', 'class' => 'tabular-nums'],
                     ['key' => 'backorder_quantity', 'label' => 'Back Order', 'align' => 'right', 'class' => 'tabular-nums'],
+                    ['key' => 'unit_price', 'label' => 'Harga', 'type' => 'currency', 'align' => 'right'],
+                    ['key' => 'discount_percent', 'label' => 'Diskon', 'type' => 'percent', 'align' => 'right'],
+                    ['key' => 'discount_amount', 'label' => 'Potongan', 'type' => 'currency', 'align' => 'right'],
                     ['key' => 'subtotal', 'label' => 'Subtotal', 'type' => 'currency', 'align' => 'right'],
                     ['key' => 'status', 'label' => 'Status', 'view' => 'components.status-label'],
                 ]"

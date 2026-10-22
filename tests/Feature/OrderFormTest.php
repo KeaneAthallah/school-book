@@ -55,3 +55,146 @@ it('carries existing items and the school discount into the form when editing', 
         ->assertSee('discountPercent', false)
         ->assertSee('10000.00', false);
 });
+
+it('keeps the item discount percent when editing an order', function () {
+    $admin = orderFormAdmin();
+    $product = Product::factory()->create(['price' => '100000.00']);
+    $school = School::factory()->create();
+    $source = OrderSource::factory()->create();
+
+    $this->actingAs($admin)->post('/orders', [
+        'order_date' => now()->toDateString(),
+        'school_id' => $school->getKey(),
+        'order_source_id' => $source->getKey(),
+        'discount_percent' => '0',
+        'items' => [[
+            'product_id' => $product->getKey(),
+            'quantity' => 10,
+            'unit_price' => '100000.00',
+            'discount_percent' => '10',
+            'availability_status' => 'available',
+        ]],
+    ])->assertRedirect();
+
+    $order = Order::query()->latest('id')->firstOrFail();
+
+    // The stored discount is applied to the line total.
+    $item = $order->items()->firstOrFail();
+    expect($item->discount_percent)->toBe('10.00')
+        ->and($item->discount_amount)->toBe('100000.00')
+        ->and($item->subtotal)->toBe('900000.00');
+
+    // The edit form must carry the percent so it is not lost on the next save.
+    $this->actingAs($admin)
+        ->get('/orders/'.$order->getKey().'/edit')
+        ->assertOk()
+        ->assertSee('items[${index}][discount_percent]', false);
+
+    $this->actingAs($admin)->put('/orders/'.$order->getKey(), [
+        'order_date' => $order->order_date->toDateString(),
+        'school_id' => $school->getKey(),
+        'order_source_id' => $source->getKey(),
+        'discount_percent' => '0',
+        'items' => [[
+            'product_id' => $product->getKey(),
+            'quantity' => 10,
+            'unit_price' => '100000.00',
+            'discount_percent' => '10',
+            'availability_status' => 'available',
+        ]],
+    ])->assertRedirect();
+
+    $item = $order->items()->firstOrFail();
+    expect($item->discount_percent)->toBe('10.00')
+        ->and($item->discount_amount)->toBe('100000.00')
+        ->and($item->subtotal)->toBe('900000.00');
+});
+
+it('stores the selected zone on the order and restores it when editing', function () {
+    $admin = orderFormAdmin();
+    $product = Product::factory()->create(['price' => '100000.00']);
+    $school = School::factory()->create();
+    $source = OrderSource::factory()->create();
+
+    $zona5 = Zona::query()->create(['code' => 'Z5', 'name' => 'Zona 5', 'status' => 'active']);
+    $product->prices()->create(['zona_id' => $zona5->getKey(), 'price' => '120000.00']);
+
+    $this->actingAs($admin)->post('/orders', [
+        'order_date' => now()->toDateString(),
+        'school_id' => $school->getKey(),
+        'order_source_id' => $source->getKey(),
+        'zona_id' => $zona5->getKey(),
+        'discount_percent' => '0',
+        'items' => [[
+            'product_id' => $product->getKey(),
+            'quantity' => 2,
+            'unit_price' => '',
+            'discount_percent' => '0',
+            'availability_status' => 'available',
+        ]],
+    ])->assertRedirect();
+
+    $order = Order::query()->latest('id')->firstOrFail();
+
+    expect($order->zona_id)->toBe($zona5->getKey());
+
+    // Blank price falls back to the zone price of the chosen zone.
+    expect($order->items()->firstOrFail()->unit_price)->toBe('120000.00');
+
+    $this->actingAs($admin)
+        ->get('/orders/'.$order->getKey().'/edit')
+        ->assertOk()
+        ->assertSee('name="zona_id"', false)
+        ->assertSee('Zona 5');
+});
+
+it('rejects an unknown zone', function () {
+    $admin = orderFormAdmin();
+    $product = Product::factory()->create(['price' => '100000.00']);
+    $school = School::factory()->create();
+    $source = OrderSource::factory()->create();
+
+    $this->actingAs($admin)->post('/orders', [
+        'order_date' => now()->toDateString(),
+        'school_id' => $school->getKey(),
+        'order_source_id' => $source->getKey(),
+        'zona_id' => 9999,
+        'discount_percent' => '0',
+        'items' => [[
+            'product_id' => $product->getKey(),
+            'quantity' => 1,
+            'unit_price' => '100000.00',
+            'discount_percent' => '0',
+            'availability_status' => 'available',
+        ]],
+    ])->assertSessionHasErrors('zona_id');
+});
+
+it('shows the item discount on the order detail page', function () {
+    $admin = orderFormAdmin();
+    $product = Product::factory()->create(['price' => '100000.00']);
+    $school = School::factory()->create();
+    $source = OrderSource::factory()->create();
+
+    $this->actingAs($admin)->post('/orders', [
+        'order_date' => now()->toDateString(),
+        'school_id' => $school->getKey(),
+        'order_source_id' => $source->getKey(),
+        'discount_percent' => '0',
+        'items' => [[
+            'product_id' => $product->getKey(),
+            'quantity' => 10,
+            'unit_price' => '100000.00',
+            'discount_percent' => '10',
+            'availability_status' => 'available',
+        ]],
+    ])->assertRedirect();
+
+    $order = Order::query()->latest('id')->firstOrFail();
+
+    $this->actingAs($admin)
+        ->get('/orders/'.$order->getKey())
+        ->assertOk()
+        ->assertSee('Diskon Item')
+        ->assertSee('10%');
+});

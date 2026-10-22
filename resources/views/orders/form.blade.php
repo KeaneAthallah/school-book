@@ -36,7 +36,7 @@
             'products' => $products,
             'items' => $items,
             'blank' => $blank,
-            'zone' => $zonas[0]['value'] ?? '',
+            'zone' => $editing && $order['zona_id'] ? (string) $order['zona_id'] : (string) ($zonas[0]['value'] ?? ''),
             'discountPercent' => old('discount_percent', $editing ? ($order['discount_percent'] ?? '0') : '0'),
         ]) }})"
         x-init="schools = {{ json_encode(collect($schools)->mapWithKeys(fn ($s) => [(string) $s['value'] => $s['rebate_percent']])->all()) }}"
@@ -92,10 +92,10 @@
             <div class="space-y-3 p-4">
                 <div class="rounded-control border border-line p-3">
                     <x-field label="Zona Harga">
-                        <select x-model="zone" x-on:change="applyZone()" class="w-full rounded-control border border-line-strong bg-panel px-3 py-2 text-sm text-ink outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-100 dark:focus:ring-brand-500/25">
+                        <select name="zona_id" x-model="zone" x-on:change="applyZone()" class="w-full rounded-control border border-line-strong bg-panel px-3 py-2 text-sm text-ink outline-none focus:border-brand-500 focus:ring-2 focus:border-brand-100 dark:focus:border-brand-500/25">
                             <option value="">— Pilih Zona —</option>
                             @foreach ($zonas as $zona)
-                                <option value="{{ $zona['value'] }}">{{ $zona['label'] }}</option>
+                                <option value="{{ $zona['value'] }}" @selected((string) old('zona_id', $editing ? ($order['zona_id'] ?? '') : ($zonas[0]['value'] ?? '')) === (string) $zona['value'])>{{ $zona['label'] }}</option>
                             @endforeach
                         </select>
                     </x-field>

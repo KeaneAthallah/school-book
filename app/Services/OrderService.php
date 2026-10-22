@@ -36,6 +36,7 @@ class OrderService
                 'number' => $this->numbers->generate('ORD', 'orders', $data['order_date'] ?? null),
                 'order_date' => $data['order_date'],
                 'school_id' => (int) $data['school_id'],
+                'zona_id' => $this->resolveZonaId($data),
                 'order_source_id' => (int) $data['order_source_id'],
                 'operator_id' => $operator->getKey(),
                 'status' => OrderStatus::Draft,
@@ -73,6 +74,7 @@ class OrderService
         return DB::transaction(function () use ($order, $data, $user): Order {
             $order->fill([
                 'school_id' => (int) $data['school_id'],
+                'zona_id' => $this->resolveZonaId($data),
                 'order_source_id' => (int) $data['order_source_id'],
                 'order_date' => $data['order_date'],
                 'notes' => $data['notes'] ?? null,
@@ -177,6 +179,7 @@ class OrderService
             return $locked->refresh();
         });
     }
+
     public function cancel(Order $order, User $user): Order
     {
         return DB::transaction(function () use ($order, $user): Order {
@@ -226,7 +229,10 @@ class OrderService
 
         $order->items()->delete();
 
-        $zonaId = $schoolId > 0 ? School::query()->whereKey($schoolId)->value('zona_id') : null;
+        // Harga memakai zona yang dipilih pada form pesanan; bila kosong
+        // fallback ke zona sekolah.
+        $zonaId = $order->zona_id
+            ?? ($schoolId > 0 ? School::query()->whereKey($schoolId)->value('zona_id') : null);
 
         foreach ($items as $line) {
             $quantity = (int) $line['quantity'];
@@ -318,6 +324,31 @@ class OrderService
             'pph_amount' => $pph,
             'total_amount' => $total,
         ])->save();
+    }
+
+    /**
+     * Zona harga yang dipilih pada form pesanan. Bila form tidak mengirim
+     * zona, pakai zona sekolah.
+     *
+     * @param  array<string, mixed>  $data
+     */
+    private function resolveZonaId(array $data): ?int
+    {
+        $raw = $data['zona_id'] ?? null;
+
+        if ($raw !== null && $raw !== '') {
+            return (int) $raw;
+        }
+
+        $schoolId = (int) ($data['school_id'] ?? 0);
+
+        if ($schoolId <= 0) {
+            return null;
+        }
+
+        $schoolZona = School::query()->whereKey($schoolId)->value('zona_id');
+
+        return $schoolZona !== null ? (int) $schoolZona : null;
     }
 
     /**

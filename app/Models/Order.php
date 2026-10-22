@@ -20,6 +20,7 @@ use Illuminate\Support\Carbon;
  * @property string $number
  * @property Carbon $order_date
  * @property int $school_id
+ * @property int|null $zona_id
  * @property int $order_source_id
  * @property int|null $operator_id
  * @property OrderStatus $status
@@ -35,7 +36,7 @@ use Illuminate\Support\Carbon;
  * @property Carbon|null $created_at
  */
 #[Fillable([
-    'number', 'order_date', 'school_id', 'order_source_id', 'operator_id', 'status',
+    'number', 'order_date', 'school_id', 'zona_id', 'order_source_id', 'operator_id', 'status',
     'subtotal', 'discount_amount', 'discount_percent', 'tax_amount',
     'dpp_amount', 'ppn_amount', 'pph_amount', 'total_amount', 'notes',
     'external_reference', 'external_source', 'source_payload', 'confirmed_at', 'completed_at',
@@ -81,6 +82,14 @@ class Order extends Model
     public function orderSource(): BelongsTo
     {
         return $this->belongsTo(OrderSource::class);
+    }
+
+    /**
+     * @return BelongsTo<Zona, $this>
+     */
+    public function zona(): BelongsTo
+    {
+        return $this->belongsTo(Zona::class);
     }
 
     /**

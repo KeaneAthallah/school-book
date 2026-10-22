@@ -65,6 +65,55 @@ class PaymentService
         });
     }
 
+    /**
+     * Update a draft payment. Verified and reversed payments are locked.
+     *
+     * @param  array<string, mixed>  $data
+     */
+    public function update(Payment $payment, array $data, User $user): Payment
+    {
+        return DB::transaction(function () use ($payment, $data, $user): Payment {
+            $locked = Payment::query()->lockForUpdate()->findOrFail((int) $payment->getKey());
+
+            if ($locked->status !== PaymentStatus::Draft) {
+                throw ValidationException::withMessages([
+                    'status' => 'Hanya pembayaran berstatus Draft yang dapat diubah.',
+                ]);
+            }
+
+            $locked->forceFill([
+                'school_id' => (int) $data['school_id'],
+                'payment_date' => $data['payment_date'],
+                'amount' => (string) $data['amount'],
+                'payment_method_id' => $data['payment_method_id'] ?? null,
+                'reference' => $data['reference'] ?? null,
+                'notes' => $data['notes'] ?? null,
+            ])->save();
+
+            $locked->allocations()->delete();
+
+            $allocations = $data['allocations'] ?? [];
+
+            if ($allocations === []) {
+                $this->autoAllocate($locked);
+            } else {
+                foreach ($allocations as $entry) {
+                    $amount = (string) ($entry['amount'] ?? '0');
+
+                    if (Money::compare($amount, '0') <= 0) {
+                        continue;
+                    }
+
+                    $this->allocate($locked, Invoice::query()->findOrFail((int) $entry['invoice_id']), $amount);
+                }
+            }
+
+            $this->audit->log('payment.updated', $locked, 'Perubahan pembayaran '.$locked->number, user: $user);
+
+            return $locked->refresh();
+        });
+    }
+
     public function allocate(Payment $payment, Invoice $invoice, string $amount): PaymentAllocation
     {
         if ($payment->school_id !== $invoice->school_id) {

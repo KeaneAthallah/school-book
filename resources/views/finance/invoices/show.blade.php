@@ -13,6 +13,13 @@
         icon="receipt"
     >
         <x-slot:actions>
+            @if ($invoice['payment_status'] !== 'paid')
+                <x-button :href="route('payments.index', ['invoice_id' => $invoice['id']])" variant="secondary">
+                    <x-icon name="wallet" class="h-4 w-4" />
+                    Lanjut Pembayaran
+                </x-button>
+            @endif
+
             <x-button :href="route('invoices.print', $invoice['id'])" variant="secondary" target="_blank" rel="noreferrer">
                 <x-icon name="printer" class="h-4 w-4" />
                 Cetak
@@ -78,6 +85,7 @@
             </dl>
 
             <div>
+                <p class="mb-2 text-xs font-medium uppercase tracking-wide text-ink-soft">Riwayat Pembayaran</p>
                 @if (count($invoice['payments']) === 0)
                     <p class="text-sm text-ink-soft">Belum ada pembayaran dialokasikan.</p>
                 @else
@@ -85,7 +93,7 @@
                         @foreach ($invoice['payments'] as $payment)
                             <li class="flex items-center justify-between py-2">
                                 <span class="text-ink-soft">
-                                    {{ $payment['number'] }}
+                                    <a href="{{ route('payments.index', ['search' => $payment['number']]) }}" class="font-medium text-brand-600 hover:underline dark:text-brand-300">{{ $payment['number'] }}</a>
                                     <span class="text-xs text-ink-muted">{{ Format::date($payment['date']) }}</span>
                                 </span>
                                 <span class="text-ink tabular-nums">{{ Format::idr($payment['amount']) }}</span>

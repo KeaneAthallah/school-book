@@ -50,19 +50,42 @@
 
     @if ($can['manage'])
         <x-modal name="record-payment" title="Catat Pembayaran" wide>
-            <form method="POST" action="{{ route('payments.store') }}" class="space-y-3" x-data="{ useInvoice: false, schoolId: '{{ old('school_id') }}' }">
+            <form method="POST" action="{{ route('payments.store') }}" class="space-y-3"
+                x-data="{
+                    useInvoice: {{ $selectedInvoiceId > 0 ? 'true' : 'false' }},
+                    schoolId: '{{ old('school_id', $selectedSchoolId ?: '') }}',
+                    amountPlaceholder: '{{ $selectedOutstanding !== null ? 'Sisa: '.Format::idr($selectedOutstanding) : '' }}',
+                    syncInvoice(select) {
+                        const opt = select.selectedOptions[0];
+                        const sid = opt?.dataset?.schoolId;
+                        if (sid) {
+                            this.schoolId = sid;
+                            this.useInvoice = true;
+                            this.amountPlaceholder = opt.dataset.outstandingLabel
+                                ? 'Sisa: ' + opt.dataset.outstandingLabel
+                                : '';
+                        } else {
+                            this.useInvoice = false;
+                            this.amountPlaceholder = '';
+                        }
+                    },
+                }"
+                x-init="
+                    @if ($selectedInvoiceId > 0)
+                        $nextTick(() => $dispatch('open-modal', 'record-payment'));
+                    @endif
+                "
+            >
                 @csrf
 
                 <div class="grid gap-3 sm:grid-cols-2">
                     <x-field label="Invoice (opsional)" name="allocations.0.invoice_id">
-                        <x-select name="allocations[0][invoice_id]" x-on:change="
-                            const opt = $event.target.selectedOptions[0];
-                            const sid = opt?.dataset?.schoolId;
-                            if (sid) { schoolId = sid; useInvoice = true; }
-                        ">
+                        <x-select name="allocations[0][invoice_id]" x-on:change="syncInvoice($event.target)">
                             <option value="">— Pilih Invoice (opsional) —</option>
                             @foreach ($openInvoices as $option)
-                                <option value="{{ $option['value'] }}" data-school-id="{{ $option['school_id'] }}">{{ $option['label'] }} — sisa {{ Format::idr($option['outstanding']) }}</option>
+                                <option value="{{ $option['value'] }}" data-school-id="{{ $option['school_id'] }}"
+                                    data-outstanding-label="{{ Format::idr($option['outstanding']) }}"
+                                    @selected((int) $selectedInvoiceId === (int) $option['value'])>{{ $option['label'] }} — sisa {{ Format::idr($option['outstanding']) }}</option>
                             @endforeach
                         </x-select>
                     </x-field>
@@ -81,7 +104,7 @@
                     </x-field>
 
                     <x-field label="Jumlah" name="amount" required>
-                        <x-input type="number" step="any" name="amount" value="{{ old('amount') }}" :invalid="$errors->has('amount')" />
+                        <x-input type="number" step="any" name="amount" value="{{ old('amount') }}" x-bind:placeholder="amountPlaceholder" :invalid="$errors->has('amount')" />
                     </x-field>
 
                     <x-field label="Metode" name="payment_method_id">

@@ -24,6 +24,7 @@ use App\Http\Controllers\SearchController;
 use App\Http\Controllers\SettingsController;
 use App\Http\Controllers\ShipmentController;
 use App\Http\Controllers\StockMutationController;
+use App\Http\Controllers\StockSummaryController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 
@@ -63,7 +64,7 @@ Route::middleware('auth')->group(function (): void {
     Route::put('orders/{order}', [OrderController::class, 'update'])->name('orders.update');
     Route::get('orders/{order}/print', [OrderController::class, 'print'])->name('orders.print');
     Route::post('orders/{order}/confirm', [OrderController::class, 'confirm'])->name('orders.confirm');
-Route::post('orders/{order}/revert-to-draft', [OrderController::class, 'revertToDraft'])->name('orders.revertToDraft');
+    Route::post('orders/{order}/revert-to-draft', [OrderController::class, 'revertToDraft'])->name('orders.revertToDraft');
     Route::post('orders/{order}/cancel', [OrderController::class, 'cancel'])->name('orders.cancel');
 
     // Goods receipts.
@@ -114,6 +115,8 @@ Route::post('orders/{order}/revert-to-draft', [OrderController::class, 'revertTo
     // Payments.
     Route::get('payments', [PaymentController::class, 'index'])->name('payments.index');
     Route::post('payments', [PaymentController::class, 'store'])->name('payments.store');
+    Route::get('payments/{payment}/edit', [PaymentController::class, 'edit'])->name('payments.edit');
+    Route::put('payments/{payment}', [PaymentController::class, 'update'])->name('payments.update');
     Route::post('payments/{payment}/verify', [PaymentController::class, 'verify'])->name('payments.verify');
     Route::post('payments/{payment}/reverse', [PaymentController::class, 'reverse'])->name('payments.reverse');
 
@@ -126,15 +129,16 @@ Route::post('orders/{order}/revert-to-draft', [OrderController::class, 'revertTo
     Route::delete('pinjaman-tunai/{id}', [MasterDataController::class, 'destroy'])->defaults('resource', 'cash-loans')->name('cash-loans.destroy');
 
     Route::get('stock-mutations', [StockMutationController::class, 'index'])->name('stock-mutations.index');
-Route::post('stock-mutations', [StockMutationController::class, 'store'])->name('stock-mutations.store');
-Route::get('stock-mutations/{mutation}/print', [StockMutationController::class, 'print'])->name('stock-mutations.print');
+    Route::post('stock-mutations', [StockMutationController::class, 'store'])->name('stock-mutations.store');
+    Route::get('stock-mutations/{mutation}/print', [StockMutationController::class, 'print'])->name('stock-mutations.print');
+    Route::get('stock-summary', [StockSummaryController::class, 'index'])->name('stock-summary.index');
     Route::get('backorders', [BackorderController::class, 'index'])->name('backorders.index');
     Route::post('backorders/order', [BackorderController::class, 'orderStore'])->name('backorders.orderStore');
     Route::get('backorders/orders/{backorderOrder}', [BackorderController::class, 'orderShow'])->name('backorders.orderShow');
-Route::get('backorders/orders/{backorderOrder}/edit', [BackorderController::class, 'orderEdit'])->name('backorders.orderEdit');
-Route::put('backorders/orders/{backorderOrder}', [BackorderController::class, 'orderUpdate'])->name('backorders.orderUpdate');
-Route::delete('backorders/orders/{backorderOrder}', [BackorderController::class, 'orderDestroy'])->name('backorders.orderDestroy');
-Route::get('backorders/orders/{backorderOrder}/print', [BackorderController::class, 'orderPrint'])->name('backorders.orderPrint');
+    Route::get('backorders/orders/{backorderOrder}/edit', [BackorderController::class, 'orderEdit'])->name('backorders.orderEdit');
+    Route::put('backorders/orders/{backorderOrder}', [BackorderController::class, 'orderUpdate'])->name('backorders.orderUpdate');
+    Route::delete('backorders/orders/{backorderOrder}', [BackorderController::class, 'orderDestroy'])->name('backorders.orderDestroy');
+    Route::get('backorders/orders/{backorderOrder}/print', [BackorderController::class, 'orderPrint'])->name('backorders.orderPrint');
     Route::get('backorders/unavailable', [BackorderController::class, 'unavailable'])->name('backorders.unavailable');
 
     // Catalogs.
