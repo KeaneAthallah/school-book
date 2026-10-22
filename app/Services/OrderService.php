@@ -142,6 +142,41 @@ class OrderService
         });
     }
 
+    public function revertToDraft(Order $order, User $user): Order
+    {
+        return DB::transaction(function () use ($order, $user): Order {
+            $locked = Order::query()->lockForUpdate()->findOrFail((int) $order->getKey());
+
+            if ($locked->status !== OrderStatus::Processing) {
+                throw ValidationException::withMessages([
+                    'status' => 'Hanya pesanan berstatus Diproses yang dapat dikembalikan ke Draft.',
+                ]);
+            }
+
+            $locked->load('items');
+
+            foreach ($locked->items as $item) {
+                // Kembalikan reserved ke 0, restore backorder_quantity.
+                $item->reserved_quantity = 0;
+                $item->backorder_quantity = $item->quantity;
+                $item->status = OrderItemStatus::Pending;
+                $item->save();
+
+                Backorder::query()
+                    ->where('order_item_id', $item->getKey())
+                    ->delete();
+            }
+
+            $locked->forceFill([
+                'status' => OrderStatus::Draft,
+                'confirmed_at' => null,
+            ])->save();
+
+            $this->audit->log('order.reverted_to_draft', $locked, 'Pengembalian pesanan '.$locked->number.' ke Draft', user: $user);
+
+            return $locked->refresh();
+        });
+    }
     public function cancel(Order $order, User $user): Order
     {
         return DB::transaction(function () use ($order, $user): Order {
@@ -213,13 +248,23 @@ class OrderService
             }
             $price = (string) $price;
 
-            $discount = (string) ($line['discount_amount'] ?? '0');
-            $subtotal = Money::sub(Money::mul($price, (string) $quantity), $discount);
+            $lineAmount = Money::mul($price, (string) $quantity);
+            $discountPercent = (string) ($line['discount_percent'] ?? '0');
+            $discount = '0';
+
+            if (Money::compare($discountPercent, '0') > 0) {
+                $discount = Money::percentage($lineAmount, $discountPercent);
+            } else {
+                $discount = (string) ($line['discount_amount'] ?? '0');
+            }
+
+            $subtotal = Money::sub($lineAmount, $discount);
 
             $order->items()->create([
                 'product_id' => $productId,
                 'quantity' => $quantity,
                 'unit_price' => $price,
+                'discount_percent' => $discountPercent,
                 'discount_amount' => $discount,
                 'subtotal' => $subtotal,
                 'status' => OrderItemStatus::Pending,

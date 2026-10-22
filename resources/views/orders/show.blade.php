@@ -26,6 +26,13 @@
                 </form>
             @endif
 
+            @if ($order['status'] === 'processing')
+                <form method="POST" action="{{ route('orders.revertToDraft', $order['id']) }}" x-data x-on:submit="if (! confirm('Kembalikan pesanan ke Draft? Backorder akan dibatalkan dan stok dilepas.')) $event.preventDefault()">
+                    @csrf
+                    <x-button type="submit" variant="secondary">Kembalikan ke Draft</x-button>
+                </form>
+            @endif
+
             @if ($can['ship'])
                 <form method="POST" action="{{ route('pickings.store') }}">
                     @csrf

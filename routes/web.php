@@ -63,6 +63,7 @@ Route::middleware('auth')->group(function (): void {
     Route::put('orders/{order}', [OrderController::class, 'update'])->name('orders.update');
     Route::get('orders/{order}/print', [OrderController::class, 'print'])->name('orders.print');
     Route::post('orders/{order}/confirm', [OrderController::class, 'confirm'])->name('orders.confirm');
+Route::post('orders/{order}/revert-to-draft', [OrderController::class, 'revertToDraft'])->name('orders.revertToDraft');
     Route::post('orders/{order}/cancel', [OrderController::class, 'cancel'])->name('orders.cancel');
 
     // Goods receipts.

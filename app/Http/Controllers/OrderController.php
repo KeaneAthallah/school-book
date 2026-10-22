@@ -224,6 +224,15 @@ class OrderController extends Controller
         return back()->with('success', 'Pesanan '.$order->number.' berhasil dikonfirmasi.');
     }
 
+    public function revertToDraft(Request $request, Order $order, OrderService $service): RedirectResponse
+    {
+        abort_unless($this->userCan($request, 'orders.manage'), 403);
+
+        $service->revertToDraft($order, $request->user());
+
+        return back()->with('success', 'Pesanan dikembalikan ke Draft dan dapat diubah.');
+    }
+
     public function cancel(Request $request, Order $order, OrderService $service): RedirectResponse
     {
         abort_unless($this->userCan($request, 'orders.cancel'), 403);

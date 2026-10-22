@@ -295,6 +295,8 @@ Alpine.data('lineItems', (config = {}) => ({
         product_id: '',
         quantity: 1,
         unit_price: '',
+        discount_percent: '0',
+        discount_amount: '0',
         product_search: '',
         showDropdown: false,
     },
@@ -401,20 +403,19 @@ Alpine.data('lineItems', (config = {}) => ({
     },
 
     subtotal() {
-        return this.items.reduce(
-            (carry, item) =>
-                carry +
-                Number(item.unit_price || 0) * Number(item.quantity || 0) -
-                Number(item.discount_amount || 0),
-            0,
-        );
+        return this.items.reduce((carry, item) => {
+            const line = Number(item.unit_price || 0) * Number(item.quantity || 0);
+            const pct = Number(item.discount_percent || 0);
+            const disc = pct > 0 ? (line * pct) / 100 : Number(item.discount_amount || 0);
+            return carry + line - disc;
+        }, 0);
     },
 
     lineTotal(item) {
-        return (
-            Number(item.unit_price || 0) * Number(item.quantity || 0) -
-            Number(item.discount_amount || 0)
-        );
+        const line = Number(item.unit_price || 0) * Number(item.quantity || 0);
+        const pct = Number(item.discount_percent || 0);
+        const disc = pct > 0 ? (line * pct) / 100 : Number(item.discount_amount || 0);
+        return Math.max(0, line - disc);
     },
 
     orderDiscount() {

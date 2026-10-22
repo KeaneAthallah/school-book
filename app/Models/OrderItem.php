@@ -16,6 +16,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property int $product_id
  * @property int $quantity
  * @property string $unit_price
+ * @property string $discount_percent
  * @property string $discount_amount
  * @property string $subtotal
  * @property int $reserved_quantity
@@ -25,7 +26,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property ItemAvailability $availability_status
  */
 #[Fillable([
-    'order_id', 'product_id', 'quantity', 'unit_price', 'discount_amount',
+    'order_id', 'product_id', 'quantity', 'unit_price', 'discount_percent', 'discount_amount',
     'subtotal', 'reserved_quantity', 'shipped_quantity', 'backorder_quantity', 'status',
     'availability_status',
 ])]
@@ -43,6 +44,7 @@ class OrderItem extends Model
             'status' => OrderItemStatus::class,
             'availability_status' => ItemAvailability::class,
             'unit_price' => 'decimal:2',
+            'discount_percent' => 'decimal:2',
             'discount_amount' => 'decimal:2',
             'subtotal' => 'decimal:2',
             'quantity' => 'integer',

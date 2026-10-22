@@ -30,6 +30,7 @@ class StoreOrderRequest extends FormRequest
             'items.*.product_id' => ['required', 'integer', 'exists:products,id'],
             'items.*.quantity' => ['required', 'integer', 'min:1'],
             'items.*.unit_price' => ['required', 'numeric', 'min:0'],
+            'items.*.discount_percent' => ['nullable', 'numeric', 'min:0', 'max:100'],
             'items.*.discount_amount' => ['nullable', 'numeric', 'min:0'],
             'items.*.availability_status' => ['nullable', 'string', 'in:available,unavailable'],
         ];

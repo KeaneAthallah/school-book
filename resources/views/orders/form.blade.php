@@ -5,13 +5,14 @@
 @section('content')
     @php
         $editing = isset($order);
-        $blank = ['product_id' => '', 'quantity' => 1, 'unit_price' => '', 'discount_amount' => '0', 'availability_status' => 'available'];
+        $blank = ['product_id' => '', 'quantity' => 1, 'unit_price' => '', 'discount_percent' => '0', 'discount_amount' => '0', 'availability_status' => 'available'];
         $items = $editing
             ? collect($order['items'])->map(fn (array $item): array => [
                 'product_id' => (string) $item['product_id'],
                 'quantity' => $item['quantity'],
                 'unit_price' => $item['unit_price'],
-                'discount_amount' => $item['discount_amount'],
+                'discount_percent' => $item['discount_percent'] ?? '0',
+                'discount_amount' => $item['discount_amount'] ?? '0',
                 'availability_status' => $item['availability_status'] ?? 'available',
             ])->all()
             : [$blank];
@@ -140,8 +141,8 @@
                             <x-input type="number" step="any" x-model="item.unit_price" x-bind:name="`items[${index}][unit_price]`" />
                         </x-field>
 
-                        <x-field label="Diskon">
-                            <x-input type="number" step="any" x-model="item.discount_amount" x-bind:name="`items[${index}][discount_amount]`" />
+                        <x-field label="Diskon (%)">
+                            <x-input type="number" step="any" min="0" max="100" x-model="item.discount_percent" x-bind:name="`items[${index}][discount_percent]`" />
                         </x-field>
 
                         <x-field label="Jumlah">
