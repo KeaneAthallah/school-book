@@ -25,6 +25,11 @@ class SettingsController extends Controller
                 'company_logo' => (string) Setting::value('company.logo', ''),
                 'header_publisher_id' => (string) Setting::value('print.header_publisher_id', ''),
                 'header_name' => (string) Setting::value('print.header_name', ''),
+                'receipt_city' => (string) Setting::value('print.receipt_city', ''),
+                'receipt_finance_name' => (string) Setting::value('print.receipt_finance_name', ''),
+                'receipt_finance_nip' => (string) Setting::value('print.receipt_finance_nip', ''),
+                'receipt_representative_name' => (string) Setting::value('print.receipt_representative_name', ''),
+                'receipt_representative_nik' => (string) Setting::value('print.receipt_representative_nik', ''),
                 'book_tax_rate' => (string) Setting::value('finance.book_tax_rate', '0.5'),
                 'goods_tax_rate' => (string) Setting::value('finance.goods_tax_rate', '2'),
                 'ppn_rate' => (string) Setting::value('finance.ppn_rate', '12'),
@@ -71,6 +76,11 @@ class SettingsController extends Controller
             'company_logo' => ['nullable', 'file', 'image', 'mimes:jpeg,jpg,png,webp', 'max:5120'],
             'header_publisher_id' => ['nullable', 'integer', 'exists:publishers,id'],
             'header_name' => ['nullable', 'string', 'max:255'],
+            'receipt_city' => ['nullable', 'string', 'max:100'],
+            'receipt_finance_name' => ['nullable', 'string', 'max:255'],
+            'receipt_finance_nip' => ['nullable', 'string', 'max:100'],
+            'receipt_representative_name' => ['nullable', 'string', 'max:255'],
+            'receipt_representative_nik' => ['nullable', 'string', 'max:100'],
             'book_tax_rate' => ['nullable', 'numeric', 'min:0', 'max:100'],
             'goods_tax_rate' => ['nullable', 'numeric', 'min:0', 'max:100'],
             'ppn_rate' => ['nullable', 'numeric', 'min:0', 'max:100'],
@@ -101,6 +111,11 @@ class SettingsController extends Controller
         $this->put('company.email', $validated['company_email'] ?? '', 'company');
         $this->put('print.header_publisher_id', ($validated['header_publisher_id'] ?? null) === null ? '' : (string) $validated['header_publisher_id'], 'print');
         $this->put('print.header_name', $validated['header_name'] ?? '', 'print');
+        $this->put('print.receipt_city', $validated['receipt_city'] ?? '', 'print');
+        $this->put('print.receipt_finance_name', $validated['receipt_finance_name'] ?? '', 'print');
+        $this->put('print.receipt_finance_nip', $validated['receipt_finance_nip'] ?? '', 'print');
+        $this->put('print.receipt_representative_name', $validated['receipt_representative_name'] ?? '', 'print');
+        $this->put('print.receipt_representative_nik', $validated['receipt_representative_nik'] ?? '', 'print');
         $bookRate = ($validated['book_tax_rate'] ?? null) === null ? '0.5' : (string) $validated['book_tax_rate'];
         $goodsRate = ($validated['goods_tax_rate'] ?? null) === null ? '2' : (string) $validated['goods_tax_rate'];
         $ppnRate = ($validated['ppn_rate'] ?? null) === null ? '12' : (string) $validated['ppn_rate'];

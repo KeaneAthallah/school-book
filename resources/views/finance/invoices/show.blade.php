@@ -96,7 +96,12 @@
                                     <a href="{{ route('payments.index', ['search' => $payment['number']]) }}" class="font-medium text-brand-600 hover:underline dark:text-brand-300">{{ $payment['number'] }}</a>
                                     <span class="text-xs text-ink-muted">{{ Format::date($payment['date']) }}</span>
                                 </span>
-                                <span class="text-ink tabular-nums">{{ Format::idr($payment['amount']) }}</span>
+                                <span class="flex items-center gap-3">
+                                    <span class="text-ink tabular-nums">{{ Format::idr($payment['amount']) }}</span>
+                                    @if ($payment['id'] && $payment['allocation_id'])
+                                        <a href="{{ route('payments.receipt', ['payment' => $payment['id'], 'allocation' => $payment['allocation_id']]) }}" target="_blank" class="text-xs font-medium text-brand-600 transition hover:underline dark:text-brand-300">Kwitansi</a>
+                                    @endif
+                                </span>
                             </li>
                         @endforeach
                     </ul>

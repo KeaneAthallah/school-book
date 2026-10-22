@@ -2,7 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\GoodsReceiptStatus;
 use App\Enums\OrderStatus;
+use App\Enums\ShipmentStatus;
+use Illuminate\Support\Facades\DB;
 use App\Http\Requests\StoreOrderRequest;
 use App\Http\Requests\UpdateOrderRequest;
 use App\Models\Backorder;
@@ -97,7 +100,7 @@ class OrderController extends Controller
             'school:id,name,npsn',
             'orderSource:id,name',
             'operator:id,name',
-            'items' => fn ($query) => $query->with('product:id,code,title')->orderBy('id'),
+            'items' => fn ($query) => $query->with('product:id,code,title', 'product.book.publisher:id,name')->orderBy('id'),
             'shipments' => fn ($query) => $query->orderBy('id'),
             'shipments.items',
             'invoices' => fn ($query) => $query->orderBy('id'),
@@ -122,6 +125,9 @@ class OrderController extends Controller
                 'notes' => $order->notes,
                 'external_reference' => $order->external_reference,
                 'subtotal' => $order->subtotal,
+                'gross_subtotal' => (string) $order->items->sum(
+                    fn (OrderItem $item): float => (float) $item->unit_price * (int) $item->quantity
+                ),
                 'discount_amount' => $order->discount_amount,
                 'item_discount_amount' => (string) $order->items->sum(
                     fn (OrderItem $item): float => (float) $item->discount_amount
@@ -260,10 +266,78 @@ class OrderController extends Controller
             'items' => fn ($query) => $query->with('product:id,code,title', 'product.book.publisher:id,name')->orderBy('id'),
         ]);
 
+        $stockMap = $this->availableStockByProduct($order->items->pluck('product_id')->filter()->unique()->values()->all());
+
         return view('print.order-note', [
             'order' => $order,
             'company' => $headers->resolve(),
+            'stockMap' => $stockMap,
+            'operatorName' => $request->user()?->name,
         ]);
+    }
+
+    public function printSurat(Request $request, Order $order, PrintHeaderService $headers): View
+{
+    abort_unless($this->userCan($request, 'orders.view'), 403);
+    $this->authorizeSchoolAccess($request->user(), $order);
+
+    $order->load([
+        'school',
+        'orderSource:id,name',
+        'items' => fn ($query) => $query->with('product:id,code,title', 'product.book.publisher:id,name')->orderBy('id'),
+    ]);
+
+    return view('print.order-surat', [
+        'order' => $order,
+        'company' => $headers->resolve(),
+        'operatorName' => $request->user()?->name,
+    ]);
+}
+
+private function availableStockByProduct(array $productIds): array
+    {
+        if ($productIds === []) {
+            return [];
+        }
+
+        $inbound = DB::table('goods_receipt_items')
+            ->join('goods_receipts', 'goods_receipts.id', '=', 'goods_receipt_items.goods_receipt_id')
+            ->where('goods_receipts.status', GoodsReceiptStatus::Confirmed->value)
+            ->whereIn('goods_receipt_items.product_id', $productIds)
+            ->groupBy('goods_receipt_items.product_id')
+            ->selectRaw('goods_receipt_items.product_id as product_id, SUM(goods_receipt_items.quantity) as qty');
+
+        $outbound = DB::table('shipment_items')
+            ->join('shipments', 'shipments.id', '=', 'shipment_items.shipment_id')
+            ->whereIn('shipments.status', [ShipmentStatus::Shipped->value, ShipmentStatus::Delivered->value])
+            ->whereIn('shipment_items.product_id', $productIds)
+            ->groupBy('shipment_items.product_id')
+            ->selectRaw('shipment_items.product_id as product_id, SUM(shipment_items.quantity) as qty');
+
+        $mutation = DB::table('stock_mutations')
+            ->whereIn('product_id', $productIds)
+            ->groupBy('product_id')
+            ->selectRaw('product_id as product_id, SUM(quantity) as qty');
+
+        $rows = DB::table('products')
+            ->leftJoinSub($inbound, 'inbound', 'inbound.product_id', '=', 'products.id')
+            ->leftJoinSub($outbound, 'outbound', 'outbound.product_id', '=', 'products.id')
+            ->leftJoinSub($mutation, 'mutation', 'mutation.product_id', '=', 'products.id')
+            ->whereIn('products.id', $productIds)
+            ->selectRaw('products.id, COALESCE(inbound.qty, 0) as masuk, COALESCE(outbound.qty, 0) as keluar, COALESCE(mutation.qty, 0) as mutasi')
+            ->get();
+
+        $map = [];
+        foreach ($rows as $row) {
+            $map[(int) $row->id] = (int) $row->masuk - (int) $row->keluar - (int) $row->mutasi;
+        }
+        foreach ($productIds as $id) {
+            if (! array_key_exists($id, $map)) {
+                $map[$id] = 0;
+            }
+        }
+
+        return $map;
     }
 
     private function paymentStatus(Order $order): string

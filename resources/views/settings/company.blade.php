@@ -76,6 +76,31 @@
         </x-card>
 
         <x-card>
+            <x-card-header title="Kwitansi" subtitle="Identitas penandatangan pada kwitansi pembayaran" icon="fileText" />
+            <div class="grid gap-3 p-4 sm:grid-cols-2">
+                <x-field label="Kota" name="receipt_city" hint="Dicetak pada baris tanggal, contoh: Palu">
+                    <x-input type="text" name="receipt_city" :value="$value('receipt_city')" :invalid="$errors->has('receipt_city')" />
+                </x-field>
+
+                <x-field label="Nama Bendahara" name="receipt_finance_name">
+                    <x-input type="text" name="receipt_finance_name" :value="$value('receipt_finance_name')" :invalid="$errors->has('receipt_finance_name')" />
+                </x-field>
+
+                <x-field label="NIP Bendahara" name="receipt_finance_nip">
+                    <x-input type="text" name="receipt_finance_nip" :value="$value('receipt_finance_nip')" :invalid="$errors->has('receipt_finance_nip')" />
+                </x-field>
+
+                <x-field label="Nama Representative" name="receipt_representative_name">
+                    <x-input type="text" name="receipt_representative_name" :value="$value('receipt_representative_name')" :invalid="$errors->has('receipt_representative_name')" />
+                </x-field>
+
+                <x-field label="NIK Representative" name="receipt_representative_nik">
+                    <x-input type="text" name="receipt_representative_nik" :value="$value('receipt_representative_nik')" :invalid="$errors->has('receipt_representative_nik')" />
+                </x-field>
+            </div>
+        </x-card>
+
+        <x-card>
             <x-card-header title="Keuangan" icon="percent" />
             <div class="grid gap-3 p-4 sm:grid-cols-2">
                 <x-field label="Pajak Buku (%)" name="book_tax_rate" hint="Pajak untuk buku">

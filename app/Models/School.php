@@ -16,12 +16,13 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @property string|null $npsn
  * @property string $name
  * @property string $status
+ * @property string|null $principal_nip
  * @property int|null $sales_user_id
  * @property int|null $zona_id
  */
 #[Fillable([
     'npsn', 'name', 'address', 'district', 'regency', 'province', 'postal_code',
-    'contact_person', 'phone', 'email', 'principal_name', 'status', 'sales_user_id', 'zona_id',
+    'contact_person', 'phone', 'email', 'principal_name', 'principal_nip', 'status', 'sales_user_id', 'zona_id',
     'rebate_percent',
 ])]
 class School extends Model

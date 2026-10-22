@@ -402,13 +402,24 @@ Alpine.data('lineItems', (config = {}) => ({
         );
     },
 
-    subtotal() {
+    grossSubtotal() {
+        return this.items.reduce((carry, item) => {
+            const line = Number(item.unit_price || 0) * Number(item.quantity || 0);
+            return carry + line;
+        }, 0);
+    },
+
+    itemDiscount() {
         return this.items.reduce((carry, item) => {
             const line = Number(item.unit_price || 0) * Number(item.quantity || 0);
             const pct = Number(item.discount_percent || 0);
             const disc = pct > 0 ? (line * pct) / 100 : Number(item.discount_amount || 0);
-            return carry + line - disc;
+            return carry + disc;
         }, 0);
+    },
+
+    subtotal() {
+        return this.grossSubtotal() - this.itemDiscount();
     },
 
     lineTotal(item) {

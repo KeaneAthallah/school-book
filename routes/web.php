@@ -63,6 +63,7 @@ Route::middleware('auth')->group(function (): void {
     Route::get('orders/{order}/edit', [OrderController::class, 'edit'])->name('orders.edit');
     Route::put('orders/{order}', [OrderController::class, 'update'])->name('orders.update');
     Route::get('orders/{order}/print', [OrderController::class, 'print'])->name('orders.print');
+    Route::get('orders/{order}/print-surat', [OrderController::class, 'printSurat'])->name('orders.printSurat');
     Route::post('orders/{order}/confirm', [OrderController::class, 'confirm'])->name('orders.confirm');
     Route::post('orders/{order}/revert-to-draft', [OrderController::class, 'revertToDraft'])->name('orders.revertToDraft');
     Route::post('orders/{order}/cancel', [OrderController::class, 'cancel'])->name('orders.cancel');
@@ -116,6 +117,7 @@ Route::middleware('auth')->group(function (): void {
     Route::get('payments', [PaymentController::class, 'index'])->name('payments.index');
     Route::post('payments', [PaymentController::class, 'store'])->name('payments.store');
     Route::get('payments/{payment}/edit', [PaymentController::class, 'edit'])->name('payments.edit');
+    Route::get('payments/{payment}/allocations/{allocation}/receipt', [PaymentController::class, 'receipt'])->name('payments.receipt');
     Route::put('payments/{payment}', [PaymentController::class, 'update'])->name('payments.update');
     Route::post('payments/{payment}/verify', [PaymentController::class, 'verify'])->name('payments.verify');
     Route::post('payments/{payment}/reverse', [PaymentController::class, 'reverse'])->name('payments.reverse');

@@ -38,7 +38,7 @@
     <div class="mt-3">{{ $users->links() }}</div>
 
     @if ($can['manage'])
-        <x-modal name="create-user" title="Tambah Pengguna">
+        <x-modal name="create-user" title="Tambah Pengguna" x-init="@if ($errors->any() && old('_method') !== 'PUT') $dispatch('open-modal', 'create-user') @endif">
             <form method="POST" action="{{ route('users.store') }}" class="space-y-3">
                 @csrf
 

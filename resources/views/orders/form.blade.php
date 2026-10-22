@@ -168,12 +168,15 @@
 
         <x-card>
             <div class="flex flex-wrap items-center justify-between gap-3 p-4">
-                <div class="grid grid-cols-2 gap-x-8 gap-y-1 text-sm sm:grid-cols-3">
+                <div class="grid grid-cols-2 gap-x-8 gap-y-1 text-sm sm:grid-cols-4">
                     <div class="text-ink-soft">
-                        Subtotal: <span class="font-medium text-ink" x-text="money(subtotal())"></span>
+                        Subtotal: <span class="font-medium text-ink" x-text="money(grossSubtotal())"></span>
                     </div>
                     <div class="text-ink-soft">
-                        Diskon (<span x-text="Number(discountPercent || 0)"></span>%): <span class="font-medium text-ink" x-text="'− ' + money(orderDiscount())"></span>
+                        Diskon Item: <span class="font-medium text-ink" x-text="'− ' + money(itemDiscount())"></span>
+                    </div>
+                    <div class="text-ink-soft">
+                        Diskon Pesanan (<span x-text="Number(discountPercent || 0)"></span>%): <span class="font-medium text-ink" x-text="'− ' + money(orderDiscount())"></span>
                     </div>
                     <div class="text-ink-soft">
                         Total: <span class="text-base font-semibold text-ink" x-text="money(grandTotal())"></span>

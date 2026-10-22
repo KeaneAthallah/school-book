@@ -4,7 +4,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="icon" type="image/png" href="{{ asset('logo.png') }}">
-    <title>Surat Pesanan {{ $order->number }}</title>
+    <title>Nota Pesanan {{ $order->number }}</title>
     <style>
         * { box-sizing: border-box; }
         body { font-family: Arial, Helvetica, sans-serif; color: #111827; margin: 0; padding: 32px; font-size: 13px; }
@@ -41,7 +41,7 @@
             @endif
         </div>
         <div class="doc">
-            <h2>SURAT PESANAN</h2>
+            <h2>NOTA PESANAN (GUDANG)</h2>
             <table>
                 <tr><td>No. Pesanan</td><td><strong>{{ $order->number }}</strong></td></tr>
                 <tr><td>Tanggal</td><td>{{ $order->order_date?->format('d/m/Y') }}</td></tr>
@@ -79,15 +79,23 @@
                 <th>Kode</th>
                 <th>Barang</th>
                 <th class="num">Jumlah</th>
+                <th class="num">Stok Gudang</th>
+                <th class="num">Selisih</th>
             </tr>
         </thead>
         <tbody>
             @foreach ($order->items as $index => $item)
+                @php
+                    $stock = $stockMap[$item->product_id ?? 0] ?? 0;
+                    $diff = $stock - (int) $item->quantity;
+                @endphp
                 <tr>
                     <td class="num">{{ $index + 1 }}</td>
                     <td>{{ $item->product?->code ?? '-' }}</td>
                     <td>{{ $item->product?->title ?? '-' }}</td>
                     <td class="num">{{ $item->quantity }}</td>
+                    <td class="num">{{ $stock }}</td>
+                    <td class="num">{{ $diff }}</td>
                 </tr>
             @endforeach
         </tbody>
@@ -101,7 +109,7 @@
         <div style="text-align: center; width: 220px;">
             <div>Palu, Tgl. ...............</div>
             <div style="margin-top: 8px;">Petugas Picking</div>
-            <div style="margin-top: 60px;">( Nama )</div>
+            <div style="margin-top: 60px;">( {{ $operatorName ?? 'Nama' }} )</div>
         </div>
     </div>
 </body>

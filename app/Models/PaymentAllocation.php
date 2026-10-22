@@ -11,8 +11,9 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property int $payment_id
  * @property int $invoice_id
  * @property string $amount
+ * @property string|null $receipt_number
  */
-#[Fillable(['payment_id', 'invoice_id', 'amount'])]
+#[Fillable(['payment_id', 'invoice_id', 'amount', 'receipt_number'])]
 class PaymentAllocation extends Model
 {
     /**

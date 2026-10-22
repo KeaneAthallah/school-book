@@ -27,7 +27,8 @@ it('renders the order form with the live calculation summary', function () {
     // per-line and order-level totals can be computed client-side.
     $response->assertSee('lineItems', false);
     $response->assertSee('money(lineTotal(item))', false);
-    $response->assertSee('money(subtotal())', false);
+    $response->assertSee('money(grossSubtotal())', false);
+    $response->assertSee('money(itemDiscount())', false);
     $response->assertSee('money(grandTotal())', false);
 });
 
@@ -197,4 +198,43 @@ it('shows the item discount on the order detail page', function () {
         ->assertOk()
         ->assertSee('Diskon Item')
         ->assertSee('10%');
+});
+
+it('breaks the order total into gross subtotal, item discount and order discount', function () {
+    $admin = orderFormAdmin();
+    $product = Product::factory()->create(['price' => '100000.00']);
+    $school = School::factory()->create();
+    $source = OrderSource::factory()->create();
+
+    $this->actingAs($admin)->post('/orders', [
+        'order_date' => now()->toDateString(),
+        'school_id' => $school->getKey(),
+        'order_source_id' => $source->getKey(),
+        // 5% of the net subtotal, matching how the service calculates it.
+        'discount_percent' => '5',
+        'items' => [[
+            'product_id' => $product->getKey(),
+            'quantity' => 10,
+            'unit_price' => '100000.00',
+            'discount_percent' => '10',
+            'availability_status' => 'available',
+        ]],
+    ])->assertRedirect();
+
+    $order = Order::query()->latest('id')->firstOrFail();
+
+    $gross = 100000.00 * 10;          // 1,000,000
+    $itemDiscount = $gross * 0.10;    // 100,000
+    $net = $gross - $itemDiscount;    // 900,000
+    $orderDiscount = $net * 0.05;     // 45,000
+
+    expect($order->subtotal)->toBe(number_format($net, 2, '.', ''))
+        ->and($order->discount_amount)->toBe(number_format($orderDiscount, 2, '.', ''));
+
+    $view = $this->actingAs($admin)->get('/orders/'.$order->getKey());
+    $view->assertOk();
+
+    // The breakdown must add up to the stored total.
+    expect((float) $order->total_amount)
+        ->toBe($net - $orderDiscount + (float) $order->tax_amount);
 });

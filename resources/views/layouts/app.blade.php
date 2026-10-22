@@ -93,6 +93,10 @@
                     <x-alert tone="error">{{ session('error') }}</x-alert>
                 @endif
 
+                @if ($errors->any())
+                    <x-alert tone="error">{{ $errors->first() }}</x-alert>
+                @endif
+
                 @yield('content')
             </main>
 

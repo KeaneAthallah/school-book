@@ -145,6 +145,7 @@ class PaymentService
         return $payment->allocations()->create([
             'invoice_id' => $invoice->getKey(),
             'amount' => $amount,
+            'receipt_number' => $this->numbers->generate('KW', 'payment_allocations', $payment->payment_date, 'receipt_number'),
         ]);
     }
 
@@ -234,6 +235,7 @@ class PaymentService
             $payment->allocations()->create([
                 'invoice_id' => $invoice->getKey(),
                 'amount' => $amount,
+                'receipt_number' => $this->numbers->generate('KW', 'payment_allocations', $payment->payment_date, 'receipt_number'),
             ]);
 
             $remaining = Money::sub($remaining, $amount);

@@ -108,6 +108,8 @@ class InvoiceController extends Controller
                         'amount' => $allocation->amount,
                         'status' => $allocation->payment?->status->value,
                         'status_label' => $allocation->payment?->status->label(),
+                        'allocation_id' => $allocation->getKey(),
+                        'receipt_number' => $allocation->receipt_number,
                     ])->values()->all(),
                 'attachments' => $invoice->attachments()->orderByDesc('id')->get()->map(fn ($attachment): array => [
                     'id' => $attachment->getKey(),

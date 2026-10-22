@@ -5,10 +5,14 @@ namespace App\Http\Controllers;
 use App\Enums\PaymentStatus;
 use App\Models\Invoice;
 use App\Models\Payment;
+use App\Models\PaymentAllocation;
 use App\Models\PaymentMethod;
 use App\Models\School;
+use App\Models\Setting;
 use App\Services\PaymentService;
 use App\Support\Money;
+use App\Support\NumberToWords;
+use App\Support\QrCode;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -27,7 +31,7 @@ class PaymentController extends Controller
             : null;
 
         $payments = Payment::query()
-            ->with(['school:id,name', 'paymentMethod:id,name'])
+            ->with(['school:id,name', 'paymentMethod:id,name', 'allocations:id,payment_id,invoice_id,amount,receipt_number'])
             ->withSum(
                 ['allocations as allocations_sum_amount' => fn (Builder $query): Builder => $query->whereHas(
                     'payment',
@@ -56,6 +60,11 @@ class PaymentController extends Controller
                 'remaining_amount' => (string) (Money::sub((string) $payment->amount, (string) ($payment->getAttribute('allocations_sum_amount') ?? '0'))),
                 'status' => $payment->status->value,
                 'status_label' => $payment->status->label(),
+                'allocations' => $payment->allocations->map(fn (PaymentAllocation $allocation): array => [
+                    'id' => $allocation->getKey(),
+                    'invoice_id' => $allocation->invoice_id,
+                    'receipt_number' => $allocation->receipt_number,
+                ])->all(),
             ]);
 
         return view('finance.payments.index', [
@@ -210,5 +219,115 @@ class PaymentController extends Controller
         $service->reverse($payment, $request->user());
 
         return back()->with('success', 'Pembayaran '.$payment->number.' dibalik.');
+    }
+
+    /**
+     * Cetak kwitansi untuk satu alokasi pembayaran pada sebuah invoice.
+     *
+     * Satu invoice dapat memiliki beberapa kwitansi bila sekolah melakukan
+     * pembayaran secara bertahap (cicilan).
+     */
+    public function receipt(Request $request, Payment $payment, PaymentAllocation $allocation): View
+    {
+        abort_unless($this->userCan($request, 'payments.view'), 403);
+        abort_unless($allocation->payment_id === $payment->getKey(), 404);
+
+        $payment->load(['school', 'allocations']);
+        $invoice = $allocation->invoice;
+        abort_if($invoice === null, 404);
+
+        $format = static fn (mixed $value): string => number_format((float) $value, 0, ',', '.');
+
+        // Sisa hutang dihitung sampai dengan pembayaran ini, sehingga kwitansi
+        // setiap cicilan tetap menampilkan sisa hutang pada saat kwitansi itu dibuat.
+        $cumulative = $this->cumulativePaid($invoice, $allocation);
+        $remaining = Money::sub($invoice->total_amount, $cumulative);
+
+        $school = $payment->school ?? $invoice->school;
+
+        $receiptNumber = $allocation->receipt_number ?? $payment->number;
+
+        return view('print.kwitansi', [
+            'payment' => $payment,
+            'allocation' => $allocation,
+            'invoice' => $invoice,
+            'school' => $school,
+            'remaining' => $remaining,
+            'format' => $format,
+            'amountInWords' => NumberToWords::rupiah($allocation->amount),
+            'payerName' => $this->payerName($school),
+            'purpose' => $this->purpose($invoice),
+            'place' => (string) Setting::value('print.receipt_city', ''),
+            'financeName' => (string) Setting::value('print.receipt_finance_name', ''),
+            'financeNip' => (string) Setting::value('print.receipt_finance_nip', ''),
+            'representativeName' => (string) Setting::value('print.receipt_representative_name', ''),
+            'representativeNik' => (string) Setting::value('print.receipt_representative_nik', ''),
+            'qrCode' => QrCode::svg(url('/kwitansi/'.$receiptNumber), 4, 1),
+        ]);
+    }
+
+    /**
+     * Total pembayaran terverifikasi pada sebuah invoice sampai dengan alokasi
+     * tertentu. Alokasi setelah ini tidak ikut dihitung, sehingga kwitansi
+     * setiap cicilan menampilkan sisa hutang pada saat kwitansi itu dibuat.
+     */
+    private function cumulativePaid(Invoice $invoice, PaymentAllocation $allocation): string
+    {
+        $allocations = PaymentAllocation::query()
+            ->where('invoice_id', $invoice->getKey())
+            ->whereHas('payment', fn (Builder $query): Builder => $query->where('status', PaymentStatus::Verified->value))
+            ->orderBy('payment_id')
+            ->orderBy('id')
+            ->get(['id', 'amount', 'payment_id']);
+
+        $paid = '0';
+
+        foreach ($allocations as $item) {
+            $paid = Money::add($paid, $item->amount);
+
+            if ($item->getKey() === $allocation->getKey()) {
+                break;
+            }
+        }
+
+        return $paid;
+    }
+
+    /**
+     * Nama penanda tangan penerimaan, mengikuti kepala sekolah.
+     */
+    private function payerName(?School $school): string
+    {
+        if ($school === null) {
+            return '-';
+        }
+
+        $principal = trim((string) $school->principal_name);
+
+        if ($principal !== '') {
+            return strtoupper($principal);
+        }
+
+        return strtoupper('Kepala Sekolah '.$school->name);
+    }
+
+    /**
+     * Keterangan "Untuk Pembayaran" pada kwitansi.
+     */
+    private function purpose(Invoice $invoice): string
+    {
+        $items = $invoice->items()->pluck('description')->filter()->unique()->take(3)->all();
+
+        if ($items === []) {
+            return 'Pembayaran Invoice '.$invoice->number;
+        }
+
+        $description = implode(', ', $items);
+
+        if ($invoice->items()->count() > count($items)) {
+            $description .= ', dan lainnya';
+        }
+
+        return strtoupper($description);
     }
 }
