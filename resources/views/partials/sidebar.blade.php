@@ -32,7 +32,7 @@
 
         ['kind' => 'group', 'label' => 'Master Data', 'icon' => 'database', 'items' => [
             ['label' => $schoolLabel, 'route' => 'master.index', 'params' => ['resource' => 'schools'], 'match' => 'master.*', 'permission' => 'schools.view'],
-            ['label' => 'Penerbit', 'route' => 'master.index', 'params' => ['resource' => 'publishers'], 'match' => 'master.*', 'permission' => 'publishers.view'],
+            ['label' => 'Penerbit/Toko', 'route' => 'master.index', 'params' => ['resource' => 'publishers'], 'match' => 'master.*', 'permission' => 'publishers.view'],
             ['label' => 'Buku', 'route' => 'master.index', 'params' => ['resource' => 'books'], 'match' => 'master.*', 'permission' => 'books.view'],
             ['label' => 'Barang Lainnya', 'route' => 'master.index', 'params' => ['resource' => 'barang-lainnya'], 'match' => 'master.*', 'permission' => 'goods.view'],
             ['label' => 'Kategori Buku', 'route' => 'master.index', 'params' => ['resource' => 'categories'], 'match' => 'master.*', 'permission' => 'categories.manage'],
@@ -65,7 +65,7 @@
 
         ['kind' => 'link', 'label' => 'Invoice', 'icon' => 'receipt', 'route' => 'invoices.index', 'match' => 'invoices.*', 'permission' => 'invoices.view'],
 
-        ['kind' => 'group', 'label' => 'Piutang', 'icon' => 'wallet', 'permission' => 'invoices.view', 'items' => [
+        ['kind' => 'group', 'label' => 'Piutang/Hutang', 'icon' => 'wallet', 'permission' => 'invoices.view', 'items' => [
             ['label' => 'Daftar Piutang', 'route' => 'receivables.index', 'match' => 'receivables.index', 'permission' => 'invoices.view'],
             ['label' => 'Barang Belum Dikirim', 'route' => 'finance.hutang.list', 'match' => 'finance.hutang.*', 'permission' => 'invoices.view'],
             ['label' => 'Jatuh Tempo', 'route' => 'receivables.index', 'query' => ['bucket' => 'overdue'], 'match' => 'receivables.index', 'permission' => 'invoices.view'],

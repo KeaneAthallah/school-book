@@ -119,7 +119,6 @@
             <div class="side">
                 <div class="place">{{ $place }}, {{ $payment->payment_date->format('d F Y') }}</div>
                 <div class="role">Rekanan,</div>
-                <div class="qr">{!! $qrCode !!}</div>
             </div>
         </div>
 

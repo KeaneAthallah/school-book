@@ -45,6 +45,15 @@
                     @endforeach
                 </x-select>
             </x-field>
+            <x-field label="Status Bayar" class="w-44">
+                <x-select name="payment_status">
+                    <option value="">Semua</option>
+                    <option value="paid" @selected($filters['payment_status'] === 'paid')>Lunas</option>
+                    <option value="partial" @selected($filters['payment_status'] === 'partial')>Sebagian</option>
+                    <option value="unpaid" @selected($filters['payment_status'] === 'unpaid')>Belum Bayar</option>
+                    <option value="no_invoice" @selected($filters['payment_status'] === 'no_invoice')>Belum Ada Invoice</option>
+                </x-select>
+            </x-field>
             <x-button type="submit" variant="secondary">Filter</x-button>
         </x-filter-bar>
 
@@ -57,7 +66,9 @@
                 ['key' => 'order_date', 'label' => 'Tanggal', 'type' => 'date'],
                 ['key' => 'school', 'label' => 'Sekolah'],
                 ['key' => 'source', 'label' => 'Sumber'],
+                ['key' => 'external_reference', 'label' => 'Referensi Eksternal'],
                 ['key' => 'status', 'label' => 'Status', 'view' => 'components.status-label'],
+                ['key' => 'payment_status', 'label' => 'Status Bayar', 'view' => 'orders.partials.payment-status'],
                 ['key' => 'items_count', 'label' => 'Item', 'align' => 'right', 'class' => 'tabular-nums'],
                 ['key' => 'total_amount', 'label' => 'Total', 'type' => 'currency', 'align' => 'right'],
             ]"

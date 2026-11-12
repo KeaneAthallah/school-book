@@ -18,7 +18,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property string|null $description
  * @property string|null $store_name
  */
-#[Fillable(['product_id', 'unit', 'description', 'store_name'])]
+#[Fillable(['product_id', 'publisher_id', 'unit', 'description', 'store_name'])]
 class Goods extends Model
 {
     /** @use HasFactory<GoodsFactory> */
@@ -30,6 +30,14 @@ class Goods extends Model
     public function product(): BelongsTo
     {
         return $this->belongsTo(Product::class);
+    }
+
+    /**
+     * @return BelongsTo<Publisher, $this>
+     */
+    public function publisher(): BelongsTo
+    {
+        return $this->belongsTo(Publisher::class);
     }
 
     protected static function booted(): void

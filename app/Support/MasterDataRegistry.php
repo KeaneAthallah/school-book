@@ -171,7 +171,7 @@ class MasterDataRegistry
     private static function publishers(): array
     {
         return [
-            ...self::base('Penerbit', Publisher::class, 'publishers.view', 'publishers.manage'),
+            ...self::base('Penerbit/Toko', Publisher::class, 'publishers.view', 'publishers.manage'),
             'search' => ['name', 'contact_person'],
             'sort' => 'name',
             'columns' => [
@@ -192,7 +192,10 @@ class MasterDataRegistry
             ],
             'rules' => fn (?Model $model): array => [
                 'name' => ['required', 'string', 'max:255'],
+                'contact_person' => ['nullable', 'string', 'max:255'],
+                'phone' => ['nullable', 'string', 'max:50'],
                 'email' => ['nullable', 'email', 'max:255'],
+                'address' => ['nullable', 'string', 'max:1000'],
                 'logo' => ['nullable', 'file', 'image', 'mimes:jpeg,jpg,png,webp', 'max:5120'],
                 'status' => ['required', Rule::in(['active', 'inactive'])],
             ],
@@ -415,7 +418,7 @@ class MasterDataRegistry
     {
         return [
             ...self::base('Barang Lainnya', Goods::class, 'goods.view', 'goods.manage'),
-            'with' => ['product'],
+            'with' => ['product', 'publisher:id,name'],
             'scope' => fn ($query) => $query->whereHas('product', fn ($q) => $q->where('type', 'goods')),
             'joins' => [['products', 'products.id', '=', 'goods.product_id']],
             'search' => ['products.code', 'products.title'],
@@ -423,6 +426,7 @@ class MasterDataRegistry
             'columns' => [
                 ['key' => 'product.code', 'label' => 'Kode'],
                 ['key' => 'product.title', 'label' => 'Nama Barang'],
+                ['key' => 'publisher.name', 'label' => 'Penerbit/Toko'],
                 ['key' => 'product.price', 'label' => 'Harga', 'type' => 'currency'],
                 ['key' => 'product.cost_price', 'label' => 'Harga Pokok', 'type' => 'currency'],
                 ['key' => 'product.status', 'label' => 'Status', 'type' => 'status'],
@@ -433,7 +437,7 @@ class MasterDataRegistry
                 ['name' => 'price', 'label' => 'Harga Jual', 'type' => 'number', 'required' => true],
                 ['name' => 'cost_price', 'label' => 'Harga Pokok', 'type' => 'number'],
                 ['name' => 'rack_location', 'label' => 'Lokasi Rak', 'type' => 'text'],
-                ['name' => 'store_name', 'label' => 'Nama Toko', 'type' => 'text'],
+                ['name' => 'publisher_id', 'label' => 'Penerbit/Toko', 'type' => 'select', 'options' => fn (): array => self::activeOptions(Publisher::class)],
                 ['name' => 'unit', 'label' => 'Satuan', 'type' => 'text'],
                 ['name' => 'status', 'label' => 'Status', 'type' => 'select', 'options' => [['value' => 'active', 'label' => 'Aktif'], ['value' => 'inactive', 'label' => 'Nonaktif']]],
             ],
@@ -443,7 +447,7 @@ class MasterDataRegistry
                 'price' => ['required', 'numeric', 'min:0'],
                 'cost_price' => ['nullable', 'numeric', 'min:0'],
                 'rack_location' => ['nullable', 'string', 'max:255'],
-                'store_name' => ['nullable', 'string', 'max:255'],
+                'publisher_id' => ['nullable', 'integer', 'exists:publishers,id'],
                 'unit' => ['nullable', 'string', 'max:255'],
                 'status' => ['required', Rule::in(['active', 'inactive'])],
             ],
@@ -456,8 +460,8 @@ class MasterDataRegistry
                     'price' => $product?->price,
                     'cost_price' => $product?->cost_price,
                     'rack_location' => $product?->rack_location,
-                    'store_name' => $goods->store_name,
-                    'unit' => $goods->unit,
+                    'publisher_id' => $goods->publisher_id,
+                'unit' => $goods->unit,
                     'status' => $product?->status,
                 ];
             },
@@ -477,7 +481,7 @@ class MasterDataRegistry
                 $goods->fill([
                     'product_id' => $product->getKey(),
                     'unit' => $attributes['unit'] ?? null,
-                    'store_name' => $attributes['store_name'] ?? null,
+                    'publisher_id' => $attributes['publisher_id'] ?? null,
                 ])->save();
 
                 return $goods;
@@ -542,6 +546,7 @@ class MasterDataRegistry
             'rules' => fn (?Model $model): array => [
                 'code' => ['required', 'string', 'max:255', Rule::unique('couriers', 'code')->ignore($model?->getKey())],
                 'name' => ['required', 'string', 'max:255'],
+                'phone' => ['nullable', 'string', 'max:50'],
                 'status' => ['required', Rule::in(['active', 'inactive'])],
             ],
         ];

@@ -5,13 +5,13 @@
 @section('content')
     <x-page-header
         title="Barang Belum Dikirim"
-        subtitle="Invoice yang sudah lunas tetapi pesanannya belum terkirim penuh."
+        subtitle="Invoice lunas yang masih memiliki sisa barang belum dikirim."
         icon="truck"
     />
 
     <x-card>
         <x-data-table
-            empty="Tidak ada invoice lunas yang belum dikirim."
+            empty="Tidak ada invoice lunas yang barangnya belum dikirim."
             empty-icon="checkCircle"
             :rows="$invoices"
             :columns="[
@@ -19,7 +19,8 @@
                 ['key' => 'order_number', 'label' => 'No. Pesanan'],
                 ['key' => 'school', 'label' => 'Sekolah'],
                 ['key' => 'paid_date', 'label' => 'Tgl Bayar', 'type' => 'date'],
-                ['key' => 'due_date', 'label' => 'Tgl Janji Kirim', 'type' => 'date'],
+                ['key' => 'due_date', 'label' => 'Jatuh Tempo', 'type' => 'date'],
+                ['key' => 'remaining_quantity', 'label' => 'Sisa Belum Kirim', 'type' => 'number', 'align' => 'right', 'class' => 'tabular-nums'],
                 ['key' => 'total_amount', 'label' => 'Nilai', 'type' => 'currency', 'align' => 'right'],
             ]"
         />

@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Enums\InvoiceStatus;
+use App\Enums\OrderStatus;
 use App\Enums\ShipmentStatus;
 use App\Models\Invoice;
 use App\Models\InvoiceItem;
@@ -66,6 +67,86 @@ class InvoiceService
             }
 
             return $this->build($locked, null, $user, $shipments->all());
+        });
+    }
+
+    /**
+     * Terbitkan invoice untuk seluruh item pesanan sebelum ada pengiriman.
+     *
+     * Dipakai ketika pesanan masih Diproses / Sebagian Ready / Ready agar
+     * sekolah dapat melakukan pelunasan lebih awal.
+     */
+    public function generateForOrderBeforeShipment(Order $order, User $user): Invoice
+    {
+        return DB::transaction(function () use ($order, $user): Invoice {
+            $locked = Order::query()->lockForUpdate()->findOrFail((int) $order->getKey());
+
+            if (! in_array($locked->status, [OrderStatus::Processing, OrderStatus::PartialReady, OrderStatus::Ready], true)) {
+                throw ValidationException::withMessages([
+                    'status' => 'Invoice hanya dapat diterbitkan sebelum pengiriman (status Diproses, Sebagian Ready, atau Ready).',
+                ]);
+            }
+
+            $locked->load('items.product:id,title');
+
+            if ($locked->items->isEmpty()) {
+                throw ValidationException::withMessages([
+                    'items' => 'Pesanan tidak memiliki item untuk diinvoice.',
+                ]);
+            }
+
+            if ($locked->items->contains(fn ($item): bool => $item->shipped_quantity > 0)) {
+                throw ValidationException::withMessages([
+                    'status' => 'Pesanan sudah memiliki barang terkirim sehingga tidak dapat diinvoice sebagai invoice pra-kirim.',
+                ]);
+            }
+
+            if ($locked->hasActiveInvoice()) {
+                throw ValidationException::withMessages([
+                    'status' => 'Pesanan ini sudah memiliki invoice aktif.',
+                ]);
+            }
+
+            $dueDays = (int) Setting::value('finance.invoice_due_days', '30');
+
+            $invoice = Invoice::query()->create([
+                'number' => $this->numbers->generate('INV', 'invoices'),
+                'order_id' => $locked->getKey(),
+                'shipment_id' => null,
+                'school_id' => $locked->school_id,
+                'invoice_date' => now()->toDateString(),
+                'due_date' => now()->addDays($dueDays)->toDateString(),
+                'status' => InvoiceStatus::Issued,
+                'subtotal' => $locked->subtotal,
+                'discount_amount' => $locked->discount_amount,
+                'discount_percent' => $locked->discount_percent,
+                'tax_amount' => $locked->tax_amount,
+                'dpp_amount' => $locked->dpp_amount,
+                'ppn_amount' => $locked->ppn_amount,
+                'pph_amount' => $locked->pph_amount,
+                'total_amount' => $locked->total_amount,
+                'paid_amount' => '0.00',
+                'created_by' => $user->getKey(),
+            ]);
+
+            foreach ($locked->items as $item) {
+                $invoice->items()->create([
+                    'order_item_id' => $item->getKey(),
+                    'shipment_item_id' => null,
+                    'product_id' => $item->product_id,
+                    'description' => $item->product?->title ?? 'Barang #'.$item->product_id,
+                    'quantity' => $item->quantity,
+                    'unit_price' => $item->unit_price,
+                    'discount_amount' => $item->discount_amount,
+                    'subtotal' => $item->subtotal,
+                ]);
+            }
+
+            $this->audit->log('invoice.issued', $invoice, 'Penerbitan invoice pra-kirim '.$invoice->number, newValues: [
+                'total_amount' => $invoice->total_amount,
+            ], user: $user);
+
+            return $invoice->refresh();
         });
     }
 
@@ -152,7 +233,9 @@ class InvoiceService
             'dpp_amount' => $dpp,
             'ppn_amount' => $ppn,
             'pph_amount' => $pph,
-            'total_amount' => Money::add($subtotal, $tax),
+            // Harga produk sudah termasuk pajak: pajak (ppn + pph) diperlakukan sebagai
+            // pengurang, sehingga total = subtotal - pajak.
+            'total_amount' => Money::sub($subtotal, $tax),
             'paid_amount' => '0.00',
             'created_by' => $user->getKey(),
         ]);
@@ -206,11 +289,21 @@ class InvoiceService
 
     private function billableQuantity(ShipmentItem $shipmentItem): int
     {
+        $orderItem = $shipmentItem->orderItem;
+
+        if ($orderItem === null) {
+            return (int) $shipmentItem->quantity;
+        }
+
+        // Hitung sisa per item pesanan, bukan per item pengiriman, agar
+        // invoice pra-kirim (qty penuh) tidak terbit dua kali saat barang dikirim.
         $invoiced = (int) InvoiceItem::query()
-            ->where('shipment_item_id', $shipmentItem->getKey())
+            ->where('order_item_id', $orderItem->getKey())
             ->whereHas('invoice', fn ($query) => $query->whereNotIn('status', [InvoiceStatus::Cancelled->value]))
             ->sum('quantity');
 
-        return max(0, $shipmentItem->quantity - $invoiced);
+        $remaining = max(0, (int) $orderItem->quantity - $invoiced);
+
+        return min((int) $shipmentItem->quantity, $remaining);
     }
 }

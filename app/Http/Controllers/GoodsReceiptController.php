@@ -6,6 +6,7 @@ use App\Enums\BackorderStatus;
 use App\Http\Requests\StoreGoodsReceiptRequest;
 use App\Models\BackorderOrder;
 use App\Models\GoodsReceipt;
+use App\Models\User;
 use App\Models\Product;
 use App\Models\Publisher;
 use App\Services\GoodsReceiptService;
@@ -180,11 +181,12 @@ class GoodsReceiptController extends Controller
         return [
             'publishers' => Publisher::query()->active()->orderBy('name')->get(['id', 'name'])
                 ->map(fn (Publisher $publisher): array => ['value' => $publisher->getKey(), 'label' => $publisher->name])->all(),
-            'products' => Product::query()->active()->orderBy('title')->get(['id', 'code', 'title', 'cost_price'])
+            'products' => Product::query()->active()->orderBy('title')->get(['id', 'code', 'title', 'cost_price', 'type'])
                 ->map(fn (Product $product): array => [
                     'value' => $product->getKey(),
                     'label' => $product->code.' - '.$product->title,
                     'cost_price' => $product->cost_price,
+                    'type' => $product->type,
                 ])->all(),
             'defaultDate' => now()->toDateString(),
         ];

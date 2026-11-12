@@ -69,6 +69,8 @@ return [
 
         'integrations.view' => ['name' => 'Lihat Integrasi', 'group' => 'Integrasi'],
         'integrations.manage' => ['name' => 'Kelola Integrasi', 'group' => 'Integrasi'],
+
+        'dev.reset' => ['name' => 'Reset Database (Dev)', 'group' => 'Sistem'],
     ],
 
     'roles' => [

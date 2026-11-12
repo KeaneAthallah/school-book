@@ -61,7 +61,7 @@ class MasterImportService
             ['name' => 'price', 'label' => 'Harga Jual', 'type' => 'price', 'required' => true],
             ['name' => 'cost_price', 'label' => 'Harga Pokok', 'type' => 'price'],
             ['name' => 'rack_location', 'label' => 'Lokasi Rak'],
-            ['name' => 'store_name', 'label' => 'Nama Toko'],
+            ['name' => 'publisher_id', 'label' => 'Penerbit/Toko', 'type' => 'publisher'],
             ['name' => 'unit', 'label' => 'Satuan'],
             ['name' => 'status', 'label' => 'Status', 'type' => 'status', 'options' => ['Aktif', 'Nonaktif']],
         ],
@@ -75,7 +75,7 @@ class MasterImportService
      */
     private const SAMPLES = [
         'books' => ['BK-001', 'Contoh Judul Buku', '978-602-1234-56-7', 'Penerbit Contoh', 'Umum', '1', 'Matematika', 'Reguler', '90000', '90000', '90000', '63000', 'A-1', 'Aktif'],
-        'barang-lainnya' => ['BRG-001', 'Contoh Barang', '50000', '35000', 'B-2', 'Toko Contoh', 'Pcs', 'Aktif'],
+        'barang-lainnya' => ['BRG-001', 'Contoh Barang', '50000', '35000', 'B-2', 'Penerbit Contoh', 'Pcs', 'Aktif'],
     ];
 
     /** @var list<string> */

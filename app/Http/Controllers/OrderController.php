@@ -5,7 +5,6 @@ namespace App\Http\Controllers;
 use App\Enums\GoodsReceiptStatus;
 use App\Enums\OrderStatus;
 use App\Enums\ShipmentStatus;
-use Illuminate\Support\Facades\DB;
 use App\Http\Requests\StoreOrderRequest;
 use App\Http\Requests\UpdateOrderRequest;
 use App\Models\Backorder;
@@ -21,6 +20,7 @@ use App\Services\PrintHeaderService;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\View\View;
 
 class OrderController extends Controller
@@ -32,9 +32,10 @@ class OrderController extends Controller
         $search = $request->string('search')->toString();
         $status = $request->string('status')->toString();
         $source = $request->string('source')->toString();
+        $paymentStatus = $request->string('payment_status')->toString();
 
         $orders = $this->scoped($request)
-            ->with(['school:id,name', 'orderSource:id,name'])
+            ->with(['school:id,name', 'orderSource:id,name', 'invoices:id,order_id,total_amount,paid_amount,status'])
             ->withCount('items')
             ->when($search !== '', function (Builder $query) use ($search): void {
                 $query->where(function (Builder $builder) use ($search): void {
@@ -54,15 +55,23 @@ class OrderController extends Controller
                 'order_date' => $order->order_date->toDateString(),
                 'school' => $order->school?->name,
                 'source' => $order->orderSource?->name,
+                'external_reference' => $order->external_reference,
                 'status' => $order->status->value,
                 'status_label' => $order->status->label(),
                 'items_count' => (int) $order->getAttribute('items_count'),
                 'total_amount' => $order->total_amount,
+                'payment_status' => $this->paymentStatus($order),
             ]);
+
+        if ($paymentStatus !== '') {
+            $orders->setCollection(
+                $orders->getCollection()->filter(fn (array $row): bool => ($row['payment_status'] ?? '') === $paymentStatus)->values()
+            );
+        }
 
         return view('orders.index', [
             'orders' => $orders,
-            'filters' => ['search' => $search, 'status' => $status, 'source' => $source],
+            'filters' => ['search' => $search, 'status' => $status, 'source' => $source, 'payment_status' => $paymentStatus],
             'statuses' => collect(OrderStatus::cases())
                 ->map(fn (OrderStatus $case): array => ['value' => $case->value, 'label' => $case->label()])
                 ->all(),
@@ -185,8 +194,12 @@ class OrderController extends Controller
                     && ! in_array($order->status->value, ['cancelled', 'fully_shipped', 'completed'], true),
                 'ship' => ($this->userCan($request, 'shipments.manage'))
                     && (int) $order->items->sum('reserved_quantity') > 0,
-                'invoice' => ($this->userCan($request, 'invoices.manage'))
-                    && $order->shipments->contains(fn ($shipment): bool => in_array($shipment->status->value, ['shipped', 'delivered'], true)),
+                'invoice' => ($this->userCan($request, 'invoices.issue'))
+                    && $order->shipments->contains(fn ($shipment): bool => in_array($shipment->status->value, ['shipped', 'delivered'], true))
+                    && $order->uninvoicedQuantity() > 0,
+                'invoice_pre_shipment' => ($this->userCan($request, 'invoices.issue'))
+                    && in_array($order->status, [OrderStatus::Processing, OrderStatus::PartialReady, OrderStatus::Ready], true)
+                    && ! $order->hasActiveInvoice(),
             ],
         ]);
     }
@@ -277,24 +290,24 @@ class OrderController extends Controller
     }
 
     public function printSurat(Request $request, Order $order, PrintHeaderService $headers): View
-{
-    abort_unless($this->userCan($request, 'orders.view'), 403);
-    $this->authorizeSchoolAccess($request->user(), $order);
+    {
+        abort_unless($this->userCan($request, 'orders.view'), 403);
+        $this->authorizeSchoolAccess($request->user(), $order);
 
-    $order->load([
-        'school',
-        'orderSource:id,name',
-        'items' => fn ($query) => $query->with('product:id,code,title', 'product.book.publisher:id,name')->orderBy('id'),
-    ]);
+        $order->load([
+            'school',
+            'orderSource:id,name',
+            'items' => fn ($query) => $query->with('product:id,code,title', 'product.book.publisher:id,name')->orderBy('id'),
+        ]);
 
-    return view('print.order-surat', [
-        'order' => $order,
-        'company' => $headers->resolve(),
-        'operatorName' => $request->user()?->name,
-    ]);
-}
+        return view('print.order-surat', [
+            'order' => $order,
+            'company' => $headers->resolve(),
+            'operatorName' => $request->user()?->name,
+        ]);
+    }
 
-private function availableStockByProduct(array $productIds): array
+    private function availableStockByProduct(array $productIds): array
     {
         if ($productIds === []) {
             return [];

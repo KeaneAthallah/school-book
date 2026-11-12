@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\BookCategory;
+use App\Models\User;
 use App\Models\Product;
 use App\Models\ProductCatalog;
 use App\Models\Publisher;

@@ -6,6 +6,7 @@ use App\Dashboard\DashboardScope;
 use App\Dashboard\Kpi;
 use App\Dashboard\Period;
 use App\Enums\OrderStatus;
+use App\Models\Invoice;
 use App\Models\User;
 
 /**
@@ -49,6 +50,9 @@ class AdminDashboardService extends RoleDashboard
                 Kpi::number('Menunggu Stok', $this->metrics->ordersWithStatus([
                     OrderStatus::Processing->value,
                 ], $scope), 'clock', 'amber'),
+                Kpi::number('Barang Belum Dikirim', Invoice::paidNotShipped()->count(), 'truck', 'sky', [
+                    'hint' => 'invoice lunas',
+                ]),
                 Kpi::number('Dalam Pengiriman', $inTransit, 'truck', 'sky'),
                 Kpi::money('Total Invoice', $invoiced, 'receipt', 'brand', [
                     'delta' => Kpi::delta((float) $invoiced, (float) $invoicedPrevious),

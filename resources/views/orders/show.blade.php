@@ -43,6 +43,15 @@
                 <x-button :href="route('shipments.create', ['order_id' => $order['id']])" variant="secondary">Buat Pengiriman</x-button>
             @endif
 
+            @if ($can['invoice_pre_shipment'])
+                <form method="POST" action="{{ route('invoices.store') }}" x-data x-on:submit="if (! confirm('Terbitkan invoice untuk seluruh pesanan ini? Invoice dapat dilunasi sebelum barang dikirim.')) $event.preventDefault()">
+                    @csrf
+                    <input type="hidden" name="order_id" value="{{ $order['id'] }}" />
+                    <input type="hidden" name="mode" value="pre_shipment" />
+                    <x-button type="submit" variant="secondary">Terbitkan Invoice</x-button>
+                </form>
+            @endif
+
             @if ($can['invoice'])
                 <form method="POST" action="{{ route('invoices.store') }}">
                     @csrf
@@ -101,7 +110,7 @@
                     <div class="flex justify-between px-4 py-2"><dt class="text-ink-soft">Diskon Item</dt><dd class="text-ink tabular-nums">− {{ Format::idr($order['item_discount_amount']) }}</dd></div>
                 @endif
                 <div class="flex justify-between px-4 py-2"><dt class="text-ink-soft">Diskon Pesanan</dt><dd class="text-ink tabular-nums">− {{ Format::idr($order['discount_amount']) }}</dd></div>
-                <div class="flex justify-between px-4 py-2"><dt class="text-ink-soft">Pajak</dt><dd class="text-ink tabular-nums">{{ Format::idr($order['tax_amount']) }}</dd></div>
+                <div class="flex justify-between px-4 py-2"><dt class="text-ink-soft">Pajak</dt><dd class="text-ink tabular-nums">− {{ Format::idr($order['tax_amount']) }}</dd></div>
                 <div class="flex justify-between px-4 py-2 font-semibold"><dt class="text-ink">Total</dt><dd class="text-ink tabular-nums">{{ Format::idr($order['total_amount']) }}</dd></div>
             </dl>
         </x-card>

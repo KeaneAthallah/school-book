@@ -118,12 +118,7 @@ $backorderMode = ! empty($prefillItems ?? []);
                         </x-field>
 
                         <x-field label="Harga Pokok">
-                            @if ($backorderMode)
-                                <div class="rounded-control border border-line-strong bg-panel px-3 py-2 text-sm text-ink">@{{ item.unit_cost }}</div>
-                                <input type="hidden" x-bind:name="`items[${index}][unit_cost]`" x-model="item.unit_cost" />
-                            @else
-                                <x-input type="number" step="any" x-model="item.unit_cost" x-bind:name="`items[${index}][unit_cost]`" />
-                            @endif
+                            <x-input type="number" step="any" x-model="item.unit_cost" x-bind:name="`items[${index}][unit_cost]`" />
                         </x-field>
 
                         <div class="flex items-end">

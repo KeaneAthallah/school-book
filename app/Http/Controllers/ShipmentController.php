@@ -3,16 +3,20 @@
 namespace App\Http\Controllers;
 
 use App\Enums\OrderStatus;
+use App\Enums\PickingStatus;
 use App\Enums\ShipmentStatus;
 use App\Models\Courier;
 use App\Models\Order;
+use App\Models\Picking;
 use App\Models\Shipment;
 use App\Models\ShippingMethod;
+use App\Models\User;
 use App\Services\PrintHeaderService;
 use App\Services\ShipmentService;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\View\View;
 
@@ -161,7 +165,10 @@ class ShipmentController extends Controller
                 'attach' => $this->userCan($request, 'shipments.confirm'),
                 'manage_attachments' => $this->userCan($request, 'shipments.manage'),
                 'deliver' => ($this->userCan($request, 'shipments.confirm')) && $shipment->status->value === 'shipped',
-                'invoice' => ($this->userCan($request, 'invoices.manage')) && in_array($shipment->status->value, ['shipped', 'delivered'], true),
+                'invoice' => ($this->userCan($request, 'invoices.issue'))
+                    && in_array($shipment->status->value, ['shipped', 'delivered'], true)
+                    && $shipment->order !== null
+                    && $shipment->order->uninvoicedQuantity() > 0,
             ],
         ]);
     }
@@ -239,8 +246,8 @@ class ShipmentController extends Controller
      */
     private function shippableOrders(): array
     {
-        $existingPickingOrderIds = \App\Models\Picking::query()
-            ->whereIn('status', [\App\Enums\PickingStatus::Draft->value, \App\Enums\PickingStatus::Picking->value, \App\Enums\PickingStatus::Picked->value])
+        $existingPickingOrderIds = Picking::query()
+            ->whereIn('status', [PickingStatus::Draft->value, PickingStatus::Picking->value, PickingStatus::Picked->value])
             ->pluck('order_id')
             ->all();
 

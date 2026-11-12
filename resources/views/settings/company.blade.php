@@ -110,6 +110,13 @@
                     <x-input type="time" name="work_default_end" :value="$value('work_default_end')" :invalid="$errors->has('work_default_end')" />
                 </x-field>
             </div>
+            <div class="px-4 pb-4">
+                <label class="flex items-center gap-2 text-sm text-ink">
+                    <input type="checkbox" name="work_enabled" value="1" @checked($value('work_enabled') !== '0' && $value('work_enabled') !== 'false') class="rounded border-line-strong bg-panel text-brand-600 focus:ring-brand-500" />
+                    Aktifkan pembatasan jam kerja
+                </label>
+                <p class="mt-1 text-xs text-ink-soft">Jika nonaktif, semua akun dapat mengakses tanpa batasan jam kerja.</p>
+            </div>
         </x-card>
 
         <x-card>

@@ -24,6 +24,7 @@
                     <x-button type="submit">Konfirmasi</x-button>
                 </form>
             @endif
+
         </x-slot:actions>
     </x-page-header>
 

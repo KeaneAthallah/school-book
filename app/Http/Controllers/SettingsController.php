@@ -32,6 +32,7 @@ class SettingsController extends Controller
                 'receipt_representative_nik' => (string) Setting::value('print.receipt_representative_nik', ''),
                 'work_default_start' => (string) Setting::value('work.default_start', '08:00'),
             'work_default_end' => (string) Setting::value('work.default_end', '17:00'),
+            'work_enabled' => (string) Setting::value('work.enabled', '1'),
                 'goods_tax_rate' => (string) Setting::value('finance.goods_tax_rate', '2'),
                 'ppn_rate' => (string) Setting::value('finance.ppn_rate', '12'),
             ],
@@ -120,6 +121,7 @@ class SettingsController extends Controller
         $this->put('print.receipt_representative_nik', $validated['receipt_representative_nik'] ?? '', 'print');
         $this->put('work.default_start', $validated['work_default_start'] ?? '08:00', 'work');
         $this->put('work.default_end', $validated['work_default_end'] ?? '17:00', 'work');
+        $this->put('work.enabled', $request->boolean('work_enabled') ? '1' : '0', 'work');
         $bookRate = ($validated['book_tax_rate'] ?? null) === null ? '0.5' : (string) $validated['book_tax_rate'];
         $goodsRate = ($validated['goods_tax_rate'] ?? null) === null ? '2' : (string) $validated['goods_tax_rate'];
         $ppnRate = ($validated['ppn_rate'] ?? null) === null ? '12' : (string) $validated['ppn_rate'];

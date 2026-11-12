@@ -27,6 +27,7 @@
         ['label' => 'Data Buku', 'icon' => 'book', 'route' => 'master.index', 'params' => ['resource' => 'books'], 'permission' => 'books.view'],
         ['label' => 'Konfigurasi', 'icon' => 'settings', 'route' => 'master.index', 'params' => ['resource' => 'settings'], 'permission' => 'settings.manage'],
         ['label' => 'Audit Log', 'icon' => 'fileText', 'route' => 'audit.index', 'permission' => 'audit.view'],
+        ['label' => 'Barang Belum Dikirim', 'icon' => 'truck', 'route' => 'finance.hutang.list', 'permission' => 'invoices.view'],
         ['label' => 'Integrasi', 'icon' => 'bolt', 'route' => 'integrations.index', 'permission' => 'integrations.view'],
         ['label' => 'Laporan', 'icon' => 'chart', 'route' => 'reports.index', 'permission' => 'reports.view'],
     ]])

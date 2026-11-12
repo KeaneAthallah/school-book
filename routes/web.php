@@ -5,6 +5,7 @@ use App\Http\Controllers\AuditLogController;
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use App\Http\Controllers\BackorderController;
 use App\Http\Controllers\CatalogController;
+use App\Http\Controllers\DevResetController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\GoodsReceiptController;
 use App\Http\Controllers\HomeController;
@@ -177,4 +178,10 @@ Route::middleware('auth')->group(function (): void {
     // Integrations.
     Route::get('integrations', [IntegrationController::class, 'index'])->name('integrations.index');
     Route::post('integrations/{source}/sync', [IntegrationController::class, 'sync'])->name('integrations.sync');
+
+    // Dev-only database reset tool (local/testing/dev environments only).
+    if (app()->environment(['local', 'development', 'dev', 'testing'])) {
+        Route::get('dev/reset', [DevResetController::class, 'show'])->name('dev.reset.show');
+        Route::post('dev/reset', [DevResetController::class, 'reset'])->name('dev.reset');
+    }
 });

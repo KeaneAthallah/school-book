@@ -6,6 +6,7 @@ use App\Dashboard\DashboardScope;
 use App\Dashboard\Kpi;
 use App\Dashboard\Period;
 use App\Enums\OrderStatus;
+use App\Models\Invoice;
 use App\Models\User;
 
 /**
@@ -57,6 +58,9 @@ class FinanceDashboardService extends RoleDashboard
                     'delta' => Kpi::delta((float) $paid, (float) $paidPrevious),
                 ]),
                 Kpi::money('Piutang', $this->metrics->outstandingTotal($scope), 'fileText', 'amber'),
+                Kpi::number('Barang Belum Dikirim', Invoice::paidNotShipped()->count(), 'truck', 'sky', [
+                    'hint' => 'invoice lunas',
+                ]),
                 Kpi::money('Jatuh Tempo', $overdueTotal, 'alert', 'rose', [
                     'valueTone' => (float) $overdueTotal > 0 ? 'rose' : 'default',
                     'hint' => $overdueCount.' invoice',

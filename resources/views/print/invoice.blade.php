@@ -145,11 +145,11 @@
                 <tr><td>Subtotal</td><td>{{ $format($invoice->subtotal) }}</td></tr>
                 <tr><td>Diskon</td><td>{{ $money($invoice->discount_amount) }}</td></tr>
                 @if ((float) $invoice->ppn_amount > 0)
-                    <tr><td>PPN</td><td>{{ $money($invoice->ppn_amount) }}</td></tr>
+                    <tr><td>PPN</td><td>− {{ $money($invoice->ppn_amount) }}</td></tr>
                 @endif
-                <tr><td>PPh</td><td>{{ $money($invoice->pph_amount) }}</td></tr>
+                <tr><td>PPh</td><td>− {{ $money($invoice->pph_amount) }}</td></tr>
                 <tr class="total"><td>Total</td><td>{{ $format($invoice->total_amount) }}</td></tr>
-                <tr><td>Uang Muka</td><td>{{ $money($invoice->paid_amount) }}</td></tr>
+                <tr><td>Dibayar</td><td>{{ $money($invoice->paid_amount) }}</td></tr>
                 <tr class="grand"><td>Sisa Yang Di Bayar</td><td>{{ $format($invoice->outstandingAmount()) }}</td></tr>
             </table>
         </div>

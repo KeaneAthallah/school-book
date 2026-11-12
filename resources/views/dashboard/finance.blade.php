@@ -24,6 +24,7 @@
         ['label' => 'Catat Pembayaran', 'icon' => 'wallet', 'route' => 'payments.index', 'permission' => 'payments.manage'],
         ['label' => 'Verifikasi Pembayaran', 'icon' => 'checkCircle', 'route' => 'payments.index', 'permission' => 'payments.verify'],
         ['label' => 'Piutang', 'icon' => 'fileText', 'route' => 'receivables.index', 'permission' => 'invoices.view'],
+        ['label' => 'Barang Belum Dikirim', 'icon' => 'truck', 'route' => 'finance.hutang.list', 'permission' => 'invoices.view'],
         ['label' => 'Piutang Jatuh Tempo', 'icon' => 'alert', 'route' => 'receivables.index', 'params' => ['bucket' => 'overdue'], 'permission' => 'invoices.view'],
         ['label' => 'Rebate / Cashback', 'icon' => 'percent', 'route' => 'rebates.index', 'permission' => 'rebates.view'],
         ['label' => 'Laporan', 'icon' => 'chart', 'route' => 'reports.index', 'permission' => 'reports.view'],
@@ -73,6 +74,7 @@
 
             @include('dashboard.partials.overdue-invoice-table', ['rows' => $data['overdue_invoices']])
         </x-card>
+
     </div>
 
     <div class="mt-4 grid gap-4 xl:grid-cols-2">

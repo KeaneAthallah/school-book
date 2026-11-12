@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Enums\BackorderStatus;
 use App\Models\Backorder;
 use App\Models\BackorderOrder;
+use App\Models\User;
 use App\Models\BackorderOrderItem;
 use App\Models\OrderItem;
 use App\Models\Publisher;
@@ -43,19 +44,24 @@ class BackorderController extends Controller
             ->orderByDesc('id')
             ->paginate(10, ['*'], 'orders_page')
             ->withQueryString()
-            ->through(fn (BackorderOrder $order): array => [
-                'id' => $order->getKey(),
-                'publisher' => $order->publisher?->name,
-                'number' => $order->number,
-                'status' => $order->items->isNotEmpty() && $order->items->every(fn ($i) => $i->backorder?->status === BackorderStatus::Fulfilled)
-                    ? 'received'
-                    : ($order->items->contains(fn ($i) => $i->backorder?->status === BackorderStatus::Fulfilled || $i->backorder?->status === BackorderStatus::Partial) ? 'partial' : $order->status),
-                'status_label' => $order->items->isNotEmpty() && $order->items->every(fn ($i) => $i->backorder?->status === BackorderStatus::Fulfilled)
-                    ? 'Diterima'
-                    : ($order->items->contains(fn ($i) => $i->backorder?->status === BackorderStatus::Fulfilled || $i->backorder?->status === BackorderStatus::Partial) ? 'Sebagian Terpenuhi' : ($order->status === 'received' ? 'Diterima' : 'Menunggu')),
-                'ordered_at' => $order->ordered_at?->format('d/m/Y'),
-                'items_count' => $order->items->count(),
-            ]);
+            ->through(function (BackorderOrder $order): array {
+                $received = $order->items->isNotEmpty() && $order->items->every(fn ($i) => $i->backorder?->status === BackorderStatus::Fulfilled);
+                return [
+                    'id' => $order->getKey(),
+                    'publisher' => $order->publisher?->name,
+                    'number' => $order->number,
+                    'status' => $received
+                        ? 'received'
+                        : ($order->items->contains(fn ($i) => $i->backorder?->status === BackorderStatus::Fulfilled || $i->backorder?->status === BackorderStatus::Partial) ? 'partial' : $order->status),
+                    'status_label' => $received
+                        ? 'Diterima'
+                        : ($order->items->contains(fn ($i) => $i->backorder?->status === BackorderStatus::Fulfilled || $i->backorder?->status === BackorderStatus::Partial) ? 'Sebagian Terpenuhi' : ($order->status === 'received' ? 'Diterima' : 'Menunggu')),
+                    'ordered_at' => $order->ordered_at?->format('d/m/Y'),
+                    // Tanggal diterima: gunakan updated_at saat status sudah diterima (tanpa ubah struktur DB).
+                    'received_at' => $received ? $order->updated_at?->format('d/m/Y') : '-',
+                    'items_count' => $order->items->count(),
+                ];
+            });
 
         $openBackorders = Backorder::query()
             ->with(['product:id,title', 'orderItem.order:id,number,school_id', 'orderItem.order.school:id,name', 'orderItems.order'])

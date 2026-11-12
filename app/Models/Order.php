@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Enums\InvoiceStatus;
 use App\Enums\OrderStatus;
 use App\Enums\ShipmentStatus;
 use App\Support\Money;
@@ -168,6 +169,37 @@ class Order extends Model
     {
         return Money::compare($this->totalInvoiceAmount(), '0') > 0
             && Money::compare($this->paidAmount(), $this->totalInvoiceAmount()) >= 0;
+    }
+
+    /**
+     * Pesanan sudah memiliki invoice yang masih berlaku.
+     */
+    public function hasActiveInvoice(): bool
+    {
+        return $this->invoices()
+            ->whereNotIn('status', [InvoiceStatus::Cancelled->value])
+            ->exists();
+    }
+
+    /**
+     * Sisa kuantitas pesanan yang belum pernah diinvoice.
+     */
+    public function uninvoicedQuantity(): int
+    {
+        $ordered = (int) $this->items()->sum('quantity');
+
+        if ($ordered <= 0) {
+            return 0;
+        }
+
+        $invoiced = (int) InvoiceItem::query()
+            ->whereHas('invoice', function (Builder $invoice): void {
+                $invoice->where('order_id', $this->getKey())
+                    ->whereNotIn('status', [InvoiceStatus::Cancelled->value]);
+            })
+            ->sum('quantity');
+
+        return max(0, $ordered - $invoiced);
     }
 
     public function hasUnshippedDelivered(): bool

@@ -155,6 +155,12 @@ class OrderService
                 ]);
             }
 
+            if ($locked->hasActiveInvoice()) {
+                throw ValidationException::withMessages([
+                    'status' => 'Pesanan memiliki invoice aktif. Batalkan invoice terlebih dahulu sebelum mengembalikan ke Draft.',
+                ]);
+            }
+
             $locked->load('items');
 
             foreach ($locked->items as $item) {
@@ -187,6 +193,12 @@ class OrderService
 
             if ($locked->status === OrderStatus::Cancelled) {
                 return $locked;
+            }
+
+            if ($locked->hasActiveInvoice()) {
+                throw ValidationException::withMessages([
+                    'status' => 'Pesanan memiliki invoice aktif. Batalkan invoice terlebih dahulu sebelum membatalkan pesanan.',
+                ]);
             }
 
             if ($locked->items()->where('shipped_quantity', '>', 0)->exists()) {
@@ -279,7 +291,7 @@ class OrderService
         }
     }
 
-    private function recalculate(Order $order, ?string $taxAmount): void
+    public function recalculate(Order $order, ?string $taxAmount): void
     {
         $order->load('items.product:products.id,type');
 
@@ -313,7 +325,9 @@ class OrderService
             [$dpp, $ppn, $pph] = [$calc['dpp'], $calc['ppn'], $calc['pph']];
         }
 
-        $total = Money::add(Money::sub(Money::add($subtotal, $ppn), $discount), $pph);
+        // Harga produk sudah termasuk pajak: pajak (ppn + pph) diperlakukan sebagai
+        // pengurang, sehingga total = subtotal - diskon - pajak.
+        $total = Money::sub(Money::sub($subtotal, $discount), $tax);
 
         $order->forceFill([
             'subtotal' => $subtotal,

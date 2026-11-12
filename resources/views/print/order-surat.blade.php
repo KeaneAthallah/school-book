@@ -130,7 +130,7 @@
             <table>
                 <tr><td>Subtotal</td><td>{{ \App\Support\Format::idr($order->subtotal) }}</td></tr>
                 <tr><td>Diskon</td><td>{{ \App\Support\Format::idr($order->discount_amount) }}</td></tr>
-                <tr><td>Pajak</td><td>{{ \App\Support\Format::idr($order->tax_amount) }}</td></tr>
+                <tr><td>Pajak</td><td>− {{ \App\Support\Format::idr($order->tax_amount) }}</td></tr>
                 <tr class="total"><td>Total</td><td>{{ \App\Support\Format::idr($order->total_amount) }}</td></tr>
             </table>
         </div>

@@ -4,7 +4,6 @@ namespace App\Models;
 
 use App\Enums\InvoicePaymentStatus;
 use App\Enums\InvoiceStatus;
-use App\Enums\ShipmentStatus;
 use App\Support\Money;
 use Database\Factories\InvoiceFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
@@ -153,23 +152,19 @@ class Invoice extends Model
     }
 
     /**
+     * Invoice lunas yang order-nya masih memiliki sisa barang belum dikirim.
+     *
      * @param  Builder<Invoice>  $query
      * @return Builder<Invoice>
      */
     public function scopePaidNotShipped(Builder $query): Builder
     {
-        return $query->whereColumn('paid_amount', '>=', 'total_amount')
+        return $query
+            ->whereNotIn('status', [InvoiceStatus::Cancelled->value, InvoiceStatus::Draft->value])
+            ->whereColumn('paid_amount', '>=', 'total_amount')
             ->where('total_amount', '>', 0)
-            ->where(function ($q): void {
-                $q->whereDoesntHave('order')
-                    ->orWhereHas('order', function ($o): void {
-                        $o->whereDoesntHave('shipments', function ($s): void {
-                            $s->whereIn('status', [
-                                ShipmentStatus::Shipped->value,
-                                ShipmentStatus::Delivered->value,
-                            ]);
-                        });
-                    });
+            ->whereHas('order.items', function (Builder $items): void {
+                $items->whereColumn('shipped_quantity', '<', 'quantity');
             });
     }
 

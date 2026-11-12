@@ -10,6 +10,7 @@ use App\Models\PaymentMethod;
 use App\Models\School;
 use App\Models\Setting;
 use App\Services\PaymentService;
+use Illuminate\Support\Facades\DB;
 use App\Support\Money;
 use App\Support\NumberToWords;
 use App\Support\QrCode;

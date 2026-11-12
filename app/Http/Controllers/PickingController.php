@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Enums\PickingStatus;
 use App\Models\Order;
 use App\Models\Picking;
+use App\Models\User;
 use App\Services\FulfillmentService;
 use App\Services\PrintHeaderService;
 use Illuminate\Database\Eloquent\Builder;

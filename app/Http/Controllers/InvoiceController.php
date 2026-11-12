@@ -7,11 +7,13 @@ use App\Enums\PaymentStatus;
 use App\Models\Invoice;
 use App\Models\Order;
 use App\Models\Shipment;
+use App\Models\User;
 use App\Services\InvoiceService;
 use App\Services\PrintHeaderService;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\View\View;
 
@@ -133,11 +135,15 @@ class InvoiceController extends Controller
         $validated = $request->validate([
             'shipment_id' => ['nullable', 'integer', 'exists:shipments,id', 'required_without:order_id'],
             'order_id' => ['nullable', 'integer', 'exists:orders,id', 'required_without:shipment_id'],
+            'mode' => ['nullable', 'string', 'in:pre_shipment'],
         ]);
 
         if ($request->filled('shipment_id')) {
             $shipment = Shipment::query()->findOrFail((int) $validated['shipment_id']);
             $invoice = $service->generateForShipment($shipment, $request->user());
+        } elseif (($validated['mode'] ?? null) === 'pre_shipment') {
+            $order = Order::query()->findOrFail((int) $validated['order_id']);
+            $invoice = $service->generateForOrderBeforeShipment($order, $request->user());
         } else {
             $order = Order::query()->findOrFail((int) $validated['order_id']);
             $invoice = $service->generateForOrder($order, $request->user());
@@ -187,7 +193,12 @@ class InvoiceController extends Controller
         abort_unless($this->userCan($request, 'invoices.view'), 403);
 
         $invoices = Invoice::query()
-            ->with(['school:id,name', 'order:id,number'])
+            ->with([
+                'school:id,name',
+                'order:id,number',
+                'order.items:id,order_id,quantity,shipped_quantity',
+                'allocations.payment:id,payment_date,status',
+            ])
             ->paidNotShipped()
             ->orderByDesc('invoice_date')
             ->get()
@@ -196,14 +207,29 @@ class InvoiceController extends Controller
                 'number' => $invoice->number,
                 'order_number' => $invoice->order?->number,
                 'school' => $invoice->school?->name,
-                'paid_date' => $invoice->invoice_date->toDateString(),
+                'paid_date' => $this->lastVerifiedPaymentDate($invoice),
                 'due_date' => $invoice->due_date->toDateString(),
+                'remaining_quantity' => (int) ($invoice->order?->items->sum(
+                    fn ($item): int => $item->outstandingQuantity(),
+                ) ?? 0),
                 'total_amount' => $invoice->total_amount,
             ])->all();
 
         return view('finance.receivables.hutang', [
             'invoices' => $invoices,
         ]);
+    }
+
+    private function lastVerifiedPaymentDate(Invoice $invoice): ?string
+    {
+        $date = $invoice->allocations
+            ->filter(fn ($allocation): bool => $allocation->payment?->status === PaymentStatus::Verified)
+            ->map(fn ($allocation) => $allocation->payment?->payment_date)
+            ->filter()
+            ->sortDesc()
+            ->first();
+
+        return $date?->toDateString();
     }
 
     public function print(Request $request, Invoice $invoice, PrintHeaderService $headers): View

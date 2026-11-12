@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Attachment;
 use App\Models\Invoice;
+use App\Models\User;
 use App\Models\Shipment;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;

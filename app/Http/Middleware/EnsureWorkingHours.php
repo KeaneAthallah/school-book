@@ -18,6 +18,10 @@ class EnsureWorkingHours
             return $next($request);
         }
 
+        if (Setting::value('work.enabled', '1') !== '1') {
+            return $next($request);
+        }
+
         if ($user === null || $user->isAdmin()) {
             return $next($request);
         }
